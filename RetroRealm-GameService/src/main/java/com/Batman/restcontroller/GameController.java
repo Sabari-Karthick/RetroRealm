@@ -67,5 +67,11 @@ public class GameController {
 		return ResponseEntity.ok(gameService.getTotalCostOfGames(gameIds));
 	}
 	
+	
+	@GetMapping("/search")
+	public ResponseEntity<?> findGamesWithPrefix(@RequestParam("name") String gamePrefix) {
+		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gamePrefix));
+	}
+	
 
 }

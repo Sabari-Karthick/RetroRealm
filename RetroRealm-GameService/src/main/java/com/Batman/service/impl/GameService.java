@@ -19,6 +19,7 @@ import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.mapper.CommonMapper;
+import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
@@ -67,6 +68,12 @@ public class GameService implements IGameService{
 			throw new GameNotFoundException("WRONG_GAME_ID_INFO");
 		}
 		return games.stream().mapToDouble(Game::getGamePrice).sum();
+	}
+
+	@Override
+	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
+		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix,GameName.class);
+		return games;
 	}
 
 }
