@@ -65,7 +65,7 @@ public class GameService implements IGameService{
 	public Double getTotalCostOfGames(Set<Integer> gameIds) {
 		List<Game> games = gameRepository.findAllById(gameIds);
 		if(games.isEmpty()) {
-			throw new GameNotFoundException("WRONG_GAME_ID_INFO");
+			return 0.0;
 		}
 		return games.stream().mapToDouble(Game::getGamePrice).sum();
 	}

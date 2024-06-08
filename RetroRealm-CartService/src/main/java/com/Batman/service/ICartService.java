@@ -9,4 +9,5 @@ public interface ICartService {
        Cart addToCart(CartRequestDto cartRequest,BindingResult bindingResult);
        Cart getCartOfUser(Integer userId);
        Cart removeItemFromCart(Integer userId,Integer gameId);
+       Cart updateSelectedItemsCart(Integer userId,Integer gameId);
 }

@@ -38,6 +38,10 @@ public class Cart {
 	@CollectionTable(name = "cart_items",joinColumns = @JoinColumn(name="cart_id",referencedColumnName = "cartId"))
 	private Set<Integer> cartItems;
 	
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "selected_cart_items",joinColumns = @JoinColumn(name="cart_id",referencedColumnName = "cartId"))
+	private Set<Integer> selectedCartItems;
+	
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
 

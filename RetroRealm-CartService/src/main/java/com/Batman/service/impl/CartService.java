@@ -25,9 +25,8 @@ public class CartService implements ICartService {
 
 	private final ICartRespository cartRepository;
 
-	
 	private final GameFeignClinet gameFeignClinet;
-	
+
 	@Override
 	public Cart addToCart(CartRequestDto cartRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -42,17 +41,21 @@ public class CartService implements ICartService {
 		if (userCartOptional.isPresent()) {
 			cart = userCartOptional.get();
 			Set<Integer> cartItems = cart.getCartItems();
+			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
 			if (!cartItems.contains(newCartItem)) {
 				cartItems.add(newCartItem);
+				selectedCartItems.add(newCartItem);
 				cart.setCartItems(cartItems);
+				cart.setSelectedCartItems(selectedCartItems);
 				cart.setTotalPrice(calculatePrice(cartItems));
 				return cartRepository.save(cart);
 			}
 		} else {
 			Set<Integer> cartItems = new HashSet<>();
+			Set<Integer> selectedCartItems = new HashSet<>();
 			cartItems.add(newCartItem);
-
-			cart = Cart.builder().userId(userId).cartItems(cartItems).totalPrice(calculatePrice(cartItems)).build();
+			selectedCartItems.add(newCartItem);
+			cart = Cart.builder().userId(userId).cartItems(cartItems).selectedCartItems(selectedCartItems).totalPrice(calculatePrice(selectedCartItems)).build();
 			return cartRepository.save(cart);
 		}
 		return userCartOptional.get();
@@ -72,10 +75,15 @@ public class CartService implements ICartService {
 		if (userCartOptional.isPresent()) {
 			cart = userCartOptional.get();
 			Set<Integer> cartItems = cart.getCartItems();
+			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
 			if (cartItems.contains(gameId)) {
+				if(selectedCartItems.contains(gameId)) {
+					selectedCartItems.remove(gameId);
+					cart.setSelectedCartItems(selectedCartItems);
+				}
 				cartItems.remove(gameId);
 				cart.setCartItems(cartItems);
-				cart.setTotalPrice(calculatePrice(cartItems));
+				cart.setTotalPrice(calculatePrice(selectedCartItems));
 				return cartRepository.save(cart);
 			}
 		} else {
@@ -83,9 +91,34 @@ public class CartService implements ICartService {
 		}
 		return userCartOptional.get();
 	}
-	
+
 	private Double calculatePrice(Set<Integer> gameIds) {
 		return gameFeignClinet.getTotalPrice(gameIds);
+	}
+
+	@Override
+	public Cart updateSelectedItemsCart(Integer userId, Integer gameId) {
+		Optional<Cart> userCartOptional = cartRepository.findByUserId(userId);
+		Cart cart;
+		if (userCartOptional.isPresent()) {
+			cart = userCartOptional.get();
+			Set<Integer> cartItems = cart.getCartItems();
+			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
+			if (cartItems.contains(gameId)) {
+				if(selectedCartItems.contains(gameId)) {
+					selectedCartItems.remove(gameId);
+					cart.setSelectedCartItems(selectedCartItems);
+				}else {
+					selectedCartItems.add(gameId);
+					cart.setSelectedCartItems(selectedCartItems);
+				}
+				cart.setTotalPrice(calculatePrice(selectedCartItems));
+				return cartRepository.save(cart);
+			}
+		} else {
+			throw new NoCartAvailableException("USER_CART_IS_EMPTY");
+		}
+		return userCartOptional.get();
 	}
 
 }

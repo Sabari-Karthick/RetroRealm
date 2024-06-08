@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -43,6 +45,11 @@ public class CartController {
 		return ResponseEntity.ok(cartService.removeItemFromCart(userId,gameId));
 	}
 	
+	
+	@PutMapping("user/{userId}/update/{gameId}")
+	public  ResponseEntity<?> updateCart(@PathVariable("userId")final Integer userId,@PathVariable("gameId") final Integer gameId){
+		return ResponseEntity.ok(cartService.updateSelectedItemsCart(userId,gameId));
+	}
 	
 	
 
