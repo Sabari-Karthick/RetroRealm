@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface GameFeignClinet {
 	
 	@GetMapping("/api/v1/game/calculate/price")
-	public Double getTotalPrice(@RequestParam("ids[]") Set<Integer> gameId);
+	Double getTotalPrice(@RequestParam("ids[]") Set<Integer> gameId);
 
 }

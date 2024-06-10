@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import com.Batman.dto.cart.CartRequestDto;
+import com.Batman.dto.cart.CartValueResponse;
 import com.Batman.entity.Cart;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.NoCartAvailableException;
@@ -55,7 +56,8 @@ public class CartService implements ICartService {
 			Set<Integer> selectedCartItems = new HashSet<>();
 			cartItems.add(newCartItem);
 			selectedCartItems.add(newCartItem);
-			cart = Cart.builder().userId(userId).cartItems(cartItems).selectedCartItems(selectedCartItems).totalPrice(calculatePrice(selectedCartItems)).build();
+			cart = Cart.builder().userId(userId).cartItems(cartItems).selectedCartItems(selectedCartItems)
+					.totalPrice(calculatePrice(selectedCartItems)).build();
 			return cartRepository.save(cart);
 		}
 		return userCartOptional.get();
@@ -77,7 +79,7 @@ public class CartService implements ICartService {
 			Set<Integer> cartItems = cart.getCartItems();
 			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
 			if (cartItems.contains(gameId)) {
-				if(selectedCartItems.contains(gameId)) {
+				if (selectedCartItems.contains(gameId)) {
 					selectedCartItems.remove(gameId);
 					cart.setSelectedCartItems(selectedCartItems);
 				}
@@ -105,10 +107,10 @@ public class CartService implements ICartService {
 			Set<Integer> cartItems = cart.getCartItems();
 			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
 			if (cartItems.contains(gameId)) {
-				if(selectedCartItems.contains(gameId)) {
+				if (selectedCartItems.contains(gameId)) {
 					selectedCartItems.remove(gameId);
 					cart.setSelectedCartItems(selectedCartItems);
-				}else {
+				} else {
 					selectedCartItems.add(gameId);
 					cart.setSelectedCartItems(selectedCartItems);
 				}
@@ -119,6 +121,14 @@ public class CartService implements ICartService {
 			throw new NoCartAvailableException("USER_CART_IS_EMPTY");
 		}
 		return userCartOptional.get();
+	}
+
+	@Override
+	public CartValueResponse getCartItems(Integer userId) {
+		Cart cart = cartRepository.findByUserId(userId)
+				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
+		CartValueResponse cartValueResponse = new CartValueResponse(cart.getSelectedCartItems(), cart.getTotalPrice());
+		return cartValueResponse;
 	}
 
 }

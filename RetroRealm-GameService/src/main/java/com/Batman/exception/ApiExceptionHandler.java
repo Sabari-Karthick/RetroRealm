@@ -45,5 +45,17 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(ExceptionMsg.builder().msg("#### " + e.getMessage() + "! ####")
 				.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
 	}
+	
+	@ExceptionHandler(value = { Throwable.class})
+	public  ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {
+
+		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+		final var badRequest = HttpStatus.INTERNAL_SERVER_ERROR;
+
+		return new ResponseEntity<>(
+				ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
+						.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),
+				badRequest);
+	}
 
 }

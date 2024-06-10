@@ -48,6 +48,7 @@ public class Cart {
     @Column(nullable = false)
     private LocalDateTime updatedDate;
 
+    @Column(nullable = false)
     private Double totalPrice;
 
     @PrePersist
