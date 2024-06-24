@@ -1,8 +1,66 @@
 package com.batman.entity;
 
-import jakarta.persistence.Id;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Set;
 
+import com.batman.enums.DiscountType;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Data;
+
+@Entity
+@Data
 public class Discount {
-	   @Id
-       private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
+	@Enumerated(EnumType.STRING)
+	private DiscountType discountType;
+	
+	@OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+	private Set<Integer> gameIds;
+
+	private LocalDate fromDate;
+
+	private LocalTime fromTime;
+
+	private LocalDate toDate;
+
+	private LocalTime toTime;
+
+	private Double discountValue;
+
+	private Boolean isExpired;
+
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdDate;
+
+	@Column(nullable = false)
+	private LocalDateTime updatedDate;
+
+	@PrePersist
+	protected void onCreate() {
+		createdDate = LocalDateTime.now();
+		updatedDate = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		updatedDate = LocalDateTime.now();
+	}
+
 }
