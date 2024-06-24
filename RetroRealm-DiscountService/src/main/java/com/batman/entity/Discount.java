@@ -1,5 +1,8 @@
 package com.batman.entity;
 
-public class Discount {
+import jakarta.persistence.Id;
 
+public class Discount {
+	   @Id
+       private Integer id;
 }
