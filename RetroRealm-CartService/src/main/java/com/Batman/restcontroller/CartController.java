@@ -17,6 +17,7 @@ import com.Batman.entity.Cart;
 import com.Batman.service.ICartService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 
@@ -35,23 +36,23 @@ public class CartController {
 	}
 	
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<?> getUserCart(@PathVariable("userId") final Integer userId){
+	public ResponseEntity<?> getUserCart(@PathVariable("userId") @NotNull(message="user Id cannot be empty") final Integer userId){
 		return ResponseEntity.ok(cartService.getCartOfUser(userId));
 	}
 	
 	@GetMapping("/value/{userId}")
-	public ResponseEntity<?> getUserCartValue(@PathVariable("userId") final Integer userId){
+	public ResponseEntity<?> getUserCartValue(@PathVariable("userId") @NotNull(message="user Id cannot be empty")  final Integer userId){
 		 return ResponseEntity.ok(cartService.getCartItems(userId));
 	}
 	
 	@PatchMapping("user/{userId}/remove/{gameId}")
-	public ResponseEntity<?> removeItemFromCart(@PathVariable("userId")final Integer userId,@PathVariable("gameId") final Integer gameId){
+	public ResponseEntity<?> removeItemFromCart(@PathVariable("userId")  @NotNull(message="user Id cannot be empty") final Integer userId,@PathVariable("gameId")  @NotNull(message="game Id cannot be empty") final Integer gameId){
 		return ResponseEntity.ok(cartService.removeItemFromCart(userId,gameId));
 	}
 	
 	
 	@PutMapping("user/{userId}/update/{gameId}")
-	public  ResponseEntity<?> updateCart(@PathVariable("userId")final Integer userId,@PathVariable("gameId") final Integer gameId){
+	public  ResponseEntity<?> updateCart(@PathVariable("userId")final  @NotNull(message="user Id cannot be empty")  Integer userId,@PathVariable("gameId")  @NotNull(message="game Id cannot be empty")  final Integer gameId){
 		return ResponseEntity.ok(cartService.updateSelectedItemsCart(userId,gameId));
 	}
 	
