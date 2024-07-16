@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.batman.exception.payload.ExceptionMsg;
 import com.batman.exception.wrapper.InputFieldException;
+import com.batman.exception.wrapper.NoDiscountAvailableException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +32,14 @@ public class ApiExceptionHandler {
 				badRequest);
 	}
 
-//	@ExceptionHandler(value = {NoCartAvailableException.class,FeignException.class})
-//	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
-//
-//		log.info("**ApiExceptionHandler controller, handle API request*\n");
-//		final var badRequest = HttpStatus.BAD_REQUEST;
-//
-//		return new ResponseEntity<>(ExceptionMsg.builder().msg("#### " + e.getMessage() + "! ####")
-//				.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
-//	}
+	@ExceptionHandler(value = {NoDiscountAvailableException.class})
+	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
+
+		log.info("**ApiExceptionHandler controller, handle API request*\n");
+		final var badRequest = HttpStatus.BAD_REQUEST;
+		return new ResponseEntity<>(ExceptionMsg.builder().msg("#### " + e.getMessage() + "! ####")
+				.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
+	}
 	
 	@ExceptionHandler(value = { Throwable.class})
 	public  ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {
