@@ -43,7 +43,7 @@ public class DiscountServiceImpl implements IDiscountService{
 	@Override
 	public List<Discount> getDiscountByGameIds(Set<Integer> gameIds) {
 		log.info("Discount Service Fetching Game Discounts For :::" + gameIds);
-		return discountRepository.findAllByGameIds(gameIds);
+		return discountRepository.findDiscountsOfGames(gameIds);
 		
 	}
 

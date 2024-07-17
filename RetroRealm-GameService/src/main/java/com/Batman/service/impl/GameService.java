@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import com.Batman.dto.PageableRequestDto;
+import com.Batman.dto.discount.DiscountDto;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.entity.Game;
@@ -18,6 +19,7 @@ import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
+import com.Batman.feignclinet.DiscountFeignClinet;
 import com.Batman.mapper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
@@ -36,6 +38,8 @@ public class GameService implements IGameService{
 	private final IGameOwnerRepository gameOwnerRepository;
 	
 	private final CommonMapper mapper;
+	
+	private final DiscountFeignClinet discountFeignClinet;
 
 	@Override
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
@@ -74,6 +78,14 @@ public class GameService implements IGameService{
 	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
 		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix,GameName.class);
 		return games;
+	}
+
+	@Override
+	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds) {
+		List<Game> games = gameRepository.findAllById(gameIds);
+		List<DiscountDto> discounts = discountFeignClinet.fetchDiscounts(gameIds);
+		
+		return null;
 	}
 
 }

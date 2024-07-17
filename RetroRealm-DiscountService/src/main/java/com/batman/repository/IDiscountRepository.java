@@ -12,5 +12,5 @@ import java.util.List;
 
 public interface IDiscountRepository extends JpaRepository<Discount, Integer>{
 	   @Query(value = "Select d from Discount d join d.gameIds g where g IN :gameIds")
-       List<Discount> findAllByGameIds(Set<Integer> gameIds);
+       List<Discount> findDiscountsOfGames(Set<Integer> gameIds);
 }

@@ -17,4 +17,5 @@ public interface IGameService {
 	Page<GameResponse> getAllGames(PageableRequestDto pageableRequest);
 	Double getTotalCostOfGames(Set<Integer> gameIds);
     List<GameName> suggestAllGameNameWithPrefix(String namePrefix);
+    List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds);
 }
