@@ -27,10 +27,12 @@ import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service("GameService")
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class GameService implements IGameService{
 	
 	private final IGameRepository gameRepository;
@@ -61,8 +63,8 @@ public class GameService implements IGameService{
 	@Override
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
 		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(), pageableRequest.getAsc()?Direction.ASC:Direction.DESC, pageableRequest.getProperty());
-		Page<Game> gameList = gameRepository.findAll(pageRequest);
-		return gameList.map(game ->  mapper.convertToResponse(game, GameResponse.class));
+		Page<Game> gamePages = gameRepository.findAll(pageRequest);
+		return gamePages.map(game ->  mapper.convertToResponse(game, GameResponse.class));
 	}
 
 	@Override
@@ -84,8 +86,9 @@ public class GameService implements IGameService{
 	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds) {
 		List<Game> games = gameRepository.findAllById(gameIds);
 		List<DiscountDto> discounts = discountFeignClinet.fetchDiscounts(gameIds);
-		
-		return null;
+		log.info("Fetched Discounts of game from discount service.....");
+		discounts.forEach(System.out::println);
+		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 
 }

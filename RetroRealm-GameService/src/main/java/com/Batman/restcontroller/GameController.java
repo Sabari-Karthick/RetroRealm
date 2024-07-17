@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,9 +70,14 @@ public class GameController {
 	
 	
 	@GetMapping("/search")
-	public ResponseEntity<?> findGamesWithPrefix(@RequestParam("name") String gamePrefix) {
+	public ResponseEntity<?> findGamesWithPrefix(@RequestParam("name") final String gamePrefix) {
 		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gamePrefix));
 	}
 	
+	
+	@PatchMapping("/add/discount")
+	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds){
+		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds));
+	}
 
 }
