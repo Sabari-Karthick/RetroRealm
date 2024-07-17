@@ -51,7 +51,6 @@ public class ApiExceptionHandler {
 
 		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
 		final var badRequest = HttpStatus.INTERNAL_SERVER_ERROR;
-
 		return new ResponseEntity<>(
 				ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
 						.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),

@@ -12,6 +12,6 @@ import com.Batman.dto.discount.DiscountDto;
 @FeignClient(name = "discount-service")
 public interface DiscountFeignClinet {
 	
-	@GetMapping("/game/search")
+	@GetMapping("api/v1/discount/game/search")
 	List<DiscountDto> fetchDiscounts(@RequestParam final Set<Integer> gameIds);
 }
