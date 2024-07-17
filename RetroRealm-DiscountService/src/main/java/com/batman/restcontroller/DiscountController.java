@@ -1,6 +1,15 @@
 package com.batman.restcontroller;
 
+import java.util.Set;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.batman.dto.discount.DiscountRequest;
@@ -10,16 +19,6 @@ import com.batman.service.IDiscountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Set;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -39,8 +38,9 @@ public class DiscountController {
 	}
 	
 	
-	@GetMapping("/search")
-	public ResponseEntity<?> fetchDiscounts(@RequestParam("ids[]") final Set<Integer> gameIds) {
+	@GetMapping("/game/search")
+	public ResponseEntity<?> fetchDiscounts(@RequestParam final Set<Integer> gameIds ) {
+		log.info("Fetching Discount by Game Id:: ", gameIds);
 		return ResponseEntity.ok(service.getDiscountByGameIds(gameIds));
 	}
 	

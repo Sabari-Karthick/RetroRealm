@@ -7,8 +7,9 @@ import java.util.Set;
 
 import com.batman.enums.DiscountType;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +17,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Data;
@@ -31,7 +32,8 @@ public class Discount {
 	@Enumerated(EnumType.STRING)
 	private DiscountType discountType;
 	
-	@OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+	@ElementCollection(targetClass = Integer.class,fetch = FetchType.EAGER)
+	@CollectionTable(name = "game_ids",joinColumns = @JoinColumn(name="discount_id",referencedColumnName = "id"))
 	private Set<Integer> gameIds;
 
 	private LocalDate fromDate;

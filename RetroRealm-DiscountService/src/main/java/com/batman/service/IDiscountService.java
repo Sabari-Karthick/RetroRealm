@@ -1,5 +1,6 @@
 package com.batman.service;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.validation.BindingResult;
@@ -9,5 +10,5 @@ import com.batman.entity.Discount;
 
 public interface IDiscountService {
     Discount createDiscount(DiscountRequest discountRequest,BindingResult bindingResult);
-    Discount getDiscountByGameIds(Set<Integer> gameIds);
+    List<Discount> getDiscountByGameIds(Set<Integer> gameIds);
 }
