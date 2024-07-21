@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.batman.exception.payload.ExceptionMsg;
+import com.batman.exception.wrapper.DiscountAlreadyExistException;
+import com.batman.exception.wrapper.FailedToUpdateGameServiceException;
 import com.batman.exception.wrapper.InputFieldException;
 import com.batman.exception.wrapper.NoDiscountAvailableException;
 
@@ -32,7 +34,7 @@ public class ApiExceptionHandler {
 				badRequest);
 	}
 
-	@ExceptionHandler(value = {NoDiscountAvailableException.class})
+	@ExceptionHandler(value = {NoDiscountAvailableException.class,FailedToUpdateGameServiceException.class,DiscountAlreadyExistException.class})
 	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle API request*\n");

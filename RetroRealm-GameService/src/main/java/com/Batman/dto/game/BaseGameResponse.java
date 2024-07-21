@@ -15,7 +15,7 @@ public class BaseGameResponse {
 	private Double gamePrice;
 	private Double gameVersion;
 	private LocalDate gameReleasedDate;
-	private Integer gameDiscount;
+	private Double gameDiscount;
 	
 	private Set<GameGenre> gameGenere;
 }

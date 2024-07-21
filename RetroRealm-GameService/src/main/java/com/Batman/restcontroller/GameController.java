@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,7 +59,10 @@ public class GameController {
 	
 	
 	@GetMapping("/all")
-	public ResponseEntity<?> getAllGames(@RequestBody final PageableRequestDto pageableRequest){
+	public ResponseEntity<?> getAllGames(@RequestBody(required = false)  PageableRequestDto pageableRequest){
+		if(pageableRequest == null) {
+			pageableRequest = new PageableRequestDto();
+		}
 		return ResponseEntity.ok(gameService.getAllGames(pageableRequest));
 	}
 	
@@ -75,9 +78,9 @@ public class GameController {
 	}
 	
 	
-	@PatchMapping("/add/discount")
-	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds){
-		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds));
+	@PutMapping("/add/discount")
+	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds,@RequestParam Double discountValue){
+		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds,discountValue));
 	}
 
 }

@@ -39,11 +39,15 @@ public class Game {
 	private Double gamePrice;
 	private Double gameVersion;
 	private LocalDate gameReleasedDate;
-	private Integer gameDiscount;
+	private Double gameDiscount;
 	
 	@ElementCollection(targetClass = GameGenre.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id", referencedColumnName = "gameID"))
 	@Enumerated(EnumType.STRING)
 	private Set<GameGenre> gameGenere;
+	
+	public double getDiscountedGamePrice() {
+	    return this.gamePrice * (1 - this.gameDiscount / 100.0);
+	}
 
 }

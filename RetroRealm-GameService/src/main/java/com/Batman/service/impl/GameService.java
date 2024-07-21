@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import com.Batman.dto.PageableRequestDto;
-import com.Batman.dto.discount.DiscountDto;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.entity.Game;
@@ -19,7 +18,6 @@ import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
-import com.Batman.feignclinet.DiscountFeignClinet;
 import com.Batman.mapper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
@@ -41,7 +39,6 @@ public class GameService implements IGameService{
 	
 	private final CommonMapper mapper;
 	
-	private final DiscountFeignClinet discountFeignClinet;
 
 	@Override
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
@@ -51,6 +48,7 @@ public class GameService implements IGameService{
 		GameOwner gameOwner = gameOwnerRepository.findById(gameRequest.getGameOwnerID()).orElseThrow(()-> new GameOwnerNotFoundException("OWNER_NOT_FOUND_FOR_ID"));
 		Game game = mapper.convertToEntity(gameRequest, Game.class);
 		game.setGameOwner(gameOwner);
+		game.setGameDiscount(0.0);
 		return mapper.convertToResponse(gameRepository.save(game), GameResponse.class);
 	}
 
@@ -73,7 +71,7 @@ public class GameService implements IGameService{
 		if(games.isEmpty()) {
 			return 0.0;
 		}
-		return games.stream().mapToDouble(Game::getGamePrice).sum();
+		return games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
 	}
 
 	@Override
@@ -83,11 +81,13 @@ public class GameService implements IGameService{
 	}
 
 	@Override
-	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds) {
+	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds,Double discountValue) {
+		log.info("Update Request For {} with value {}",gameIds,discountValue);
 		List<Game> games = gameRepository.findAllById(gameIds);
-		List<DiscountDto> discounts = discountFeignClinet.fetchDiscounts(gameIds);
-		log.info("Fetched Discounts of game from discount service.....");
-		discounts.forEach(System.out::println);
+		games.forEach(game -> game.setGameDiscount(discountValue));
+		games = gameRepository.saveAll(games);
+		games.forEach(System.out::println);
+		log.info("Leaving Update Game Discount Request......");
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 
