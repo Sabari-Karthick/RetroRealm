@@ -86,7 +86,6 @@ public class GameService implements IGameService{
 		List<Game> games = gameRepository.findAllById(gameIds);
 		games.forEach(game -> game.setGameDiscount(discountValue));
 		games = gameRepository.saveAll(games);
-		games.forEach(System.out::println);
 		log.info("Leaving Update Game Discount Request......");
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
