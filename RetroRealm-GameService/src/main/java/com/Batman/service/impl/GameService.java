@@ -18,12 +18,14 @@ import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
+import com.Batman.exception.wrapper.InternalProcessingError;
 import com.Batman.mapper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +40,8 @@ public class GameService implements IGameService{
 	private final IGameOwnerRepository gameOwnerRepository;
 	
 	private final CommonMapper mapper;
+	
+	private static final String SERVICE_NAME = "game-service";
 	
 
 	@Override
@@ -75,6 +79,7 @@ public class GameService implements IGameService{
 	}
 
 	@Override
+	@RateLimiter(name = SERVICE_NAME,fallbackMethod = "gameServiceFallBackMethod")
 	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
 		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix,GameName.class);
 		return games;
@@ -88,6 +93,10 @@ public class GameService implements IGameService{
 		games = gameRepository.saveAll(games);
 		log.info("Leaving Update Game Discount Request......");
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
+	}
+	
+	protected void gameServiceFallBackMethod() {
+		throw new InternalProcessingError("REQUEST_OVERLOADED");
 	}
 
 }

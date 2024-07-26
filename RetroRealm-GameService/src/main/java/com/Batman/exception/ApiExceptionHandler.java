@@ -14,6 +14,7 @@ import com.Batman.exception.wrapper.CategoryNotFoundException;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
+import com.Batman.exception.wrapper.InternalProcessingError;
 import com.Batman.exception.wrapper.VerificationMissingException;
 
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class ApiExceptionHandler {
 				badRequest);
 	}
 
-	@ExceptionHandler(value = { CategoryNotFoundException.class, GameNotFoundException.class,AlreadyExistsException.class ,VerificationMissingException.class,GameOwnerNotFoundException.class})
+	@ExceptionHandler(value = { CategoryNotFoundException.class, GameNotFoundException.class,AlreadyExistsException.class ,VerificationMissingException.class,GameOwnerNotFoundException.class,InternalProcessingError.class})
 	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle API request*\n");
