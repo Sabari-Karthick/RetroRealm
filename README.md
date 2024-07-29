@@ -1,13 +1,13 @@
-#RetroRealm
+# RetroRealm
 Welcome to RetroRealm - A Digital Game Purchasing Platform designed  by leveraging advanced micro-service architecture. Built with Spring Boot, RetroRealm integrates a wide range of cutting-edge technologies and frameworks to ensure scalability, performance, and reliability.
 
-Features
-Microservice Architecture
-Spring Boot: The backbone of our application, enabling the creation of robust and scalable microservices.
-Service Discovery and Registration
-Eureka: A service registry for locating services for the purpose of load balancing and failover of middle-tier servers.
-Caching
-Redis: High-speed caching to optimize data retrieval and enhance performance.
+## Features
+## Microservice Architecture
+ ### Spring Boot: The backbone of our application, enabling the creation of robust and scalable microservices.
+## Service Discovery and Registration
+### Eureka: A service registry for locating services for the purpose of load balancing and failover of middle-tier servers.
+## Caching
+### Redis: High-speed caching to optimize data retrieval and enhance performance.
 Monitoring and Analytics
 Grafana Stack: Comprehensive monitoring and visualization of system metrics, logs, and traces using Prometheus, Grafana, and Loki.
 Search Functionality
