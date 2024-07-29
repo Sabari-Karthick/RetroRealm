@@ -34,4 +34,3 @@ Reliable and scalable messaging for asynchronous communication between services.
 Comprehensive security mechanisms to protect data and ensure user privacy.
 ## Design Patterns
 Implementation of various design patterns to ensure code reusability, maintainability, and scalability.
-Getting Star
