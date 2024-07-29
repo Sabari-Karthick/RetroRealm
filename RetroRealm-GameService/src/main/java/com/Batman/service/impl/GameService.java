@@ -25,6 +25,7 @@ import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +96,7 @@ public class GameService implements IGameService{
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 	
-	protected void gameServiceFallBackMethod() {
+	protected List<GameName> gameServiceFallBackMethod(RequestNotPermitted requestNotPermitted) {
 		throw new InternalProcessingError("REQUEST_OVERLOADED");
 	}
 
