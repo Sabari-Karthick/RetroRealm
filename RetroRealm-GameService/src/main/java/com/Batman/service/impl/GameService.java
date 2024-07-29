@@ -71,6 +71,7 @@ public class GameService implements IGameService{
 	}
 
 	@Override
+	@RateLimiter(name = SERVICE_NAME,fallbackMethod = "gameServiceFallBackMethod")
 	public Double getTotalCostOfGames(Set<Integer> gameIds) {
 		List<Game> games = gameRepository.findAllById(gameIds);
 		if(games.isEmpty()) {
