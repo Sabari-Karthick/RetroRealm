@@ -18,7 +18,7 @@ import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
-import com.Batman.exception.wrapper.InternalProcessingError;
+import com.Batman.exception.wrapper.TooManyRequestException;
 import com.Batman.mapper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
@@ -97,7 +97,7 @@ public class GameService implements IGameService{
 	}
 	
 	protected List<GameName> gameServiceFallBackMethod(RequestNotPermitted requestNotPermitted) {
-		throw new InternalProcessingError("REQUEST_OVERLOADED");
+		throw new TooManyRequestException("REQUEST_OVERLOADED");
 	}
 
 }
