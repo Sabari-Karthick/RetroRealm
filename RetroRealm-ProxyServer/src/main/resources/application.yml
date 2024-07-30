@@ -38,6 +38,11 @@ spring:
         predicates:
         - Path=/api/v1/payment/**
         uri: lb://PAYMENT-SERVICE
+        filters:
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: "#{@rateLimter}"
+            key-resolver: "#{@proxyKeyResolver}"
       - id: user_route
         predicates:
         - Path=/user-service/**
@@ -74,6 +79,11 @@ spring:
         predicates:
         - Path=/api/v1/order/**
         uri: lb://order-service
+        filters:
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: "#{@rateLimter}"
+            key-resolver: "#{@proxyKeyResolver}"
       - id: discount-route
         predicates:
         - Path=/api/v1/discount/**
