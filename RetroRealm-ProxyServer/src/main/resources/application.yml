@@ -53,7 +53,7 @@ spring:
         filters:
         - name: RequestRateLimiter
           args:
-            rate-limiter: "#{@gameLimiter}"
+            rate-limiter: "#{@rateLimter}"
             key-resolver: "#{@proxyKeyResolver}"
             
       - id: cart_route
