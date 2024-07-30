@@ -1,0 +1,75 @@
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+server:
+  address: localhost
+  port: 8080
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: API-GATEWAY
+  boot:
+    admin:
+      client:
+        url: http://localhost:7000/Retro/admin/
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+      - id: payment_route
+        predicates:
+        - Path=/api/v1/payment/**
+        uri: lb://PAYMENT-SERVICE
+      - id: user_route
+        predicates:
+        - Path=/user-service/**
+        uri: lb://USER-SERVICE
+      - id: client_route
+        predicates:
+        - Path=/app/**
+        uri: lb://proxy-client
+      - id: game_route
+        predicates:
+        - Path=/api/v1/game/**
+        uri: lb://game-service
+        filters:
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: "#{@gameServiceRateLimiter}"
+            key-resolver: "#{@proxyKeyResolver}"
+            
+      - id: cart_route
+        predicates:
+        - Path=/api/v1/cart/**
+        uri: lb://cart-service
+      - filters:
+        - SetPath=/
+        id: eureka-route
+        predicates:
+        - Path=/eureka/home
+        uri: http://localhost:8761
+      - id: eureka-static-route
+        predicates:
+        - Path=/eureka/**
+        uri: http://localhost:8761
+      - id: order-route
+        predicates:
+        - Path=/api/v1/order/**
+        uri: lb://order-service
+      - id: discount-route
+        predicates:
+        - Path=/api/v1/discount/**
+        uri: lb://discount-service
+  main:
+    web-application-type: reactive 
