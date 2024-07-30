@@ -17,7 +17,14 @@ spring:
   boot:
     admin:
       client:
-        url: http://localhost:7000/Retro/admin/
+        url: http://localhost:8000/Retro/admin/
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 16379
+      password: mypass
+      timeout: 60000      
   cloud:
     compatibility-verifier:
       enabled: false
@@ -46,7 +53,7 @@ spring:
         filters:
         - name: RequestRateLimiter
           args:
-            rate-limiter: "#{@gameServiceRateLimiter}"
+            rate-limiter: "#{@gameLimiter}"
             key-resolver: "#{@proxyKeyResolver}"
             
       - id: cart_route
