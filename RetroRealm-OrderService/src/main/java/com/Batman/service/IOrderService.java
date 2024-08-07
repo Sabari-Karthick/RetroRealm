@@ -8,7 +8,10 @@ import com.Batman.dto.OrderRequest;
 import com.Batman.entity.Order;
 
 public interface IOrderService {
-       String placeOrder(OrderRequest orderRequest,BindingResult bindingResult);
-       List<Order> getOrdersOfUser(Integer userId);
-       Order getOrderById(Integer orderId);
+	
+	Order placeOrder(OrderRequest orderRequest, BindingResult bindingResult);
+
+	List<Order> getOrdersOfUser(Integer userId);
+
+	Order getOrderById(Integer orderId);
 }

@@ -1,10 +1,10 @@
 package com.Batman.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import com.Batman.enums.OrderStatus;
-import com.Batman.enums.PaymentType;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -49,9 +49,9 @@ public class Order {
 	@Column(nullable = false)
 	private Double orderPrice;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private PaymentType paymentType;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "order_payments", joinColumns = @JoinColumn(name = "payment_id", referencedColumnName = "orderId"))
+	private List<Integer> paymentIds;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
