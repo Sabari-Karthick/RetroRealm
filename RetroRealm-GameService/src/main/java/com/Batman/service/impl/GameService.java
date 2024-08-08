@@ -25,7 +25,7 @@ import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
 
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class GameService implements IGameService{
 	
 	private final CommonMapper mapper;
 	
-	private static final String SERVICE_NAME = "game-service";
+	private static final String SERVICE_NAME = "gameService";
 	
 
 	@Override
@@ -72,6 +72,7 @@ public class GameService implements IGameService{
 
 	@Override
 	@RateLimiter(name = SERVICE_NAME,fallbackMethod = "gameServiceFallBackMethod")
+	@CircuitBreaker(name =  SERVICE_NAME)
 	public Double getTotalCostOfGames(Set<Integer> gameIds) {
 		List<Game> games = gameRepository.findAllById(gameIds);
 		if(games.isEmpty()) {
@@ -81,13 +82,13 @@ public class GameService implements IGameService{
 	}
 
 	@Override
-	@RateLimiter(name = SERVICE_NAME,fallbackMethod = "gameServiceFallBackMethod")
 	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
 		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix,GameName.class);
 		return games;
 	}
 
 	@Override
+	@CircuitBreaker(name =  SERVICE_NAME)
 	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds,Double discountValue) {
 		log.info("Update Request For {} with value {}",gameIds,discountValue);
 		List<Game> games = gameRepository.findAllById(gameIds);
@@ -97,7 +98,9 @@ public class GameService implements IGameService{
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 	
-	protected List<GameName> gameServiceFallBackMethod(RequestNotPermitted requestNotPermitted) {
+	protected List<GameName> gameServiceFallBackMethod(Exception ex) {
+		log.error(ex.getMessage());
+		log.info("Entering Game Service Fall Back Method ...");
 		throw new TooManyRequestException("REQUEST_OVERLOADED");
 	}
 

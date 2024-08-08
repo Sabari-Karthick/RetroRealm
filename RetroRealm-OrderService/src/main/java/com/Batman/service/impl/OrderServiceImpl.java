@@ -2,7 +2,9 @@ package com.Batman.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +17,26 @@ import com.Batman.entity.Order;
 import com.Batman.enums.OrderStatus;
 import com.Batman.enums.PaymentType;
 import com.Batman.exception.wrapper.InputFieldException;
-import com.Batman.exception.wrapper.InvalidCartDetails;
+import com.Batman.exception.wrapper.InvalidCartDetailsException;
 import com.Batman.exception.wrapper.RecordNotAvailableException;
 import com.Batman.feign.CartFeignClient;
 import com.Batman.feign.PaymentFeignClient;
 import com.Batman.repository.IOrderRepository;
 import com.Batman.service.IOrderService;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ */
+/**
+ * 
+ */
+/**
+ * 
+ */
 @Service("Order Service")
 @RequiredArgsConstructor
 @Transactional
@@ -36,6 +48,8 @@ public class OrderServiceImpl implements IOrderService {
 	private final CartFeignClient cartFeignClient;
 
 	private final PaymentFeignClient paymentFeignClient;
+	
+	private static final String SERVICE_NAME ="orderService";
 
 	@Override
 	public Order placeOrder(OrderRequest orderRequest, BindingResult bindingResult) {
@@ -45,12 +59,12 @@ public class OrderServiceImpl implements IOrderService {
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
 		}
 		
-		CartValueResponse userCartValue = cartFeignClient.getUserCartValue(orderRequest.getUserId());
+		CartValueResponse userCartValue = getCartResponse(orderRequest.getUserId());
 		
 		if (!userCartValue.getCartItems().equals(orderRequest.getGameIds())
 				|| !userCartValue.getTotalPrice().equals(orderRequest.getTotalPrice())) {
-			log.error("Invalid Car Error.. ");
-			throw new InvalidCartDetails("INVALID_CART_DETAILS");
+			log.error("Invalid Cart Error.. ");
+			throw new InvalidCartDetailsException("INVALID_CART_DETAILS");
 		}
 		
 		PaymentType paymentType = orderRequest.getPaymentType();
@@ -62,7 +76,7 @@ public class OrderServiceImpl implements IOrderService {
 		List<Integer> paymentIds = new ArrayList<>();
         PaymentRequest paymentRequest = PaymentRequest.builder().paymentType(paymentType).amount(totalPrice).build();
         
-        ResponseEntity<?> paymentResponse = paymentFeignClient.pay(paymentRequest);
+        ResponseEntity<?> paymentResponse = makePayment(paymentRequest);
         Integer paymentId = (Integer) paymentResponse.getBody();
         paymentIds.add(paymentId);
         
@@ -90,5 +104,36 @@ public class OrderServiceImpl implements IOrderService {
 		return orderRepository.findById(orderId)
 				.orElseThrow(() -> new RecordNotAvailableException("ORDER_NOT_FOUND_FOR_ID"));
 	}
+	
+	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
+	private CartValueResponse getCartResponse(Integer userId) {
+		log.info("Entering Get Cart Response ...");
+		CartValueResponse cartValueResponse = cartFeignClient.getUserCartValue(userId);
+		if(Objects.isNull(cartValueResponse))
+			throw  new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
+		log.info("Leaving Get Cart Response ...");
+		return cartValueResponse;
+	}
+	
+	/**
+	 * This logic is not completed update
+	 * @param paymentRequest
+	 * @return
+	 */
+	private ResponseEntity<?> makePayment(PaymentRequest paymentRequest) {
+		
+		log.info("Entering make Payment ...");
+		ResponseEntity<?> payResponse = paymentFeignClient.pay(paymentRequest);
+		if(Objects.isNull(payResponse))
+			throw  new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
+		log.info("Leaving make Payment...");
+		return payResponse;
+	}
+	
+	public ResponseEntity<?> retryFallback(Exception ex) {
+		log.info("Entering Retry Fallback Method of Order Service ...");
+		log.error(ex.getMessage());
+		return new ResponseEntity<>("Cannot Make Order, Please Try Again Later...",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }

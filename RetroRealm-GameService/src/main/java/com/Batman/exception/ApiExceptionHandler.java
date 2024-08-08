@@ -17,6 +17,7 @@ import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.TooManyRequestException;
 import com.Batman.exception.wrapper.VerificationMissingException;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,10 +56,20 @@ public class ApiExceptionHandler {
 				.timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), tooManyRequests);
 	}
 
+	
+	@ExceptionHandler(value = { CallNotPermittedException.class })
+	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleCallNotPermittedException(final T e) {
+
+		log.info("**ApiExceptionHandler controller, handle call not permitted exception*\n");
+		final var serviceNotAvailable = HttpStatus.SERVICE_UNAVAILABLE;
+		return new ResponseEntity<>(ExceptionMsg.builder().msg("*" + e.getMessage() + "!**").httpStatus(serviceNotAvailable)
+				.timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), serviceNotAvailable);
+	}
+
 	@ExceptionHandler(value = { Throwable.class })
 	public ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {
 
-		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+		log.info("**ApiExceptionHandler controller, handle  exception*\n");
 		final var internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 		return new ResponseEntity<>(ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
 				.httpStatus(internalServerError).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),

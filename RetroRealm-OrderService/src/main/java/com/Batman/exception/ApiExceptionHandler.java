@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.Batman.exception.payload.ExceptionMsg;
 import com.Batman.exception.wrapper.InputFieldException;
-import com.Batman.exception.wrapper.InvalidCartDetails;
+import com.Batman.exception.wrapper.InvalidCartDetailsException;
 import com.Batman.exception.wrapper.RecordNotAvailableException;
 
 import feign.FeignException;
@@ -34,7 +34,7 @@ public class ApiExceptionHandler {
 				badRequest);
 	}
 
-	@ExceptionHandler(value = {InvalidCartDetails.class,RecordNotAvailableException.class, FeignException.class})
+	@ExceptionHandler(value = {InvalidCartDetailsException.class,RecordNotAvailableException.class, FeignException.class})
 	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle API request*\n");

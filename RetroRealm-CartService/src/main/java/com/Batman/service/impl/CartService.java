@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -17,16 +19,21 @@ import com.Batman.feignclinet.GameFeignClinet;
 import com.Batman.repository.ICartRespository;
 import com.Batman.service.ICartService;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service("Cart Service")
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CartService implements ICartService {
 
 	private final ICartRespository cartRepository;
 
 	private final GameFeignClinet gameFeignClinet;
+	
+	private static final String SERVICE_NAME = "cartService";
 
 	@Override
 	public Cart addToCart(CartRequestDto cartRequest, BindingResult bindingResult) {
@@ -94,6 +101,7 @@ public class CartService implements ICartService {
 		return userCartOptional.get();
 	}
 
+	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
 	private Double calculatePrice(Set<Integer> gameIds) {
 		return gameFeignClinet.getTotalPrice(gameIds);
 	}
@@ -130,5 +138,11 @@ public class CartService implements ICartService {
 		CartValueResponse cartValueResponse = new CartValueResponse(cart.getSelectedCartItems(), cart.getTotalPrice());
 		return cartValueResponse;
 	}
+	
+	public ResponseEntity<?> retryFallback(Exception ex) {
+		log.info("Entering Retry Fallback Method of Cart Service ...");
+		log.error(ex.getMessage());
+		return new ResponseEntity<>("Please Try Again Later...",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }
