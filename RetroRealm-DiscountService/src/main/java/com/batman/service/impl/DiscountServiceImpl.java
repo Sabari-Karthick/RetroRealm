@@ -48,6 +48,15 @@ public class DiscountServiceImpl implements IDiscountService {
 		Discount savedDiscount = discountRepository.save(discount);
 		log.info("Discount Added ...");
 		log.info("Sending Update Request to Game Service ....");
+		
+		/**
+		 * This should be updated to kafka instead of manual calling
+		 * 
+		 * 
+		 */
+		
+		
+		
 		ResponseEntity<?> response = gameFeignClient.addDiscountToGames(discountRequest.getGameIds(),
 				discountRequest.getDiscountValue());
 		if (response.getStatusCode().is2xxSuccessful()) {

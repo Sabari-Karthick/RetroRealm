@@ -72,6 +72,12 @@ public class CartService implements ICartService {
 
 	@Override
 	public Cart getCartOfUser(Integer userId) {
+		/**
+		 * 
+		 * Consideration Needed whether to store total amount 
+		 * and Do we need to update the cart when discount is applied
+		 * and whether an notification needs to be send when cart price is dropped
+		 */
 		Cart cart = cartRepository.findByUserId(userId)
 				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
 		return cart;
