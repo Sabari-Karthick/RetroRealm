@@ -48,8 +48,8 @@ public class OrderServiceImpl implements IOrderService {
 	private final CartFeignClient cartFeignClient;
 
 	private final PaymentFeignClient paymentFeignClient;
-	
-	private static final String SERVICE_NAME ="orderService";
+
+	private static final String SERVICE_NAME = "orderService";
 
 	@Override
 	public Order placeOrder(OrderRequest orderRequest, BindingResult bindingResult) {
@@ -58,36 +58,44 @@ public class OrderServiceImpl implements IOrderService {
 			log.error("Input Field Invalid Error ...");
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
 		}
-		
+
 		CartValueResponse userCartValue = getCartResponse(orderRequest.getUserId());
-		
+
 		if (!userCartValue.getCartItems().equals(orderRequest.getGameIds())
 				|| !userCartValue.getTotalPrice().equals(orderRequest.getTotalPrice())) {
 			log.error("Invalid Cart Error.. ");
 			throw new InvalidCartDetailsException("INVALID_CART_DETAILS");
 		}
-		
+
 		PaymentType paymentType = orderRequest.getPaymentType();
 		Double totalPrice = orderRequest.getTotalPrice();
-		
+
 		Order order = Order.builder().orderItems(orderRequest.getGameIds()).userId(orderRequest.getUserId())
 				.orderPrice(totalPrice).build();
-		
+
 		List<Integer> paymentIds = new ArrayList<>();
-        PaymentRequest paymentRequest = PaymentRequest.builder().paymentType(paymentType).amount(totalPrice).build();
-        
-        ResponseEntity<?> paymentResponse = makePayment(paymentRequest);
-        Integer paymentId = (Integer) paymentResponse.getBody();
-        paymentIds.add(paymentId);
-        
-        if(paymentResponse.getStatusCode().is5xxServerError()) {
-        	log.info("Payment Request For the order is Failed ...");
-        	order.setOrderStatus(OrderStatus.FAILED);
-        }else {
-        	log.info("Payment Request For the order is Success ...");
-        	order.setOrderStatus(OrderStatus.COMPLETED);
-        }
+		PaymentRequest paymentRequest = PaymentRequest.builder().paymentType(paymentType).amount(totalPrice).build();
+
+		ResponseEntity<?> paymentResponse = null;
+		try {
+			paymentResponse = makePayment(paymentRequest);
+			Integer paymentId = (Integer) paymentResponse.getBody();
+			paymentIds.add(paymentId);
+			if (paymentResponse.getStatusCode().is5xxServerError()) {
+				log.info("Payment Request For the order is Failed ...");
+				order.setOrderStatus(OrderStatus.FAILED);
+			} else {
+				log.info("Payment Request For the order is Success ...");
+				order.setOrderStatus(OrderStatus.COMPLETED);
+			}
+		} catch (Exception e) {
+			log.error("Error Occured While Creating the Order...");
+			log.error(e.getMessage());
+			order.setOrderStatus(OrderStatus.FAILED);
+		}
+
 		return orderRepository.save(order);
+
 	}
 
 	@Override
@@ -104,36 +112,37 @@ public class OrderServiceImpl implements IOrderService {
 		return orderRepository.findById(orderId)
 				.orElseThrow(() -> new RecordNotAvailableException("ORDER_NOT_FOUND_FOR_ID"));
 	}
-	
-	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
+
+	@Retry(name = SERVICE_NAME, fallbackMethod = "retryFallback")
 	private CartValueResponse getCartResponse(Integer userId) {
 		log.info("Entering Get Cart Response ...");
 		CartValueResponse cartValueResponse = cartFeignClient.getUserCartValue(userId);
-		if(Objects.isNull(cartValueResponse))
-			throw  new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
+		if (Objects.isNull(cartValueResponse))
+			throw new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
 		log.info("Leaving Get Cart Response ...");
 		return cartValueResponse;
 	}
-	
+
 	/**
 	 * This logic is not completed update
+	 * 
 	 * @param paymentRequest
 	 * @return
 	 */
 	private ResponseEntity<?> makePayment(PaymentRequest paymentRequest) {
-		
+
 		log.info("Entering make Payment ...");
 		ResponseEntity<?> payResponse = paymentFeignClient.pay(paymentRequest);
-		if(Objects.isNull(payResponse))
-			throw  new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
+		if (Objects.isNull(payResponse))
+			throw new InvalidCartDetailsException("CART_DETAILS_NOT_FOUND");
 		log.info("Leaving make Payment...");
 		return payResponse;
 	}
-	
+
 	public ResponseEntity<?> retryFallback(Exception ex) {
 		log.info("Entering Retry Fallback Method of Order Service ...");
 		log.error(ex.getMessage());
-		return new ResponseEntity<>("Cannot Make Order, Please Try Again Later...",HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+		return new ResponseEntity<>("Cannot Make Order, Please Try Again Later...", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
