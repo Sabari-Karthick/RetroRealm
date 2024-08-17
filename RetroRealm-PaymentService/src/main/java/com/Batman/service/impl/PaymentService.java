@@ -31,13 +31,15 @@ public class PaymentService implements IPaymentService{
 		try {
 			//Actual Payment Logic Needs to be implemented
 			Thread.sleep(10000);
+			log.info("Making Payment... ");
             payment.setPaymentStatus(PaymentStatus.COMPLETED);			
-		} catch (InterruptedException ignore) {
+		} catch (Exception ignore) {
+			log.error("Error While Making Payment ...");
 			payment.setPaymentStatus(PaymentStatus.FAILED);			
 		}
-		ZonedDateTime CompletedTime = ZonedDateTime.now(ZoneId.systemDefault());
+		ZonedDateTime completedTime = ZonedDateTime.now(ZoneId.systemDefault());
 		payment.setIntiatedTime(initiatedTime);
-		payment.setCompletedTime(CompletedTime);
+		payment.setCompletedTime(completedTime);
 		payment.setPaymentType(paymentType);
 		payment.setAmount(amount);
 		return paymentRepository.save(payment);

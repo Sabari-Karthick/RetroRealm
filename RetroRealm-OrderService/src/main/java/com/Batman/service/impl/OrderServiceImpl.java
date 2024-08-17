@@ -6,10 +6,12 @@ import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.CartValueResponse;
 import com.Batman.dto.OrderRequest;
 import com.Batman.dto.PaymentRequest;
@@ -48,6 +50,8 @@ public class OrderServiceImpl implements IOrderService {
 	private final CartFeignClient cartFeignClient;
 
 	private final PaymentFeignClient paymentFeignClient;
+	
+	private final KafkaTemplate<String,Integer> kafkaTemplate;
 
 	private static final String SERVICE_NAME = "orderService";
 
@@ -70,7 +74,7 @@ public class OrderServiceImpl implements IOrderService {
 		PaymentType paymentType = orderRequest.getPaymentType();
 		Double totalPrice = orderRequest.getTotalPrice();
 
-		Order order = Order.builder().orderItems(orderRequest.getGameIds()).userId(orderRequest.getUserId())
+		Order orderEntity = Order.builder().orderItems(orderRequest.getGameIds()).userId(orderRequest.getUserId())
 				.orderPrice(totalPrice).build();
 
 		List<Integer> paymentIds = new ArrayList<>();
@@ -83,19 +87,22 @@ public class OrderServiceImpl implements IOrderService {
 			paymentIds.add(paymentId);
 			if (paymentResponse.getStatusCode().is5xxServerError()) {
 				log.info("Payment Request For the order is Failed ...");
-				order.setOrderStatus(OrderStatus.FAILED);
+				orderEntity.setOrderStatus(OrderStatus.FAILED);
 			} else {
 				log.info("Payment Request For the order is Success ...");
-				order.setOrderStatus(OrderStatus.COMPLETED);
+				orderEntity.setOrderStatus(OrderStatus.COMPLETED);
 			}
 		} catch (Exception e) {
 			log.error("Error Occured While Creating the Order...");
 			log.error(e.getMessage());
-			order.setOrderStatus(OrderStatus.FAILED);
+			orderEntity.setOrderStatus(OrderStatus.FAILED);
 		}
 
-		return orderRepository.save(order);
-
+		 Order order = orderRepository.save(orderEntity);
+		 log.info("Order is Placed with status {} with Id ::{}",order.getOrderStatus(),order.getOrderId());
+		 log.info("Sending Order Placed Event ...");
+         kafkaTemplate.send(KafkaConstants.TOPIC, order.getUserId());
+         return order;
 	}
 
 	@Override

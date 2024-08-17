@@ -13,13 +13,13 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.Batman.constants.KafkaConstants;
-import com.Batman.entity.Order;
 
 @Configuration
 public class KafkaConfig {
 
 	@Bean
-	ProducerFactory<String, Order> producerFactory() {
+	//ProducerFactory<String, Order> producerFactory() {  /** For Testing **/
+		ProducerFactory<String, Integer> producerFactory() {
 		Map<String, Object> configuration = new HashMap<>();
 
 		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.HOST);
@@ -30,7 +30,8 @@ public class KafkaConfig {
 	}
 
 	@Bean
-	KafkaTemplate<String, Order> getTemplate() {
+	// KafkaTemplate<String, Order> getTemplate() {
+	KafkaTemplate<String, Integer> getTemplate() {
 		return new KafkaTemplate<>(producerFactory());
 	}
 
