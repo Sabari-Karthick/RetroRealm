@@ -1,5 +1,6 @@
 package com.Batman.restcontroller;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.dto.gameowner.GameOwnerRequest;
 import com.Batman.dto.gameowner.GameOwnerResponse;
+import com.Batman.projections.GameName;
 import com.Batman.service.IGameOwnerService;
 import com.Batman.service.IGameService;
 
@@ -69,6 +71,11 @@ public class GameController {
 	@GetMapping("/calculate/price")
 	public ResponseEntity<?> getCostOfGames(@RequestParam("ids[]") final Set<Integer> gameIds) {
 		return ResponseEntity.ok(gameService.getTotalCostOfGames(gameIds));
+	}
+	
+	@GetMapping("/names")
+	public List<String> getNamesByGameId(@RequestParam("ids[]") final Set<Integer> gameIds) {
+		return gameService.getAllGameNameWithIds(gameIds).stream().map(GameName::getGameName).toList();
 	}
 	
 	

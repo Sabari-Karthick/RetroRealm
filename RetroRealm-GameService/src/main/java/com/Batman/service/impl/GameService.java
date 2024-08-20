@@ -104,4 +104,9 @@ public class GameService implements IGameService{
 		throw new TooManyRequestException("REQUEST_OVERLOADED");
 	}
 
+	@Override
+	public List<GameName> getAllGameNameWithIds(Set<Integer> gameIds) {
+		return gameRepository.findByGameIDIn(gameIds, GameName.class);
+	}
+
 }

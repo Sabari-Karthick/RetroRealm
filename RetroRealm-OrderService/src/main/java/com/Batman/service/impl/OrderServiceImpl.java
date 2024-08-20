@@ -107,7 +107,7 @@ public class OrderServiceImpl implements IOrderService {
 		 log.info("Sending Order Placed Event ...");
 		 
 		 
-		 List<String> gameNames = gameFeignClient.getGameNamesByGameIds(order.getOrderItems());
+		 List<String> gameNames = gameFeignClient.getNamesByGameId(order.getOrderItems());
 		 OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder().gameNames(gameNames).orderId(order.getOrderId()).orderStatus(order.getOrderStatus().toString()).totalPrice(order.getOrderPrice()).userMail("sabariks2003@gmail.com").build();
 		 
          kafkaTemplate.send(KafkaConstants.TOPIC, orderDetailsDto);
