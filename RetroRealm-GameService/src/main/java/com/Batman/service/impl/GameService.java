@@ -83,10 +83,16 @@ public class GameService implements IGameService{
 
 	@Override
 	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
+		log.info("Fetching Game By Prefix ...");
 		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix,GameName.class);
+		log.info("Fetched Game By Prefix ...");
 		return games;
 	}
 
+	/**
+	 * Need to add Kafka Listener Here
+	 * 
+	 */
 	@Override
 	@CircuitBreaker(name =  SERVICE_NAME)
 	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds,Double discountValue) {

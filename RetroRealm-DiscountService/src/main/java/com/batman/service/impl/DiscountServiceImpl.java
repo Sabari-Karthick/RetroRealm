@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import com.batman.dto.discount.DiscountRequest;
+import com.batman.dto.events.DiscountPlacedEvent;
 import com.batman.entity.Discount;
 import com.batman.exception.wrapper.DiscountAlreadyExistException;
 import com.batman.exception.wrapper.FailedToUpdateGameServiceException;
@@ -32,7 +34,9 @@ public class DiscountServiceImpl implements IDiscountService {
 	private final CommonMapper mapper;
 
 	private final GameFeignClient gameFeignClient;
-
+	
+	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
+ 
 	@Override
 	public Discount createDiscount(DiscountRequest discountRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
