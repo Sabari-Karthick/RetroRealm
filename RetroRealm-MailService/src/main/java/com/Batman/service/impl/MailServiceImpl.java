@@ -6,6 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.Batman.constants.KafkaConstants;
+import com.Batman.dto.OrderDetailsDto;
 import com.Batman.enums.Entity;
 import com.Batman.service.IMailService;
 
@@ -28,10 +29,10 @@ public class MailServiceImpl implements IMailService{
 		javaMailSender.send(javaMailSender.createMimeMessage());
 	}
 	
-	@KafkaListener(topics = {KafkaConstants.TOPIC},groupId = KafkaConstants.GROUP_ID)
-	public void listen(Integer id) {
+	@KafkaListener(topics = KafkaConstants.TOPIC,groupId = KafkaConstants.GROUP_ID)
+	public void orderPlacedEventListener(OrderDetailsDto orderDetailsDto) {
 		log.info("Entering Kafka Listener ...");
-		log.info("User id :: {}",id);
+		log.info("Order Id :: {}",orderDetailsDto.getOrderId());
 	}
 
 }

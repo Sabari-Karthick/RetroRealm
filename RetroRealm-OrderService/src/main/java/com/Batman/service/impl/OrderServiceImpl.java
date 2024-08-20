@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 
 import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.CartValueResponse;
+import com.Batman.dto.OrderDetailsDto;
 import com.Batman.dto.OrderRequest;
 import com.Batman.dto.PaymentRequest;
 import com.Batman.entity.Order;
@@ -22,6 +23,7 @@ import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.InvalidCartDetailsException;
 import com.Batman.exception.wrapper.RecordNotAvailableException;
 import com.Batman.feign.CartFeignClient;
+import com.Batman.feign.GameFeignClient;
 import com.Batman.feign.PaymentFeignClient;
 import com.Batman.repository.IOrderRepository;
 import com.Batman.service.IOrderService;
@@ -51,7 +53,9 @@ public class OrderServiceImpl implements IOrderService {
 
 	private final PaymentFeignClient paymentFeignClient;
 	
-	private final KafkaTemplate<String,Integer> kafkaTemplate;
+	private final GameFeignClient gameFeignClient;
+	
+	private final KafkaTemplate<String,OrderDetailsDto> kafkaTemplate;
 
 	private static final String SERVICE_NAME = "orderService";
 
@@ -101,7 +105,12 @@ public class OrderServiceImpl implements IOrderService {
 		 Order order = orderRepository.save(orderEntity);
 		 log.info("Order is Placed with status {} with Id ::{}",order.getOrderStatus(),order.getOrderId());
 		 log.info("Sending Order Placed Event ...");
-         kafkaTemplate.send(KafkaConstants.TOPIC, order.getUserId());
+		 
+		 
+		 List<String> gameNames = gameFeignClient.getGameNamesByGameIds(order.getOrderItems());
+		 OrderDetailsDto orderDetailsDto = OrderDetailsDto.builder().gameNames(gameNames).orderId(order.getOrderId()).orderStatus(order.getOrderStatus().toString()).totalPrice(order.getOrderPrice()).userMail("sabariks2003@gmail.com").build();
+		 
+         kafkaTemplate.send(KafkaConstants.TOPIC, orderDetailsDto);
          return order;
 	}
 
