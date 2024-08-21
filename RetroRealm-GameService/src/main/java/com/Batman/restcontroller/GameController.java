@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -85,9 +84,9 @@ public class GameController {
 	}
 	
 	
-	@PutMapping("/add/discount")
-	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds,@RequestParam Double discountValue){
-		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds,discountValue));
-	}
+//	@PutMapping("/add/discount")
+//	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds,@RequestParam Double discountValue){
+//		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds,discountValue));
+//	}
 
 }

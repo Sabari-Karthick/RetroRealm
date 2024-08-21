@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
 
 import com.Batman.dto.PageableRequestDto;
+import com.Batman.dto.events.DiscountPlacedEvent;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.projections.GameName;
@@ -18,5 +19,5 @@ public interface IGameService {
 	Double getTotalCostOfGames(Set<Integer> gameIds);
     List<GameName> suggestAllGameNameWithPrefix(String namePrefix);
     List<GameName> getAllGameNameWithIds(Set<Integer> gameIds);
-    List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds,Double discountValue);
+    List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent);
 }

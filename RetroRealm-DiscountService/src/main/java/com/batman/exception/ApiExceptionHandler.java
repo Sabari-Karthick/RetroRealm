@@ -2,6 +2,7 @@ package com.batman.exception;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.CompletionException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,16 +44,25 @@ public class ApiExceptionHandler {
 				.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
 	}
 	
+	@ExceptionHandler(value = CompletionException.class)
+	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleCompletionException(final T e) {
+
+		log.info("**ApiExceptionHandler controller, handle Completion future exception*\n");
+		final var serverError = HttpStatus.INTERNAL_SERVER_ERROR;
+		return new ResponseEntity<>(ExceptionMsg.builder().msg("#### " + e.getMessage() + "! ####")
+				.httpStatus(serverError).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), serverError);
+	}
+	
 	@ExceptionHandler(value = { Throwable.class})
 	public  ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {
 
 		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
-		final var badRequest = HttpStatus.INTERNAL_SERVER_ERROR;
+		final var serverError = HttpStatus.INTERNAL_SERVER_ERROR;
 
 		return new ResponseEntity<>(
 				ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
-						.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),
-				badRequest);
+						.httpStatus(serverError).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),
+						serverError);
 	}
 
 }

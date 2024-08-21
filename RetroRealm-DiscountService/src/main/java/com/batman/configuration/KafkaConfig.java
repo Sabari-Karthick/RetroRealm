@@ -26,7 +26,6 @@ public class KafkaConfig {
 		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.HOST);
 		configuration.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configuration.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
 		return new DefaultKafkaProducerFactory<>(configuration);
 	}
 

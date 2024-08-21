@@ -6,11 +6,14 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.PageableRequestDto;
+import com.Batman.dto.events.DiscountPlacedEvent;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.entity.Game;
@@ -89,15 +92,19 @@ public class GameService implements IGameService{
 		return games;
 	}
 
-	/**
-	 * Need to add Kafka Listener Here
-	 * 
-	 */
+
 	@Override
 	@CircuitBreaker(name =  SERVICE_NAME)
-	public List<GameResponse> updateDiscountOfGames(Set<Integer> gameIds,Double discountValue) {
+	@KafkaListener(topics = KafkaConstants.TOPIC,groupId = KafkaConstants.GROUP_ID)
+	public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
+		Set<Integer> gameIds = discountPlacedEvent.getGameIds();
+		Double discountValue = discountPlacedEvent.getDiscountValue();
 		log.info("Update Request For {} with value {}",gameIds,discountValue);
 		List<Game> games = gameRepository.findAllById(gameIds);
+		if(games.isEmpty()) {
+			log.error("No Games Found with the provided Ids...");
+			throw new  GameNotFoundException("No Games Found");
+		}
 		games.forEach(game -> game.setGameDiscount(discountValue));
 		games = gameRepository.saveAll(games);
 		log.info("Leaving Update Game Discount Request......");

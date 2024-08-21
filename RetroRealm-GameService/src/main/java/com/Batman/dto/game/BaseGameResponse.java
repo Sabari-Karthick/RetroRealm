@@ -16,6 +16,11 @@ public class BaseGameResponse {
 	private Double gameVersion;
 	private LocalDate gameReleasedDate;
 	private Double gameDiscount;
-	
 	private Set<GameGenre> gameGenere;
+	
+	public double getDiscountedGamePrice() {
+	    return this.gamePrice * (1 - this.gameDiscount / 100.0);
+	}
+	
+	
 }
