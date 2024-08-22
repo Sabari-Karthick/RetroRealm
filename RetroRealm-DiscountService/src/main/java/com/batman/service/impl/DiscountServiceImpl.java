@@ -2,21 +2,16 @@ package com.batman.service.impl;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
+//import org.springframework.context.ApplicationEventPublisher;
 //import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
-import com.batman.constants.KafkaConstants;
 import com.batman.dto.discount.DiscountRequest;
-import com.batman.dto.events.DiscountPlacedEvent;
 import com.batman.entity.Discount;
 import com.batman.exception.wrapper.DiscountAlreadyExistException;
-import com.batman.exception.wrapper.FailedToUpdateGameServiceException;
 import com.batman.exception.wrapper.InputFieldException;
 import com.batman.mapper.CommonMapper;
 import com.batman.repository.IDiscountRepository;
@@ -35,6 +30,7 @@ public class DiscountServiceImpl implements IDiscountService {
 
 	private final CommonMapper mapper;
 
+//	private final ApplicationEventPublisher applicationEventPublisher;
 //	private final GameFeignClient gameFeignClient;
 	
 //	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
