@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.springframework.kafka.core.KafkaTemplate;
+//import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class DiscountServiceImpl implements IDiscountService {
 
 //	private final GameFeignClient gameFeignClient;
 	
-	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
+//	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
  
 	@Override
 	public Discount createDiscount(DiscountRequest discountRequest, BindingResult bindingResult) {
@@ -53,20 +53,29 @@ public class DiscountServiceImpl implements IDiscountService {
 		discount.setIsExpired(false);
 		Discount savedDiscount = discountRepository.save(discount);
 		log.info("Discount Added ...");
-        log.info("Sending Discount Added Event ... ");	
+
+		/**
+		 * 
+		 *  The game update should be scheduled not updated with the discount save.
+		 * 
+		 * 
+		 */
 		
-        DiscountPlacedEvent discountPlacedEvent = DiscountPlacedEvent.builder().gameIds(discountRequest.getGameIds()).discountValue(discountRequest.getDiscountValue()).build();
-        CompletableFuture<SendResult<String,DiscountPlacedEvent>> future = kafkaTemplate.send(KafkaConstants.TOPIC, discountPlacedEvent);
-        future.handle((result , throwable) -> {
-        	if(throwable == null) {
-        		log.info("SuccessFull Response Received....");
-        		return result;
-    		} else {
-    			log.error("Failed to Update Game Discount....");
-    			throw new CompletionException(new FailedToUpdateGameServiceException(
-    					throwable.getMessage() + " Response Arrived From Game Service"));
-    		}
-        });
+		
+//        log.info("Sending Discount Added Event ... ");	
+//		
+//        DiscountPlacedEvent discountPlacedEvent = DiscountPlacedEvent.builder().gameIds(discountRequest.getGameIds()).discountValue(discountRequest.getDiscountValue()).build();
+//        CompletableFuture<SendResult<String,DiscountPlacedEvent>> future = kafkaTemplate.send(KafkaConstants.TOPIC, discountPlacedEvent);
+//        future.handle((result , throwable) -> {
+//        	if(throwable == null) {
+//        		log.info("SuccessFull Response Received....");
+//        		return result;
+//    		} else {
+//    			log.error("Failed to Update Game Discount....");
+//    			throw new CompletionException(new FailedToUpdateGameServiceException(
+//    					throwable.getMessage() + " Response Arrived From Game Service"));
+//    		}
+//        });
        
         return savedDiscount;
 	}
