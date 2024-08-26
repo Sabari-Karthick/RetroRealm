@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
 
+import com.batman.enums.DiscountStatus;
 import com.batman.enums.DiscountType;
 
 import jakarta.persistence.CollectionTable;
@@ -27,13 +28,16 @@ import lombok.Data;
 public class Discount {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer discountId;
 
 	@Enumerated(EnumType.STRING)
 	private DiscountType discountType;
 	
+	@Enumerated(EnumType.STRING)
+	private DiscountStatus discountStatus;
+	
 	@ElementCollection(targetClass = Integer.class,fetch = FetchType.EAGER)
-	@CollectionTable(name = "game_ids",joinColumns = @JoinColumn(name="discount_id",referencedColumnName = "id"))
+	@CollectionTable(name = "game_ids",joinColumns = @JoinColumn(name="discount_id",referencedColumnName = "discountId"))
 	private Set<Integer> gameIds;
 
 	private LocalDate fromDate;
