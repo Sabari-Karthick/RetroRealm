@@ -23,9 +23,6 @@ High-speed caching to optimize data retrieval and enhance performance.
 ## API Gateway
 ### Spring Cloud Gateway: 
 A powerful gateway for routing requests, load balancing, and providing a unified entry point.
-## Load Balancing
-### Ribbon: 
-Client-side load balancing to distribute requests across multiple service instances.
 ## Messaging and Event Streaming
 ### Kafka: 
 Reliable and scalable messaging for asynchronous communication between services.
