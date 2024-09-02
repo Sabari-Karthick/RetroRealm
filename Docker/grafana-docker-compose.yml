@@ -1,60 +1,49 @@
 version: "3"
 name  : grafana
-networks:
-  loki:
 services:
-  tempo:
-    image: grafana/tempo:2.2.2
-    command: -config.file=/etc/tempo.yaml
-    volumes:
-      - ./docker/tempo/tempo.yml:/etc/tempo.yaml:ro
-      - ./docker/tempo/tempo-data:/tmp/tempo
-    ports:
-      - "3110:3100"  # Tempo
-      - "9411:9411" # zipkin
-    networks:
-      - loki
-  loki:
-    image: grafana/loki:2.9.0
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - loki
-  grafana:
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
-        - name: Tempo
-          type: tempo
-          access: proxy
-          orgId: 1
-          url: http://tempo:3100
-          basicAuth: false
-          version: 1
-          editable: true  
-        EOF
-        /run.sh
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    networks:
-      - loki
+    tempo:
+        image: grafana/tempo
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command: [ "-config.file=/etc/tempo.yaml" ]
+        volumes:
+            - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
+            - ./tempo-data:/tmp/tempo
+        ports:
+            - "14268"  # jaeger ingest
+            - "9411:9411" # zipkin
+
+    loki:
+        image: grafana/loki
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command: [ "-config.file=/etc/loki/local-config.yaml" ]
+        ports:
+            - "3100:3100"                                   # loki needs to be exposed so it receives logs
+        environment:
+            - JAEGER_AGENT_HOST=tempo
+            - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+
+    prometheus:
+        image: prom/prometheus
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command:
+            - --enable-feature=exemplar-storage
+            - --config.file=/etc/prometheus/prometheus.yml
+        volumes:
+            - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        ports:
+            - "9090:9090"
+
+    grafana:
+        image: grafana/grafana
+        extra_hosts: ['host.docker.internal:host-gateway']
+        volumes:
+            - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+            - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+        environment:
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_DISABLE_LOGIN_FORM=true
+        ports:
+            - "3000:3000"
