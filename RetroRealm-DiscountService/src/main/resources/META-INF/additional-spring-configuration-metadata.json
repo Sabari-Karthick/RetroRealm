@@ -1,5 +1,22 @@
-{"properties": [{
-  "name": "spring.datasource.jdbc-url",
-  "type": "java.lang.String",
-  "description": "A description for 'spring.datasource.jdbc-url'"
-}]}
+{"properties": [
+  {
+    "name": "spring.datasource.jdbc-url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.jdbc-url'"
+  },
+  {
+    "name": "spring.datasource.quartz.username",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.quartz.username'"
+  },
+  {
+    "name": "spring.datasource.quartz.jdbc-url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.quartz.jdbc-url'"
+  },
+  {
+    "name": "spring.datasource.quartz.password",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.quartz.password'"
+  }
+]}

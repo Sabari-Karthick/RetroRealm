@@ -36,7 +36,7 @@ public class SchedulerConfiguration {
 	
 	@Bean
     @QuartzDataSource
-    @ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource.quartz")
     DataSource quartzDataSource() {
         return DataSourceBuilder.create().build();
     }
