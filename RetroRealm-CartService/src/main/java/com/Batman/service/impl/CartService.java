@@ -72,14 +72,18 @@ public class CartService implements ICartService {
 
 	@Override
 	public Cart getCartOfUser(Integer userId) {
+		log.info("Entering Get Cart of User {} ...",userId);
 		/**
 		 * 
 		 * Consideration Needed whether to store total amount 
 		 * and Do we need to update the cart when discount is applied
 		 * and whether an notification needs to be send when cart price is dropped
 		 */
+		
+		
 		Cart cart = cartRepository.findByUserId(userId)
 				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
+		log.info("Leaving Get Cart of User {} ...",userId);
 		return cart;
 	}
 
@@ -109,7 +113,10 @@ public class CartService implements ICartService {
 
 	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
 	private Double calculatePrice(Set<Integer> gameIds) {
-		return gameFeignClinet.getTotalPrice(gameIds);
+		log.info("Sending Get Total Price Request For Game Service ...");
+		 Double totalPrice = gameFeignClinet.getTotalPrice(gameIds);
+		 log.info("Leaving Get Total Price Request For Game Service ...");
+		 return totalPrice;
 	}
 
 	@Override
@@ -139,9 +146,11 @@ public class CartService implements ICartService {
 
 	@Override
 	public CartValueResponse getCartItems(Integer userId) {
+		log.info("Entering getCartItems ...");
 		Cart cart = cartRepository.findByUserId(userId)
 				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
 		CartValueResponse cartValueResponse = new CartValueResponse(cart.getSelectedCartItems(), cart.getTotalPrice());
+		log.info("Leaving getCartItems ...");
 		return cartValueResponse;
 	}
 	
