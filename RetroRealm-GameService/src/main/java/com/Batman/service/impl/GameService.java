@@ -77,11 +77,14 @@ public class GameService implements IGameService{
 	@RateLimiter(name = SERVICE_NAME,fallbackMethod = "gameServiceFallBackMethod")
 	@CircuitBreaker(name =  SERVICE_NAME)
 	public Double getTotalCostOfGames(Set<Integer> gameIds) {
+		log.info("Entering getTotalCostOfGames ...");
 		List<Game> games = gameRepository.findAllById(gameIds);
 		if(games.isEmpty()) {
 			return 0.0;
 		}
-		return games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
+		double totalCost = games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
+		log.info("Leaving getTotalCostOfGames ...");
+		return totalCost;
 	}
 
 	@Override
@@ -111,7 +114,7 @@ public class GameService implements IGameService{
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 	
-	protected List<GameName> gameServiceFallBackMethod(Exception ex) {
+	public Double gameServiceFallBackMethod(Throwable ex) {
 		log.error(ex.getMessage());
 		log.info("Entering Game Service Fall Back Method ...");
 		throw new TooManyRequestException("REQUEST_OVERLOADED");
