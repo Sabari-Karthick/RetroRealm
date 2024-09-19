@@ -34,20 +34,19 @@ public class SchedulerConfiguration {
         return jobFactory;
     }
 	
-	@Bean
+	@Bean("QUARTZDATASOURCE")
     @QuartzDataSource
     @ConfigurationProperties(prefix = "spring.datasource.quartz")
     DataSource quartzDataSource() {
+		log.info("Initializing Quartx Datasource ... ");
         return DataSourceBuilder.create().build();
     }
 	
 	@Bean
 	SchedulerFactoryBean scheduler(DataSource quartzDataSource) {
 		
-
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setConfigLocation(new ClassPathResource("quartz.properties"));
-        
         schedulerFactory.setJobFactory(springBeanJobFactory());
         schedulerFactory.setDataSource(quartzDataSource);
 
