@@ -88,6 +88,11 @@ spring:
         predicates:
         - Path=/api/v1/discount/**
         uri: lb://discount-service
+        filters:
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: "#{@rateLimter}"
+            key-resolver: "#{@proxyKeyResolver}"
   main:
     web-application-type: reactive 
 springdoc:

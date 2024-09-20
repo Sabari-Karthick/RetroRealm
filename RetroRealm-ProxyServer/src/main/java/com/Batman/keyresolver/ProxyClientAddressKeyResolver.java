@@ -11,7 +11,13 @@ import org.springframework.web.server.ServerWebExchange;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-
+/**
+ * 
+ * This Class is Used to extract the IP Address of the request Sender
+ * 
+ * 
+ * 
+ */
 @Primary
 @Component(value = "proxyKeyResolver")
 @Slf4j
