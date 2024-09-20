@@ -12,10 +12,11 @@ public class JwtAuthenticationException extends AuthenticationException {
 	private static final long serialVersionUID = 1L;
 
 	
-	private HttpStatus httpStatus;
+	private final HttpStatus httpStatus;
 
     public JwtAuthenticationException(String msg) {
         super(msg);
+        this.httpStatus = HttpStatus.UNAUTHORIZED;
     }
 
     public JwtAuthenticationException(String msg, HttpStatus httpStatus) {

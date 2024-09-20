@@ -50,9 +50,9 @@ public class AuthenticationService implements UserDetailsService {
 		});
 		String token = jwtProvider.createToken(user.getEmail(), user.getRoles().iterator().next().name());
 		AuthenticationResponse response = new AuthenticationResponse();
-
 		response.setResponse(user);
 		response.setToken(token);
+		log.info("Leaving Login ...");
 		return response;
 	}
 

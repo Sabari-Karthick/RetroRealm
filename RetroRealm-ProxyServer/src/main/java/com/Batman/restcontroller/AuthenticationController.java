@@ -3,10 +3,11 @@ package com.Batman.restcontroller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Batman.dto.AuthenticationRequest;
-import com.Batman.feignclinet.UserFeignClinet;
+import com.Batman.service.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,12 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class AuthenticationController {
 	
-	private final UserFeignClinet feignClinet;
+	private final AuthenticationService authenticationService;
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
-		
-		return ResponseEntity.ok().build();
+		return new ResponseEntity<>(authenticationService.login(request), HttpStatus.OK);
 	}
 	
 

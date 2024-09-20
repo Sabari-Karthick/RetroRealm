@@ -107,3 +107,8 @@ springdoc:
       url: /v3/api-docs
     - name: game-service
       url: /api/v1/game/v3/api-docs
+#jwt 
+jwt:
+  header: Authorization
+  secret: batman
+  expiration: 604800      

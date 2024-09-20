@@ -48,40 +48,56 @@ public class JwtProvider {
 	}
 
 	public String createToken(String usermail, String role) {
+		log.info("Entering createToken ...");
 		Claims claims = Jwts.claims().setSubject(usermail);
 		claims.put("role", role);
 		Date now = new Date();
 		Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
 
-		return Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(validity)
+		String token = Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(validity)
 				.signWith(SignatureAlgorithm.HS256, secretKey).compact();
+		log.info("Leaving createToken ...");
+		return token;
 	}
 
 	public boolean validateToken(String token) {
 		try {
-			log.info("Validating Token......");
+			log.info("Enter validateToken...");
 			Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 			return !claimsJws.getBody().getExpiration().before(new Date());
 		} catch (JwtException | IllegalArgumentException exception) {
 			log.error("Token Validation Failed......" + exception.getMessage());
 			throw new JwtAuthenticationException("INVALID_TOKEN", HttpStatus.UNAUTHORIZED);
+		} finally {
+			log.info("Leaving validateToken...");
 		}
 	}
 
 	public Authentication getAuthentication(String token) {
+		log.info("Entering getAuthentication...");
 		UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsermail(token));
-		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+				userDetails, "", userDetails.getAuthorities());
+		log.info("Leaving validateToken...");
+		return usernamePasswordAuthenticationToken;
 	}
 
 	public String getUsermail(String token) {
-		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+		log.info("Entering JWT getUsermail...");
+		String userMail = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+		log.info("Leaving JWT getUsermail...");
+		return userMail;
 	}
 
 	public String resolveToken(HttpServletRequest request) {
+		log.info("Entering JWT resolveToken...");
 		String bearerToken = request.getHeader(authorizationHeader);
 		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+			log.info("Token Found ...");
 			return bearerToken.substring(7);
 		}
+		log.error("Token Not Found ...");
+		log.info("Leaving JWT resolveToken...");
 		return null;
 	}
 }

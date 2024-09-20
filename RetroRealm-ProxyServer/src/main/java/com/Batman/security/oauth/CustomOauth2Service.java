@@ -16,15 +16,18 @@ import com.Batman.enums.Role;
 import com.Batman.feignclinet.UserFeignClinet;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOauth2Service extends DefaultOAuth2UserService {
 
 	private final UserFeignClinet userClient;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+		log.info("Entering loadUser...");
 		String provider = userRequest.getClientRegistration().getRegistrationId();
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		OAuth2UserInfo oAuth2UserInfo = OAuth2UserFactory.getOAuth2UserInfo(provider, oAuth2User.getAttributes());
@@ -36,11 +39,15 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 			user2.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
 			user2.setRoles(Collections.singleton(Role.GAMER));
 			user = userClient.saveUser(user2);
+			log.info("Adding the new User...");
 		} else {
 			user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
 			user = userClient.saveUser(user);
+			log.info("Updating the  User...");
 		}
-		return new UserPrincipal(user, oAuth2User.getAttributes());
+		 UserPrincipal userPrincipal = new UserPrincipal(user, oAuth2User.getAttributes());
+		 log.info("Leaving loadUser...");
+		 return userPrincipal;
 	}
 
 }
