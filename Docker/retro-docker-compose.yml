@@ -1,4 +1,9 @@
 version : '4'
 name : retro_realm
 services:
-    
+    redis:
+     image: redis:6.0
+     ports:
+      - "16379:6379"
+     command: ["redis-server", "--requirepass", "mypass"]
+     restart: unless-stopped
