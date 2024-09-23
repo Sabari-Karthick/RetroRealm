@@ -18,21 +18,18 @@ import com.batman.service.IDiscountService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 
 
 @RestController
 @RequestMapping("/api/v1/discount/")
 @RequiredArgsConstructor
-@Slf4j
 public class DiscountController {
 
 	private final IDiscountService service;
 	
 	@PostMapping("/create")
-	public ResponseEntity<?> postMethodName(@Valid @RequestBody final DiscountRequest request,BindingResult bindingResult) {
-		log.info("Discount Creation Request Arrived ......");
+	public ResponseEntity<?> createDiscount(@Valid @RequestBody final DiscountRequest request,BindingResult bindingResult) {
 		Discount discount = service.createDiscount(request, bindingResult);
 		return new ResponseEntity<Discount>(discount,HttpStatus.CREATED);
 	}
@@ -40,7 +37,6 @@ public class DiscountController {
 	
 	@GetMapping("/game/search")
 	public ResponseEntity<?> fetchDiscounts(@RequestParam final Set<Integer> gameIds ) {
-		log.info("Fetching Discount by Game Id:: ", gameIds);
 		return ResponseEntity.ok(service.getDiscountByGameIds(gameIds));
 	}
 	
