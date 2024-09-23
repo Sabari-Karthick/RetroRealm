@@ -18,6 +18,18 @@ spring:
     admin:
       client:
         url: http://localhost:8000/Retro/admin/
+#Oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 1375276823100263
+            scope: email,public_profile
+          google:
+            client-id: 273703224070-cgdm9rslova2i6a9luugcu32uid65iga.apps.googleusercontent.com
+            scope: email,profile
+
   data:
     redis:
       database: 0
@@ -111,4 +123,5 @@ springdoc:
 jwt:
   header: Authorization
   secret: batman
-  expiration: 604800      
+  expiration: 604800      1
+  
