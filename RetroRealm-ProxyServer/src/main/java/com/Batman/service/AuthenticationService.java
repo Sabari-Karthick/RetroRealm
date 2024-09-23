@@ -1,5 +1,7 @@
 package com.Batman.service;
 
+import java.util.Map;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +33,7 @@ public class AuthenticationService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String userMail) throws UsernameNotFoundException {
 		log.info("Entering loadUserByUsername...");
-		User user = userFeignClinet.findByEmail(userMail).orElseThrow(() -> {
+		User user = userFeignClinet.getUserByMail(Map.of("userMail",userMail)).orElseThrow(() -> {
 			log.error("USER NOT FOUND...");
 			return new UsernameNotFoundException("USER_NOT_FOUND");
 		});
@@ -40,11 +42,11 @@ public class AuthenticationService implements UserDetailsService {
 		return userPrincipal;
 	}
 
-	public AuthenticationResponse login(AuthenticationRequest request) {
+	public AuthenticationResponse login(AuthenticationRequest authRequest) {
 		log.info("Entering Login ...");
 		authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		User user = userFeignClinet.findByEmail(request.getEmail()).orElseThrow(() -> {
+				.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
+		User user = userFeignClinet.getUserByMail(Map.of("userMail",authRequest.getEmail())).orElseThrow(() -> {
 			log.error("USER WITH THIS MAIL NOT FOUND...");
 			return new UsernameNotFoundException("EMAIL_NOT_FOUND");
 		});

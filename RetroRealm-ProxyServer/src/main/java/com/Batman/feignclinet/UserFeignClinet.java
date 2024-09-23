@@ -1,12 +1,12 @@
 package com.Batman.feignclinet;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.Batman.dto.User;
 
@@ -14,14 +14,11 @@ import com.Batman.dto.User;
 @FeignClient(name = "user-service")
 public interface UserFeignClinet {
 	
-	@GetMapping("/api/v1/game/calculate/price")
-	Double getTotalPrice(@RequestParam("ids[]") Set<Integer> gameId);
+	@GetMapping("/api/v1/users/mail")
+	Optional<User> getUserByMail(@RequestBody Map<String, String> request);
 	
-	@GetMapping("/api/v1/game/calculate/price")
-	Optional<User> findByEmail(String userMail);
-	
-	@PostMapping()
-	User saveUser(User user);
+	@PostMapping("/api/v1/users/register")
+	User registerUser(@RequestBody User user);
 	
 
 }

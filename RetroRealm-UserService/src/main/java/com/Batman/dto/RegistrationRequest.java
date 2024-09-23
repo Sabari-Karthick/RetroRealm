@@ -1,6 +1,10 @@
 package com.Batman.dto;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Set;
 
+import com.Batman.enums.AuthenticationProiver;
+import com.Batman.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -16,13 +20,10 @@ public class RegistrationRequest {
 
   
    @Size(min = 8,max = 12,message = "UNIQUE_USERNAME")	
-   private String username;
+   private String name;
 
     @Size(min = 6, max = 16, message = "PASSWORD_CHARACTER_LENGTH")
     private String password;
-
-    @Size(min = 6, max = 16, message = "PASSWORD2_CHARACTER_LENGTH")
-    private String password2;
  
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
@@ -32,4 +33,7 @@ public class RegistrationRequest {
     @NotBlank(message = "EMAIL_CANNOT_BE_EMPTY")
     private String email;
     
+    private AuthenticationProiver authenticationProvider = AuthenticationProiver.LOCAL;
+
+    private Set<Role> roles = Collections.singleton(Role.GAMER);
 }

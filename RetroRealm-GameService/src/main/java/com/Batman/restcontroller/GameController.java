@@ -38,7 +38,7 @@ public class GameController {
 	@PostMapping("/release")
 	public ResponseEntity<?> saveGame(@Valid @RequestBody final GameRequest gameRequest, BindingResult bindingResult) {
 		GameResponse game = gameService.registerGame(gameRequest, bindingResult);
-		return new ResponseEntity<GameResponse>(game, HttpStatus.CREATED);
+		return new ResponseEntity<>(game, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{id}")
@@ -50,7 +50,7 @@ public class GameController {
 	@PostMapping("/owner")
 	public ResponseEntity<?> registerOwner(@Valid @RequestBody final GameOwnerRequest gameOwnerRequest,BindingResult bindingResult){
 		GameOwnerResponse registerOwner = gameOwnerService.registerOwner(gameOwnerRequest,bindingResult);
-		return new ResponseEntity<GameOwnerResponse>(registerOwner,HttpStatus.CREATED);
+		return new ResponseEntity<>(registerOwner,HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/owner/{id}")

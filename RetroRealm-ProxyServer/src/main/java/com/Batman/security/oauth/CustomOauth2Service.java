@@ -1,6 +1,7 @@
 package com.Batman.security.oauth;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -31,18 +32,18 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 		String provider = userRequest.getClientRegistration().getRegistrationId();
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		OAuth2UserInfo oAuth2UserInfo = OAuth2UserFactory.getOAuth2UserInfo(provider, oAuth2User.getAttributes());
-		User user = userClient.findByEmail(oAuth2UserInfo.getEmail()).orElse(null);
+		User user = userClient.getUserByMail(Map.of("userMail",oAuth2UserInfo.getEmail())).orElse(null);
 		if (Objects.isNull(user)) {
 			User user2 = new User();
 			user2.setName(oAuth2UserInfo.getFirstName());
 			user2.setEmail(oAuth2UserInfo.getEmail());
 			user2.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
 			user2.setRoles(Collections.singleton(Role.GAMER));
-			user = userClient.saveUser(user2);
+			user = userClient.registerUser(user2);
 			log.info("Adding the new User...");
 		} else {
 			user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
-			user = userClient.saveUser(user);
+			user = userClient.registerUser(user);
 			log.info("Updating the  User...");
 		}
 		 UserPrincipal userPrincipal = new UserPrincipal(user, oAuth2User.getAttributes());

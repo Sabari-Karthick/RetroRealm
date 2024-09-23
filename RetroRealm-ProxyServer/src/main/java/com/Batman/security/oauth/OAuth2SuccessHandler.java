@@ -22,34 +22,32 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
-	
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
 	private final JwtProvider jwtProvider;
-		
+
 	private final ObjectMapper objectMapper;
-  
+
 	private final CommonMapper mapper;
-	
+
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		
-		 UserPrincipal oAuth2User = (UserPrincipal) authentication.getPrincipal();
-    	
-    	String email = (String) oAuth2User.getAttributes().get("email");
-    	String token = jwtProvider.createToken(email, Role.GAMER.toString());
-    	
-    	AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-    	authenticationResponse.setResponse(mapper.convertToResponse(oAuth2User.getUser(), User.class));
-    	authenticationResponse.setToken(token);
-    	String successResponse = objectMapper.writeValueAsString(authenticationResponse);
-    	response.setContentType("application/json");
-    	response.setStatus(200);
-    	response.getWriter().write(successResponse);
-    	response.getWriter().flush();
 
-    	
-        
+		UserPrincipal oAuth2User = (UserPrincipal) authentication.getPrincipal();
+
+		String email = (String) oAuth2User.getAttributes().get("email");
+		String token = jwtProvider.createToken(email, Role.GAMER.toString());
+
+		AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+		authenticationResponse.setResponse(mapper.convertToResponse(oAuth2User.getUser(), User.class));
+		authenticationResponse.setToken(token);
+		String successResponse = objectMapper.writeValueAsString(authenticationResponse);
+		response.setContentType("application/json");
+		response.setStatus(200);
+		response.getWriter().write(successResponse);
+		response.getWriter().flush();
+
 	}
 
 }
