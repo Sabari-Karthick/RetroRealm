@@ -36,6 +36,7 @@ public class SecurityConfig {
                 		.requestMatchers("/oauth2/**",  "/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers("/eureka/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/users/register").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(login -> login
