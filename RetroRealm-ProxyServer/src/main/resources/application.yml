@@ -13,22 +13,24 @@ server:
     context-path: /
 spring:
   application:
-    name: API-GATEWAY
+    name: api-gateway-service
   boot:
     admin:
       client:
         url: http://localhost:8000/Retro/admin/
-#Oauth
-  security:
-    oauth2:
-      client:
-        registration:
-          facebook:
-            client-id: 1375276823100263
-            scope: email,public_profile
-          google:
-            client-id: 273703224070-cgdm9rslova2i6a9luugcu32uid65iga.apps.googleusercontent.com
-            scope: email,profile
+##Oauth
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+##          facebook:
+##            client-id: ${facebook.client-id}
+##            client-secret: ${facebook.client-secret}
+##            scope: email,public_profile
+#          google:
+#            client-id: ${google.clinet-id}
+#            client-secret: ${google.client-secret}
+#            scope: email,profile
 
   data:
     redis:
@@ -36,10 +38,16 @@ spring:
       host: localhost
       port: 16379
       password: mypass
-      timeout: 60000      
+      timeout: 60000 
+#  config:
+#    import: "configserver:http://localhost:8088"     
   cloud:
     compatibility-verifier:
       enabled: false
+#    config:
+#      discovery:
+#        enabled: true  
+#        service-id: retrorealm-config-server  
     gateway:
       discovery:
         locator:
@@ -106,6 +114,7 @@ spring:
             rate-limiter: "#{@rateLimter}"
             key-resolver: "#{@proxyKeyResolver}"
   main:
+#    allow-bean-definition-overriding: true
     web-application-type: reactive 
 springdoc:
   api-docs:
