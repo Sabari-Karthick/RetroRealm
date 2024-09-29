@@ -1,14 +1,19 @@
 package com.Batman.service.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import com.Batman.dto.RegistrationRequest;
 import com.Batman.entity.User;
+import com.Batman.enums.AuthenticationProiver;
+import com.Batman.enums.Role;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.UserNotFoundException;
 import com.Batman.mapper.CommonMapper;
@@ -25,25 +30,36 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements IUserService {
 
 	private final IUserRepository userRepository;
-
+   
+	private final PasswordEncoder encoder;
+	
 	private final CommonMapper mapper;
 
 	@Override
-	public User registerUser(RegistrationRequest user,BindingResult bindingResult) {
+	public String registerUser(RegistrationRequest user,BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			log.error("Input field Exception in{}",bindingResult.getFieldError()+" "+bindingResult.getFieldError().getDefaultMessage());
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
 		}
 		log.info("Entering registerUser ...");
+		if(userRepository.findByEmail(user.getEmail()).isPresent())
+			    throw new UserNotFoundException("USER_Exists");
 		User userEntity = mapper.convertToEntity(user, User.class);
 		log.info("Registering user {}", user.getName());
+		if(Objects.isNull(userEntity.getAuthenticationProvider()))
+			 userEntity.setAuthenticationProvider(AuthenticationProiver.LOCAL);
+		if(Objects.isNull(userEntity.getRoles()))
+			 userEntity.setRoles(Collections.singleton(Role.GAMER));
+		userEntity.setPassword(encoder.encode(user.getPassword()));;
 		User savedUser = userRepository.save(userEntity);
 		log.info("Leaving registerUser ...");
-		return savedUser;
+		return "User Registered With ID :: "+savedUser.getUserID();
 
 	}
 
 	@Override
 	public User getUserByEmail(String userMail) {
+		log.info("Entering getUserByEmail ...");
 		if(StringUtils.isBlank(userMail)) {
 			log.error("User Mail is Null");
 			throw new InputFieldException("User Mail is Null");

@@ -1,52 +1,50 @@
-//package com.Batman.configuration;
-//
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.config.http.SessionCreationPolicy;
-//import org.springframework.security.web.SecurityFilterChain;
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-//
-//import com.Batman.security.jwt.JwtFilter;
-//import com.Batman.security.oauth.CustomOauth2Service;
-//import com.Batman.security.oauth.OAuth2SuccessHandler;
-//
-//import lombok.RequiredArgsConstructor;
-//
-//@Configuration
-//@EnableWebSecurity
-//@EnableMethodSecurity
-//@RequiredArgsConstructor
-//public class SecurityConfig {
-//	
-//	private final JwtFilter jwtFilter;
-//	
+package com.Batman.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+
+import com.Batman.security.jwt.JwtFilter;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebFluxSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+	
+	private final JwtFilter jwtFilter;
+	
 //	private final CustomOauth2Service oauth2Service;
-//	
+	
 //	private final OAuth2SuccessHandler oAuth2SuccessHandler;
-//
-//	@Bean
-//	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(request -> request
-//                		.requestMatchers("/oauth2/**",  "/swagger-ui/**","/v3/api-docs/**").permitAll()
-//                        .requestMatchers("/eureka/**").permitAll()
-//                        .requestMatchers("/api/v1/auth/**").permitAll()
-//                        .requestMatchers("/api/v1/users/register").permitAll()
-//                        .anyRequest().authenticated())
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+	@Bean
+	SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeExchange(request -> request
+                		.pathMatchers("/oauth2/**",  "/swagger-ui/**","/v3/api-docs/**").permitAll()
+                        .pathMatchers("/eureka/**").permitAll()
+                        .pathMatchers("/api/v1/auth/**").permitAll()
+                        .pathMatchers("/api/v1/users/register").permitAll()
+                        .anyExchange().authenticated())
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 //                .oauth2Login(login -> login
 //						.authorizationEndpoint(authorization -> authorization.baseUri("/oauth2/authorize"))
 //						.userInfoEndpoint(userInfo -> userInfo.userService(oauth2Service))
 //						.successHandler(oAuth2SuccessHandler))
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//		return http.build();
-//
-//	}
-//
-//}
+               .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+
+		return http.build();
+
+	}
+
+}

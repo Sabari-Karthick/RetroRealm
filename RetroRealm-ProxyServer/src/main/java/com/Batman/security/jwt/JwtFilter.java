@@ -1,78 +1,48 @@
-//package com.Batman.security.jwt;
-//
-///**
-// * 
-// * 
-// * @author _karthick 
-// * @date 30/11/23
-// * 
-// * 
-// * 
-// * 
-// */
-//import java.io.IOException;
-//import java.time.ZoneId;
-//import java.time.ZonedDateTime;
-//
-//import jakarta.servlet.FilterChain;
-//import jakarta.servlet.ServletException;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//
-//import org.springframework.http.HttpStatus;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.context.SecurityContextHolder;
-//import org.springframework.stereotype.Component;
-//import org.springframework.web.filter.OncePerRequestFilter;
-//
-//import com.Batman.exception.payload.ExceptionMsg;
-//import com.Batman.exceptions.JwtAuthenticationException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//
-//@Slf4j
-//@RequiredArgsConstructor
-//@Component
-//public class JwtFilter extends OncePerRequestFilter {
-//
-//	private final JwtProvider provider;
-//
-//	private final ObjectMapper mapper;
-//
-//	@Override
-//	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-//			throws ServletException, IOException {
-//		log.info("Entered Authentication Filter.......");
-//		String token = provider.resolveToken(request);
-//		try {
-//			if (token != null && provider.validateToken(token)) {
-//				log.info("Entering Authentication ...");
-//				Authentication authentication = provider.getAuthentication(token);
-//
-//				if (authentication != null) {
-//					log.info("Successfully Authenticated ...");
-//					SecurityContextHolder.getContext().setAuthentication(authentication);
-//				}
-//			}
-//		}
-//
-//		catch (IllegalArgumentException | JwtAuthenticationException e) {
-//			log.error("Error While Authentication ...");
-//			SecurityContextHolder.clearContext();
-//
-//			ExceptionMsg error = ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
-//					.httpStatus(HttpStatus.BAD_REQUEST).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build();
-//			String errorResponse = mapper.writeValueAsString(error);
-//
-//			response.setContentType("application/json");
-//			response.setStatus(403);
-//			response.getWriter().write(errorResponse);
-//			response.getWriter().flush();
-//			return;
-//		}
-//		log.info("Leaving Authentication Filter ...");
-//		filterChain.doFilter(request, response);
-//	}
-//}
+package com.Batman.security.jwt;
+
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+
+import com.Batman.exceptions.JwtAuthenticationException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class JwtFilter implements WebFilter {
+
+	private final JwtProvider provider;
+
+	
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+		log.info("Entered Authentication Filter.......");
+		ServerHttpRequest request = exchange.getRequest();
+		String token = provider.resolveToken(request);
+		try {
+			if (token != null && provider.validateToken(token)) {
+				log.info("Entering Authentication ...");
+				Mono<Authentication> authenticationMono = provider.getAuthentication(token).switchIfEmpty(Mono.error(new JwtAuthenticationException("AUTHENTICATION_FAILED")));
+				log.info("SuccessFully Authenticated ...");
+				return authenticationMono.flatMap(authentication -> 
+			    chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+			);
+			}
+		}
+
+		catch (IllegalArgumentException | JwtAuthenticationException e) {
+			log.error("Error While Authentication ...");
+			return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.clearContext());
+		}
+		log.info("Leaving Authentication Filter ...");
+		return chain.filter(exchange);
+	}
+}

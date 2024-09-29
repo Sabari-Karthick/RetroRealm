@@ -16,7 +16,6 @@ import com.Batman.service.IUserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -31,7 +30,7 @@ public class UserController {
 
 	}
 
-	@GetMapping("/mail")
+	@PostMapping("/mail")
 	public ResponseEntity<?> getUserByMail(@RequestBody @NotNull final Map<String, String> request) {
 		return  ResponseEntity.ok(userService.getUserByEmail(request.get("userMail")));
      }

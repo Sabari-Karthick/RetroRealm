@@ -65,7 +65,7 @@ spring:
             key-resolver: "#{@proxyKeyResolver}"
       - id: user_route
         predicates:
-        - Path=/user-service/**
+        - Path=/api/v1/users/**
         uri: lb://USER-SERVICE
       - id: client_route
         predicates:
@@ -114,7 +114,6 @@ spring:
             rate-limiter: "#{@rateLimter}"
             key-resolver: "#{@proxyKeyResolver}"
   main:
-#    allow-bean-definition-overriding: true
     web-application-type: reactive 
 springdoc:
   api-docs:

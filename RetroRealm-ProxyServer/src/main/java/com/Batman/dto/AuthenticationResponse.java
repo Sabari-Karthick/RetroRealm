@@ -6,7 +6,10 @@ import lombok.Data;
 @Data
 public class AuthenticationResponse {
 
-	
-	private User response;
+	/**
+	 * This Response Needs to be Modified
+	 * 
+	 */
+	private String userMail;
 	private String token;
 }
