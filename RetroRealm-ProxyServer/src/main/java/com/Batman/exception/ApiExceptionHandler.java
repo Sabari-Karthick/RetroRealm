@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ApiExceptionHandler {
 
-	@ExceptionHandler(value = { JwtAuthenticationException.class,UsernameNotFoundException.class})
+	@ExceptionHandler(value = { JwtAuthenticationException.class,UsernameNotFoundException.class,BadCredentialsException.class})
 	public <T extends AuthenticationException> ResponseEntity<ExceptionMsg> handleValidationException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle Authentication exception*\n");
@@ -46,7 +47,8 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(value = { Throwable.class})
 	public  ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {
 
-		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+		log.info("**ApiExceptionHandler controller, handle unknown exception*\n");
+		log.info("Exception Class :: {}",e.getClass().getSimpleName());
 		final var badRequest = HttpStatus.INTERNAL_SERVER_ERROR;
 
 		return new ResponseEntity<>(
