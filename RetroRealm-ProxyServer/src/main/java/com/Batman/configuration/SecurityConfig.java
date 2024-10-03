@@ -2,10 +2,13 @@ package com.Batman.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
+import org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
@@ -15,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableMethodSecurity
+@EnableReactiveMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 	
@@ -26,25 +29,25 @@ public class SecurityConfig {
 //	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
 	@Bean
-	SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+	SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(CsrfSpec::disable)
                 .authorizeExchange(request -> request
-                		.pathMatchers("/oauth2/**",  "/swagger-ui/**","/v3/api-docs/**").permitAll()
+                		.pathMatchers("/oauth2/**","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .pathMatchers("/eureka/**").permitAll()
                         .pathMatchers("/api/v1/auth/**").permitAll()
                         .pathMatchers("/api/v1/users/register").permitAll()
                         .anyExchange().authenticated())
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-//                .oauth2Login(login -> login
-//						.authorizationEndpoint(authorization -> authorization.baseUri("/oauth2/authorize"))
-//						.userInfoEndpoint(userInfo -> userInfo.userService(oauth2Service))
-//						.successHandler(oAuth2SuccessHandler))
-               .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+                .httpBasic(HttpBasicSpec::disable)
+                .oauth2Login(withDefaults())
+                .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 
 		return http.build();
 
 	}
+	
+
 
 }
