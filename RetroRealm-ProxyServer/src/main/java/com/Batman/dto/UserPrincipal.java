@@ -7,12 +7,12 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import lombok.Data;
 
 @Data
-public class UserPrincipal implements UserDetails/*,OAuth2User*/,Serializable{
+public class UserPrincipal implements UserDetails,OAuth2User,Serializable{
 
 
 	private static final long serialVersionUID = 1L;
@@ -71,14 +71,14 @@ public class UserPrincipal implements UserDetails/*,OAuth2User*/,Serializable{
 		return true;
 	}
 
-//	@Override
-//	public Map<String, Object> getAttributes() {
-//		return attributes;
-//	}
-//
-//	@Override
-//	public String getName() {
-//		return user.getEmail();
-//	}
+	@Override
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	@Override
+	public String getName() {
+		return user.getEmail();
+	}
 
 }

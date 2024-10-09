@@ -39,6 +39,7 @@ public class User {
 	
 	private String email;
 	
+	@Enumerated(EnumType.STRING)
 	private AuthenticationProiver authenticationProvider;
 	
 	private String password;

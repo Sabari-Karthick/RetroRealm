@@ -1,5 +1,8 @@
 package com.Batman.security.jwt;
 
+import java.util.Optional;
+
+import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -21,12 +24,19 @@ public class JwtFilter implements WebFilter {
 
 	private final JwtProvider provider;
 
-	
+	private static final String COOKIE_NAME = "RSESSION";
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 		log.info("Entered Authentication Filter.......");
 		ServerHttpRequest request = exchange.getRequest();
-		String token = provider.resolveToken(request);
+		log.info("REQUESTED PATH ::: {}",request.getPath().toString());
+		Optional<HttpCookie> cookie = Optional.ofNullable(request.getCookies().getFirst(COOKIE_NAME));
+	    String token = cookie
+	        .map(HttpCookie::getValue)
+	        .orElseGet(() -> {
+	            log.info("No Cookie Found, Getting token from Request Header ...");
+	            return provider.resolveToken(request);
+	        });
 		try {
 			if (token != null && provider.validateToken(token)) {
 				log.info("Entering Authentication ...");

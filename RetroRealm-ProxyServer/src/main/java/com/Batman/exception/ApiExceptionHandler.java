@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ApiExceptionHandler {
 
-	@ExceptionHandler(value = { JwtAuthenticationException.class,UsernameNotFoundException.class,BadCredentialsException.class})
+	@ExceptionHandler(value = { JwtAuthenticationException.class,UsernameNotFoundException.class,BadCredentialsException.class,OAuth2AuthenticationException.class})
 	public <T extends AuthenticationException> ResponseEntity<ExceptionMsg> handleValidationException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle Authentication exception*\n");
