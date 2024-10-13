@@ -16,7 +16,7 @@ public class FacebookOAuth2UserInfo extends OAuth2UserInfo {
 
 	    @Override
 	    public String getFirstName() {
-	        return (String) attributes.get("given_name");
+	        return (String) attributes.get("name");
 	    }
 
 	    @Override

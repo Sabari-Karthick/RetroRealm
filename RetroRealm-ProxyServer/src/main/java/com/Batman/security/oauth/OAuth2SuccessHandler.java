@@ -6,7 +6,7 @@ import java.time.Duration;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
 	@SneakyThrows
 	public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
 		log.info("Entering onAuthenticationSuccess... ");
-        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 		String email = (String) oAuth2User.getAttributes().get("email");
 		String token = jwtProvider.createToken(email, Role.GAMER.toString());
 /*		AuthenticationResponse authenticationResponse = new AuthenticationResponse();

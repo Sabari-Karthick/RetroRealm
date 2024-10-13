@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -75,7 +76,11 @@ public class JwtProvider {
 
 	public Mono<Authentication> getAuthentication(String token) {
 		log.info("Entering getAuthentication...");
-		Mono<UserDetails> userDetailsMono = this.userDetailsService.findByUsername(getUsermail(token));
+		Mono<UserDetails> userDetailsMono = this.userDetailsService.findByUsername(getUsermail(token))
+				.doOnError(error -> {
+					log.error("Bad Credentials, User not found ... ");
+					throw new BadCredentialsException(error.getMessage());
+				});
 		return userDetailsMono.map(userDetails -> {
 			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 					userDetails, "", userDetails.getAuthorities());

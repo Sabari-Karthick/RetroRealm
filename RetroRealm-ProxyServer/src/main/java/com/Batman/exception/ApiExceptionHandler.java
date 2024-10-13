@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.Batman.exception.payload.ExceptionMsg;
 import com.Batman.exceptions.JwtAuthenticationException;
+import com.Batman.exceptions.UserRegistrationException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,19 @@ public class ApiExceptionHandler {
 //		return new ResponseEntity<>(ExceptionMsg.builder().msg("#### " + e.getMessage() + "! ####")
 //				.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
 //	}
+	
+	@ExceptionHandler(value = { UserRegistrationException.class})
+	public  ResponseEntity<ExceptionMsg> handleUserRegistrationException(final UserRegistrationException e) {
+
+		log.info("**ApiExceptionHandler controller, handle UserRegistrationException *\n");
+		log.info("Exception Class :: {}",e.getClass().getSimpleName());
+		final var badRequest = HttpStatus.INTERNAL_SERVER_ERROR;
+
+		return new ResponseEntity<>(
+				ExceptionMsg.builder().msg("*" + e.getMessage() + "!**")
+						.httpStatus(badRequest).timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(),
+				badRequest);
+	}
 	
 	@ExceptionHandler(value = { Throwable.class})
 	public  ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {

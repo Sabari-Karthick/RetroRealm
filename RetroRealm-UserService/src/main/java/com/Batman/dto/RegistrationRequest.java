@@ -26,6 +26,9 @@ public class RegistrationRequest {
    @Size(min = 8,max = 20,message = "INVALID_LENGTH")	
    private String name;
 
+    /*
+     * Needs to be updated with custom validation
+     */
     @Size(min = 6, max = 16, message = "PASSWORD_CHARACTER_LENGTH")
     private String password;
  
