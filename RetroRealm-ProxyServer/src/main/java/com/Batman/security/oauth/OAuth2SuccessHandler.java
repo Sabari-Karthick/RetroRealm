@@ -81,6 +81,7 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
                     .httpOnly(true)   // Prevent access via JavaScript to avoid XSS
                     .secure(true)     // Send over HTTPS only
                     .path("/")        // Set the path for the cookie to which paths and all this to be send
+//                    .sameSite("Strict")// Sent in requests that originate from the same site
                     .maxAge(Duration.ofHours(5))
                     .build();
         log.info("Leaving createCookie ...");
