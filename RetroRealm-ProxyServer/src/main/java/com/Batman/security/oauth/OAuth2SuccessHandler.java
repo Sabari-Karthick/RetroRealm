@@ -87,5 +87,4 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
         log.info("Leaving createCookie ...");
         return cookie;
 	}
-
 }
