@@ -17,7 +17,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateProviderRequest {
 
-  
+	private Integer userID;
+	
     private String name;
  
     private LocalDate dateOfBirth;

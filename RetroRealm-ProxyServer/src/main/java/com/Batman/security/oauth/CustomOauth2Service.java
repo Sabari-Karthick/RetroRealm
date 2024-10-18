@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -60,9 +61,10 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 							 throw new UserRegistrationException(e.getMessage());
 					     }).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}",newUser.getName(),newUser.getAuthenticationProvider()));
 				 } else {
-					 log.info("Updating the  User...");
+					 log.info("Updating the User...");
 					 user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
 					 return updateUser(user).doOnError(e -> {
+						 log.error("Load User, User Update Error ...");
 						 throw new UserRegistrationException(e.getMessage());
 				     }).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}",user.getName(),user.getAuthenticationProvider()));
 				 }
@@ -98,7 +100,14 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 		 log.info("Entering updateUser ...");
 		 Mono<User> userMono = WebClient.create().put().uri(USER_SERVICE_UPDATE_USER_URL)
 				.bodyValue(user).retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("ERROR_WHILE_UPDATING_USER")))
+				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+					log.error("Error While retrieving User Details ...");
+					throw new UsernameNotFoundException("AUTHENTICATION_ERROR");
+				 })
+				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+					log.error("Error While retrieving User Details ...");
+					throw new UserRegistrationException("ERROR_WHILE_USER_UPDATE");
+				 })
 				.bodyToMono(User.class);
 		 log.info("Leaving updateUser ...");
 		 return userMono;
