@@ -68,9 +68,12 @@ public class GameService implements IGameService{
 
 	@Override
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
+		log.info("Entering getAllGames... ");
 		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(), pageableRequest.getAsc()?Direction.ASC:Direction.DESC, pageableRequest.getProperty());
 		Page<Game> gamePages = gameRepository.findAll(pageRequest);
-		return gamePages.map(game ->  mapper.convertToResponse(game, GameResponse.class));
+		 Page<GameResponse> response = gamePages.map(game ->  mapper.convertToResponse(game, GameResponse.class));
+		 log.info("Leaving getAllGames... ");
+		 return response;
 	}
 
 	@Override

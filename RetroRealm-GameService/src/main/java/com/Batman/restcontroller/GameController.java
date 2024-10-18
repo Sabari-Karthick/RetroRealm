@@ -59,11 +59,8 @@ public class GameController {
 	}
 	
 	
-	@GetMapping("/all")
-	public ResponseEntity<?> getAllGames(@RequestBody(required = false)  PageableRequestDto pageableRequest){
-		if(pageableRequest == null) {
-			pageableRequest = new PageableRequestDto();
-		}
+	@PostMapping("/all")
+	public ResponseEntity<?> getAllGames(@RequestBody PageableRequestDto pageableRequest){
 		return ResponseEntity.ok(gameService.getAllGames(pageableRequest));
 	}
 	
