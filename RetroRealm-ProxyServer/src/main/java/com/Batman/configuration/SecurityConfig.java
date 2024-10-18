@@ -44,7 +44,9 @@ public class SecurityConfig {
                         .anyExchange().authenticated())
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .httpBasic(HttpBasicSpec::disable)
-                .oauth2Login(oauth2 -> oauth2.authenticationSuccessHandler(oAuth2SuccessHandler))
+                .oauth2Login(oauth2 -> oauth2
+                		 .authenticationSuccessHandler(oAuth2SuccessHandler))
+//                		 .authorizationRequestRepository(authorizationRequestRepository))
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .formLogin(FormLoginSpec::disable)
                 .logout(LogoutSpec::disable);
