@@ -2,6 +2,8 @@ management:
   endpoint:
     shutdown:
       enabled: true
+    health:
+      show-details: always 
   endpoints:
     web:
       exposure:
@@ -11,6 +13,7 @@ server:
   port: 8080
   servlet:
     context-path: /
+  
 spring:
   application:
     name: api-gateway-service
@@ -18,19 +21,19 @@ spring:
     admin:
       client:
         url: http://localhost:8000/Retro/admin/
-##Oauth
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-##          facebook:
-##            client-id: ${facebook.client-id}
-##            client-secret: ${facebook.client-secret}
-##            scope: email,public_profile
-#          google:
-#            client-id: ${google.clinet-id}
-#            client-secret: ${google.client-secret}
-#            scope: email,profile
+#Oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: ${facebook.client-id}
+            client-secret: ${facebook.client-secret}
+            scope: email,public_profile
+          google:
+            client-id: ${google.client-id}
+            client-secret: ${google.client-secret}
+            scope: email,profile
 
   data:
     redis:
@@ -39,15 +42,17 @@ spring:
       port: 16379
       password: mypass
       timeout: 60000 
-#  config:
-#    import: "configserver:http://localhost:8088"     
-  cloud:
+  config:
+#    import: configserver:http://localhost:8088
+    import: "optional:configserver:"
+  cloud: 
     compatibility-verifier:
       enabled: false
-#    config:
-#      discovery:
-#        enabled: true  
-#        service-id: retrorealm-config-server  
+    config:
+      discovery:
+        enabled: true  
+        service-id: retrorealm-config-server  
+      fail-fast: true
     gateway:
       discovery:
         locator:
@@ -132,4 +137,9 @@ jwt:
   header: Authorization
   secret: batman
   expiration: 604800      1
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: DEBUG
   

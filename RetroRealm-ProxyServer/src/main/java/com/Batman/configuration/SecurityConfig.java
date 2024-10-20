@@ -30,6 +30,8 @@ public class SecurityConfig {
 	
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	
+//	private final ServerAuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
+	
 
 	@Bean
 	SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {

@@ -66,7 +66,7 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 					 return updateUser(user).doOnError(e -> {
 						 log.error("Load User, User Update Error ...");
 						 throw new UserRegistrationException(e.getMessage());
-				     }).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}",user.getName(),user.getAuthenticationProvider()));
+				     }).doOnNext(result -> log.info("User Updated ::: {} with Provider ::: {}",user.getName(),user.getAuthenticationProvider()));
 				 }
 			 }).map(user -> new UserPrincipal(user, oauthAttributes))
 			 .doOnTerminate(() -> log.info("Leaving loadUser..."));
