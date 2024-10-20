@@ -61,6 +61,11 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 							 throw new UserRegistrationException(e.getMessage());
 					     }).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}",newUser.getName(),newUser.getAuthenticationProvider()));
 				 } else {
+					 String existingProvider = user.getAuthenticationProvider().toString();
+					 if(existingProvider.equalsIgnoreCase(provider.toUpperCase())) {
+						 log.info("User is already registered with the provider :: {}",existingProvider);
+						 return Mono.just(user);
+					 }
 					 log.info("Updating the User...");
 					 user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
 					 return updateUser(user).doOnError(e -> {
