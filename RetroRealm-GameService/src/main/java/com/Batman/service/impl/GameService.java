@@ -1,12 +1,14 @@
 package com.Batman.service.impl;
 
 import static com.Batman.constants.GameConstants.GAME_RESPONSE;
+import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
 
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -53,6 +55,8 @@ public class GameService implements IGameService {
 	private static final String SERVICE_NAME = "game-service";
 
 	@Override
+	@Caching(cacheable = @Cacheable(value = GAME_RESPONSE, key = "#result.gameId", condition = "#result != null"), 
+         	evict = @CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true))
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
@@ -78,6 +82,7 @@ public class GameService implements IGameService {
 	}
 
 	@Override
+	@Cacheable(value = GAME_PAGE_RESPONSE, condition = "!#result.isEmpty()")
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
 		log.info("Entering getAllGames... ");
 		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
@@ -113,6 +118,7 @@ public class GameService implements IGameService {
 	@Override
 	@CircuitBreaker(name = SERVICE_NAME)
 	@KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
+	@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
 	public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
 		Set<Integer> gameIds = discountPlacedEvent.getGameIds();
 		Double discountValue = discountPlacedEvent.getDiscountValue();
