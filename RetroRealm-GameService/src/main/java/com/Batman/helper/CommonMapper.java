@@ -1,4 +1,4 @@
-package com.Batman.mapper;
+package com.Batman.helper;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

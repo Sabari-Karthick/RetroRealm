@@ -29,7 +29,7 @@ import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.TooManyRequestException;
-import com.Batman.mapper.CommonMapper;
+import com.Batman.helper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
@@ -57,6 +57,7 @@ public class GameService implements IGameService {
 	@Override
 	@Caching(cacheable = @Cacheable(value = GAME_RESPONSE, key = "#result.gameId", condition = "#result != null"), 
          	evict = @CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true))
+	@CacheDistribute
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
@@ -82,7 +83,8 @@ public class GameService implements IGameService {
 	}
 
 	@Override
-	@Cacheable(value = GAME_PAGE_RESPONSE, condition = "!#result.isEmpty()")
+	@Cacheable(value = GAME_PAGE_RESPONSE,key = GAME_PAGE_RESPONSE, condition = "!#result.isEmpty()")
+	@CacheDistribute
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
 		log.info("Entering getAllGames... ");
 		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
