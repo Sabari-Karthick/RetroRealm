@@ -11,7 +11,7 @@
 	<groupId>Batman</groupId>
 	<artifactId>RetroRealm-ServiceRegistry</artifactId>
 	<version>1.0</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>RetroRealm-ServiceRegistry</name>
 	<description>A Digital Game Selling Platform Service Registry</description>
 	<properties>

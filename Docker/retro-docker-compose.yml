@@ -7,3 +7,15 @@ services:
       - "16379:6379"
      command: ["redis-server", "--requirepass", "mypass"]
      restart: unless-stopped
+    service-registry:
+      build:
+        context: ../RetroRealm-ServiceRegistry
+        dockerfile: Dockerfile
+    #   image: retrorealm-sr
+      ports:
+      - "8762:8762"
+      environment:
+      - SERVER_PORT=8762
+    #   restart: always
+        
+       
