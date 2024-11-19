@@ -1,6 +1,5 @@
 package com.Batman.dto;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import lombok.Data;
 
 @Data
-public class UserPrincipal implements UserDetails,OAuth2User,Serializable{
+public class UserPrincipal implements UserDetails,OAuth2User{
 
 
 	private static final long serialVersionUID = 1L;

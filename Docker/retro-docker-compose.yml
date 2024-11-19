@@ -1,21 +1,40 @@
-version : '4'
-name : retro_realm
+version: '4'
+name: retro_realm
 services:
-    redis:
-     image: redis:6.0
-     ports:
-      - "16379:6379"
-     command: ["redis-server", "--requirepass", "mypass"]
-     restart: unless-stopped
-    service-registry:
-      build:
-        context: ../RetroRealm-ServiceRegistry
-        dockerfile: Dockerfile
+  service-registry:
+    container_name: eureka
+    build:
+      context: ../RetroRealm-ServiceRegistry
+      dockerfile: Dockerfile
     #   image: retrorealm-sr
-      ports:
-      - "8762:8762"
-      environment:
-      - SERVER_PORT=8762
-    #   restart: always
-        
-       
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+    restart: always
+  user-service-db:
+    image: mysql:latest
+    container_name: user-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: retro_users
+    ports:
+      - "33067:3306"
+  user-service:
+    container_name: user-service
+    build:
+      context: ../RetroRealm-UserService
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - DB_URL=jdbc:mysql://user-service-db:3306/retro_users
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - EUREKA_URI=http://eureka:8761/eureka
+    depends_on:
+      - user-service-db
+      - service-registry
+    restart: on-failure:2
+

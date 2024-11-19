@@ -1,0 +1,126 @@
+version: '3'
+name: core-stack
+services:
+  redis:
+    image: redis:6.0
+    ports:
+      - "16379:6379"
+    command: ["redis-server", "--requirepass", "mypass"]
+    restart: unless-stopped
+  zookeeper:
+    image: zookeeper:3.8
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000  
+    networks:
+      - kafka-network
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    restart: on-failure:1
+    networks:
+      - kafka-network
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+      JVM_OPTS: "-Xms32M -Xmx64M"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-network
+  tempo:
+        image: grafana/tempo
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command: [ "-config.file=/etc/tempo.yaml" ]
+        volumes:
+            - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
+            - ./tempo-data:/tmp/tempo
+        ports:
+            - "14268"  # jaeger ingest
+            - "9411:9411" # zipkin
+  loki:
+        image: grafana/loki
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command: [ "-config.file=/etc/loki/local-config.yaml" ]
+        ports:
+            - "3100:3100"                                   # loki needs to be exposed so it receives logs
+        environment:
+            - JAEGER_AGENT_HOST=tempo
+            - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+  prometheus:
+        image: prom/prometheus
+        extra_hosts: ['host.docker.internal:host-gateway']
+        command:
+            - --enable-feature=exemplar-storage
+            - --config.file=/etc/prometheus/prometheus.yml
+        volumes:
+            - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        ports:
+            - "9090:9090"
+  grafana:
+        image: grafana/grafana
+        extra_hosts: ['host.docker.internal:host-gateway']
+        volumes:
+            - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+            - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+        environment:
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_DISABLE_LOGIN_FORM=true
+        ports:
+            - "3000:3000"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+    container_name: es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.license.self_generated.type=trial
+    ports:
+      - "9200:9200"
+    networks:
+      - elastic-net
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.1
+    container_name: kib
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic-net
+  
+networks:
+  kafka-network:
+    driver: bridge
+  elastic-net:
+    driver: bridge
+    
+volumes:
+  esdata:
+    driver: local
