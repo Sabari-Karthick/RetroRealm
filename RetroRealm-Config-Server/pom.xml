@@ -10,7 +10,8 @@
 	</parent>
 	<groupId>Batman</groupId>
 	<artifactId>RetroRealm-Config-Server</artifactId>
-	<version>beta</version>
+	<version>1.0</version>
+	<packaging>jar</packaging>
 	<name>RetroRealm-Config-Server</name>
 	<description>Retro Realm Config Server</description>
 	<url/>
