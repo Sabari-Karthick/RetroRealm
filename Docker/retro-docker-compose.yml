@@ -1,48 +1,34 @@
 version: '4'
 name: retro_realm
 services:
+  admin-server:
+    container_name: admin-server
+    build:
+      context: ../RetroRealm-AdminServer
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVER_PORT=8000
+    restart: always
   service-registry:
     container_name: eureka
     build:
       context: ../RetroRealm-ServiceRegistry
       dockerfile: Dockerfile
-    #   image: retrorealm-sr
     ports:
       - "8761:8761"
     environment:
       - SERVER_PORT=8761
-    restart: always
-  user-service-db:
-    image: mysql:latest
-    container_name: user-service-db
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: retro_users
-    ports:
-      - "33067:3306"
-  user-service:
-    container_name: user-service
-    build:
-      context: ../RetroRealm-UserService
-      dockerfile: Dockerfile
-    ports:
-      - "8081:8081"
-    environment:
-      - SERVER_PORT=8081
-      - DB_URL=jdbc:mysql://user-service-db:3306/retro_users
-      - DB_USERNAME=root
-      - DB_PASSWORD=1234
-      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
     depends_on:
-      - user-service-db
-      - service-registry
-    restart: on-failure:2
+      - admin-server
+    restart: always
   config-server:
-    container_name: cfg-server
+    container_name: config-server
     build:
       context: ../RetroRealm-Config-Server
       dockerfile: Dockerfile
-    #   image: retrorealm-sr
     ports:
       - "8001:8001"
     environment:
@@ -50,6 +36,22 @@ services:
       - GITHUB_USERNAME=${GIT_USERNAME}
       - GITHUB_ACCESS_TOKEN=${GIT_PASSWORD}
       - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+    depends_on:
+      - admin-server
+      - service-registry
+    restart: always
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ../RetroRealm-ProxyServer
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_URI=http://eureka:8761/eureka
     depends_on:
       - service-registry
     restart: always
+     

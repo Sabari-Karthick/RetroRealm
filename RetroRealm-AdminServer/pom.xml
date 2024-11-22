@@ -11,7 +11,7 @@
 	<groupId>Batman</groupId>
 	<artifactId>RetroRealm-AdminServer</artifactId>
 	<version>1.0</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>RetroRealm-AdminServer</name>
 	<description>A Digital Game Selling Platform Admin Server</description>
 	<properties>
