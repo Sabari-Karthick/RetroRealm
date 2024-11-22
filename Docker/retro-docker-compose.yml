@@ -51,7 +51,10 @@ services:
     environment:
       - SERVER_PORT=8080
       - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
     depends_on:
+      - admin-server
       - service-registry
+      - config-server
     restart: always
      

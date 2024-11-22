@@ -12,7 +12,7 @@
 	<groupId>Batman</groupId>
 	<artifactId>RetroRealm-ProxyServer</artifactId>
 	<version>1.0</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>RetroRealm-ProxyServer</name>
 	<description>A Digital Game Selling Platform Proxy Server</description>
 	<properties>

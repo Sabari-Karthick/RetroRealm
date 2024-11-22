@@ -9,18 +9,20 @@ management:
       exposure:
         include: '*'
 server:
-  address: localhost
   port: 8080
   servlet:
     context-path: /
-  
+eureka:
+  client:
+    serviceUrl:
+       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
 spring:
   application:
-    name: api-gateway-service
+    name: api-gateway
   boot:
     admin:
       client:
-        url: http://localhost:8000/Retro/admin/
+        url: ${ADMIN_SERVER_URL:http://localhost:8000/Retro/admin/}
 #Oauth
   security:
     oauth2:
@@ -90,16 +92,16 @@ spring:
         predicates:
         - Path=/api/v1/cart/**
         uri: lb://cart-service
-      - filters:
-        - SetPath=/
-        id: eureka-route
-        predicates:
-        - Path=/eureka/home
-        uri: http://localhost:8761
-      - id: eureka-static-route
-        predicates:
-        - Path=/eureka/**
-        uri: http://localhost:8761
+      # - filters:
+      #   - SetPath=/
+      #   id: eureka-route
+      #   predicates:
+      #   - Path=/eureka/home
+      #   uri: http://localhost:8761
+      # - id: eureka-static-route
+      #   predicates:
+      #   - Path=/eureka/**
+      #   uri: http://localhost:8761
       - id: order-route
         predicates:
         - Path=/api/v1/order/**
@@ -135,7 +137,7 @@ springdoc:
 #jwt 
 jwt:
   header: Authorization
-  secret: batman
+  secret: ${jwt.secret}
   expiration: 604800      1
 #logging:
 #  level:
