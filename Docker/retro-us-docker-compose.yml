@@ -1,9 +1,14 @@
 version: '3'
 name: user-service
+networks:
+  retro-main:
+    external: true
 services:
   user-service-db:
     image: mysql:latest
     container_name: user-service-db
+    networks:
+          - retro-main
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: retro_users
@@ -14,6 +19,8 @@ services:
     build:
       context: ../RetroRealm-UserService
       dockerfile: Dockerfile
+    networks:
+          - retro-main
     ports:
       - "8081:8081"
     environment:
@@ -22,7 +29,7 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=1234
       - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
     depends_on:
       - user-service-db
-      - service-registry
     restart: on-failure:2

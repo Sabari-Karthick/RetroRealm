@@ -40,8 +40,8 @@ spring:
   data:
     redis:
       database: 0
-      host: localhost
-      port: 16379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:16379}
       password: mypass
       timeout: 60000 
   config:

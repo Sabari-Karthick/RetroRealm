@@ -7,6 +7,8 @@ services:
       - "16379:6379"
     command: ["redis-server", "--requirepass", "mypass"]
     restart: unless-stopped
+    networks:
+        - retro-main
   zookeeper:
     image: zookeeper:3.8
     container_name: zookeeper
@@ -56,6 +58,8 @@ services:
         ports:
             - "14268"  # jaeger ingest
             - "9411:9411" # zipkin
+        networks:
+            - retro-main
   loki:
         image: grafana/loki
         extra_hosts: ['host.docker.internal:host-gateway']
@@ -67,6 +71,8 @@ services:
             - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
             - JAEGER_SAMPLER_TYPE=const
             - JAEGER_SAMPLER_PARAM=1
+        networks:
+            - retro-main
   prometheus:
         image: prom/prometheus
         extra_hosts: ['host.docker.internal:host-gateway']
@@ -120,6 +126,8 @@ networks:
     driver: bridge
   elastic-net:
     driver: bridge
+  retro-main:
+    external: true
     
 volumes:
   esdata:

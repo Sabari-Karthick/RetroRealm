@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
 
+	private static final String COOKIE_NAME = "RETROAUTH";
 	private final JwtProvider jwtProvider;
 
 
@@ -77,7 +78,7 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
 
 	private ResponseCookie createCookie(String token) {
 		log.info("Entering createCookie ...");
-        ResponseCookie cookie = ResponseCookie.from("RSESSION", token)
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
                     .httpOnly(true)   // Prevent access via JavaScript to avoid XSS
                     .secure(true)     // Send over HTTPS only
                     .path("/")        // Set the path for the cookie to which paths and all this to be send

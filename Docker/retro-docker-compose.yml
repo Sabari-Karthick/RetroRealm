@@ -1,11 +1,16 @@
 version: '4'
 name: retro_realm
+networks:
+  retro-main:
+    external: true
 services:
   admin-server:
     container_name: admin-server
     build:
       context: ../RetroRealm-AdminServer
       dockerfile: Dockerfile
+    networks:
+        - retro-main
     ports:
       - "8000:8000"
     environment:
@@ -16,11 +21,14 @@ services:
     build:
       context: ../RetroRealm-ServiceRegistry
       dockerfile: Dockerfile
+    networks:
+          - retro-main
     ports:
       - "8761:8761"
     environment:
       - SERVER_PORT=8761
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - TRACE_URL=http://tempo:9411
     depends_on:
       - admin-server
     restart: always
@@ -29,6 +37,8 @@ services:
     build:
       context: ../RetroRealm-Config-Server
       dockerfile: Dockerfile
+    networks:
+          - retro-main
     ports:
       - "8001:8001"
     environment:
@@ -46,12 +56,16 @@ services:
     build:
       context: ../RetroRealm-ProxyServer
       dockerfile: Dockerfile
+    networks:
+          - retro-main
     ports:
       - "8080:8080"
     environment:
       - SERVER_PORT=8080
       - EUREKA_URI=http://eureka:8761/eureka
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - admin-server
       - service-registry

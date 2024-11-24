@@ -39,7 +39,7 @@ public class SecurityConfig {
         http
                 .csrf(CsrfSpec::disable)
                 .authorizeExchange(request -> request
-                        .pathMatchers("/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/login", "/home").permitAll()
+                        .pathMatchers("/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/login", "/home","/actuator/**").permitAll()
                         .pathMatchers("/eureka/**").permitAll()
                         .pathMatchers("/api/v1/auth/**").permitAll()
                         .pathMatchers("/api/v1/users/register").permitAll()

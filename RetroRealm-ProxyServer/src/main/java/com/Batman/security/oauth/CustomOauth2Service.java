@@ -30,8 +30,8 @@ import reactor.core.publisher.Mono;
 public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 
 	
-	private static final String USER_SERVICE_GET_USER_URL = "http://localhost:8082/api/v1/users/mail";
-	private static final String USER_SERVICE_UPDATE_USER_URL = "http://localhost:8082/api/v1/users/provider/update";
+	private static final String USER_SERVICE_GET_USER_URL = "http://user-service:8081/api/v1/users/mail";
+	private static final String USER_SERVICE_UPDATE_USER_URL = "http://user-service:8081/api/v1/users/provider/update";
 
 	@Override
 	public Mono<OAuth2User> loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
