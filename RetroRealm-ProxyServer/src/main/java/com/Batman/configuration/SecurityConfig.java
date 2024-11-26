@@ -1,6 +1,7 @@
 package com.Batman.configuration;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -30,6 +31,9 @@ public class SecurityConfig {
 	
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	
+	@Value("${allowed.paths}")
+	private String[] allowedPaths;
+	
 //	private final ServerAuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
 	
 
@@ -39,10 +43,7 @@ public class SecurityConfig {
         http
                 .csrf(CsrfSpec::disable)
                 .authorizeExchange(request -> request
-                        .pathMatchers("/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/login", "/home","/actuator/**").permitAll()
-                        .pathMatchers("/eureka/**").permitAll()
-                        .pathMatchers("/api/v1/auth/**").permitAll()
-                        .pathMatchers("/api/v1/users/register").permitAll()
+                        .pathMatchers(allowedPaths).permitAll()
                         .anyExchange().authenticated())
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .httpBasic(HttpBasicSpec::disable)
