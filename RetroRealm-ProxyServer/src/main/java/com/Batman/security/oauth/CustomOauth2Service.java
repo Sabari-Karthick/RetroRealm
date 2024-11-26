@@ -19,6 +19,7 @@ import com.Batman.dto.UserPrincipal;
 import com.Batman.enums.AuthenticationProiver;
 import com.Batman.enums.Role;
 import com.Batman.exceptions.UserRegistrationException;
+import com.Batman.helper.UserServiceUrlResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 
+	private final UserServiceUrlResolver userServiceUrlResolver;
 	
-	private static final String USER_SERVICE_GET_USER_URL = "http://user-service:8081/api/v1/users/mail";
-	private static final String USER_SERVICE_UPDATE_USER_URL = "http://user-service:8081/api/v1/users/provider/update";
 
 	@Override
 	public Mono<OAuth2User> loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -44,7 +44,7 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 				throw new OAuth2AuthenticationException("FAILED_TO_RETRIEVE_ATTRIBUTES");
 			}			
 			OAuth2UserInfo oAuth2UserInfo = OAuth2UserFactory.getOAuth2UserInfo(provider, oauthAttributes);
-			Mono<User> userMono = WebClient.create().post().uri(USER_SERVICE_GET_USER_URL)
+			Mono<User> userMono = WebClient.create().post().uri(userServiceUrlResolver.getUserByMailUrl())
 					.contentType(MediaType.APPLICATION_JSON) 
 					.bodyValue(Map.of("userMail", oAuth2UserInfo.getEmail())).retrieve()
 					.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
@@ -103,7 +103,7 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 	
 	private Mono<User> updateUser(User user){
 		 log.info("Entering updateUser ...");
-		 Mono<User> userMono = WebClient.create().put().uri(USER_SERVICE_UPDATE_USER_URL)
+		 Mono<User> userMono = WebClient.create().put().uri(userServiceUrlResolver.getUpdateUserUrl())
 				.bodyValue(user).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
 					log.error("Error While retrieving User Details ...");

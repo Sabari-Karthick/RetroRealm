@@ -18,5 +18,10 @@
     "name": "allowed.paths",
     "type": "java.lang.String",
     "description": "A description for 'allowed.paths'"
+  },
+  {
+    "name": "is-local",
+    "type": "java.lang.String",
+    "description": "A description for 'is-local'"
   }
 ]}
