@@ -1,0 +1,13 @@
+version: '4'
+name: retro-DB
+services:
+    game-db:
+      image: mysql:latest
+      container_name: game-db
+      networks:
+          - retro-main
+      environment:
+        MYSQL_ROOT_PASSWORD: 1234
+        MYSQL_DATABASE: retro_games
+      ports:
+        - "33067:3306"

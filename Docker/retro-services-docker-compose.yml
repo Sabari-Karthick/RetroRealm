@@ -1,0 +1,16 @@
+version: '4'
+name: retro-services
+networks:
+  retro-main:
+    external: true
+services:
+    game-service:
+      container_name: user-service
+      build:
+        context: ../RetroRealm-UserService
+        dockerfile: Dockerfile
+        networks:
+         - retro-main
+      environment:
+         
+        
