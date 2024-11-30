@@ -15,7 +15,7 @@
         <!-- HTTP configuration for the Loki appender -->
         <http>
             <!-- The URL of the Loki server to which logs are pushed -->
-            <url>http://localhost:3100/loki/api/v1/push</url>
+            <url>http://loki:3100/loki/api/v1/push</url>
         </http>
 
         <!-- Formatting options for the logs sent to Loki -->

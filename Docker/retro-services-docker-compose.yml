@@ -5,12 +5,25 @@ networks:
     external: true
 services:
     game-service:
-      container_name: user-service
+      container_name: game-service
       build:
-        context: ../RetroRealm-UserService
+        context: ../RetroRealm-GameService
         dockerfile: Dockerfile
         networks:
          - retro-main
       environment:
-         
+        - SERVER_PORT=8082
+        - DB_URL=jdbc:mysql://user-db:3306/retro_games
+        - DB_USERNAME=root
+        - DB_PASSWORD=1234
+        - EUREKA_URI=http://eureka:8761/eureka
+        - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+        - REDIS_HOST=redis
+        - REDIS_PORT=6379
+        - REDIS_PASSWORD=mypass 
+        - KAFKA_HOST=kafka:9092
+      restart: no
+      networks:
+         - retro-main
+    
         

@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -28,13 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @EnableKafka
 @Slf4j
 public class KafkaConfig {
+	
+	@Value("${kafka.host}")
+	private String host;
 
 	
 	@Bean
 	ConsumerFactory<String, DiscountPlacedEvent> getConsumerFactory(){
 		
 		HashMap<String, Object> config = new HashMap<>();
-		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,KafkaConstants.HOST);
+		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,host);
 		config.put(ConsumerConfig.GROUP_ID_CONFIG,KafkaConstants.GROUP_ID);
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);

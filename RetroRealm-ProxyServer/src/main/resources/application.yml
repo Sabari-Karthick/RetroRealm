@@ -45,7 +45,7 @@ spring:
       database: 0
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:16379}
-      password: mypass
+      password: ${REDIS_PASSWORD:mypass}
       timeout: 60000 
   config:
 #    import: configserver:http://localhost:8088

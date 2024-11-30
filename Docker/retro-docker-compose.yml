@@ -66,6 +66,7 @@ services:
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=mypass
     depends_on:
       - admin-server
       - service-registry

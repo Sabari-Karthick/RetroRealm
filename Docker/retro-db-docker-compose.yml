@@ -1,5 +1,8 @@
 version: '4'
 name: retro-DB
+networks:
+  retro-main:
+    external: true
 services:
     game-db:
       image: mysql:latest
