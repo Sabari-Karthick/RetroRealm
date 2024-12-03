@@ -26,11 +26,11 @@ public class CacheConfiguration {
 	
 	@Bean
 	RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() { // Cache Specific Configurations
-	    return (builder) -> builder
+	    return builder -> builder
 	      .withCacheConfiguration(GAME_OWNER,
 	        RedisCacheConfiguration
 	            .defaultCacheConfig()
-	            .entryTtl(Duration.ofMinutes(5)));
+	            .entryTtl(Duration.ofMinutes(300)));
 	}
 
 }
