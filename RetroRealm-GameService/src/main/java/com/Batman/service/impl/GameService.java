@@ -1,14 +1,13 @@
 package com.Batman.service.impl;
 
-import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
+import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -55,8 +54,7 @@ public class GameService implements IGameService {
 	private static final String SERVICE_NAME = "game-service";
 
 	@Override
-	@Caching(cacheable = @Cacheable(value = GAME_RESPONSE, key = "#result.gameId", condition = "#result != null"), 
-         	evict = @CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true))
+	@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
 	@CacheDistribute
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -83,7 +81,7 @@ public class GameService implements IGameService {
 	}
 
 	@Override
-	@Cacheable(value = GAME_PAGE_RESPONSE,key = GAME_PAGE_RESPONSE, condition = "!#result.isEmpty()")
+	@Cacheable(value = GAME_PAGE_RESPONSE,key = GAME_PAGE_RESPONSE, condition = "#result != null && !#result.isEmpty()")
 	@CacheDistribute
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
 		log.info("Entering getAllGames... ");
@@ -91,6 +89,7 @@ public class GameService implements IGameService {
 				pageableRequest.getAsc() ? Direction.ASC : Direction.DESC, pageableRequest.getProperty());
 		Page<Game> gamePages = gameRepository.findAll(pageRequest);
 		Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
+		log.debug("Game Counts :: {}",response.getSize());
 		log.info("Leaving getAllGames... ");
 		return response;
 	}

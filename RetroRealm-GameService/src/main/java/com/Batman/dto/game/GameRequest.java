@@ -28,6 +28,6 @@ public class GameRequest {
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate gameReleasedDate;
-	@NotNull(message = "Genere cannot be empty")
+	@NotNull(message = "Genre cannot be empty")
 	private Set<GameGenre> gameGenere;
 }

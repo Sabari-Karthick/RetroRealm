@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogManagementAspect {
 
-	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..)) || execution(* com.Batman.advice.*.*(..))")
+	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..)) || execution(* com.Batman.exception.*.*(..))")
 	public void executeLogs() {
 
 	}

@@ -141,7 +141,7 @@ springdoc:
 jwt:
   header: Authorization
   secret: ${jwt.secret}
-  expiration: 604800      1
+  expiration: 604800      
 #logging:
 #  level:
 #    org:

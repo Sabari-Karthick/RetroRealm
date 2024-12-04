@@ -42,7 +42,7 @@ public class GameController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getGameById(@PathVariable(value = "id")final Integer id){
+	public ResponseEntity<?> getGameById(@PathVariable final Integer id){
 		return ResponseEntity.ok(gameService.searchById(id));
 	}
 	
@@ -54,13 +54,13 @@ public class GameController {
 	}
 	
 	@GetMapping("/owner/{id}")
-	public ResponseEntity<?> getById(@PathVariable(value = "id")final Integer id){
+	public ResponseEntity<?> getById(@PathVariable final Integer id){
 		return ResponseEntity.ok(gameOwnerService.getGameOwnerById(id));
 	}
 	
 	
 	@PostMapping("/all")
-	public ResponseEntity<?> getAllGames(@RequestBody PageableRequestDto pageableRequest){
+	public ResponseEntity<?> fetchAllGames(@RequestBody PageableRequestDto pageableRequest){
 		return ResponseEntity.ok(gameService.getAllGames(pageableRequest));
 	}
 	

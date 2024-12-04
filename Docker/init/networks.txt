@@ -1,0 +1,2 @@
+docker network create kafka-network
+docker network create retro-main

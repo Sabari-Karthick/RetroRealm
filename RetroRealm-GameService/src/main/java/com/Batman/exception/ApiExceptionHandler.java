@@ -3,6 +3,8 @@ package com.Batman.exception;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -65,6 +67,18 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<>(ExceptionMsg.builder().msg("*" + e.getMessage() + "!**").httpStatus(serviceNotAvailable)
 				.timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), serviceNotAvailable);
 	}
+	
+	@ExceptionHandler(value = { DataIntegrityViolationException.class })
+	public <T extends DataAccessException> ResponseEntity<ExceptionMsg> handleDataAccessException(final T e) {
+
+		log.info("**ApiExceptionHandler controller, handle data access exception exception*\n");
+		String errorMessage = e.getMessage();
+		final var badRequest = HttpStatus.BAD_REQUEST;
+		if(e.getMessage().contains("Duplicate")) errorMessage = "Record Already Exists";
+		return new ResponseEntity<>(ExceptionMsg.builder().msg("*" + errorMessage + "!**").httpStatus(badRequest)
+				.timestamp(ZonedDateTime.now(ZoneId.systemDefault())).build(), badRequest);
+	}
+	
 
 	@ExceptionHandler(value = { Throwable.class })
 	public ResponseEntity<ExceptionMsg> handleAllException(final Throwable e) {

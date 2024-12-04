@@ -72,16 +72,17 @@ services:
       - service-registry
       - config-server
     restart: always
-  user-db:
+  mysql:
     image: mysql:latest
-    container_name: user-db
+    container_name: mysql
     networks:
           - retro-main
     environment:
       MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: retro_users
     ports:
       - "33067:3306"
+    volumes: 
+      - ./init:/docker-entrypoint-initdb.d
     depends_on:
       - admin-server
       - service-registry
@@ -92,17 +93,17 @@ services:
       context: ../RetroRealm-UserService
       dockerfile: Dockerfile
     networks:
-          - retro-main
+        - retro-main
     ports:
       - "8081:8081"
     environment:
       - SERVER_PORT=8081
-      - DB_URL=jdbc:mysql://user-db:3306/retro_users
+      - DB_URL=jdbc:mysql://mysql:3306/retro_users
       - DB_USERNAME=root
       - DB_PASSWORD=1234
       - EUREKA_URI=http://eureka:8761/eureka
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
     depends_on:
-      - user-db
+      - mysql
     restart: on-failure:2
      
