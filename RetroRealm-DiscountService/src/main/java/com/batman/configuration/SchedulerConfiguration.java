@@ -2,6 +2,7 @@ package com.batman.configuration;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,9 +28,8 @@ public class SchedulerConfiguration {
 	
 	@Bean
     SpringBeanJobFactory springBeanJobFactory() {
+		log.info("Configuring Job factory ...");
         AutoWiringSpringBeanJobFactory jobFactory = new AutoWiringSpringBeanJobFactory();
-        log.info("Configuring Job factory ...");
-
         jobFactory.setApplicationContext(context);
         return jobFactory;
     }
@@ -43,8 +43,7 @@ public class SchedulerConfiguration {
     }
 	
 	@Bean
-	SchedulerFactoryBean scheduler(DataSource quartzDataSource) {
-		
+	SchedulerFactoryBean scheduler(@Qualifier("QUARTZDATASOURCE") DataSource quartzDataSource) {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setConfigLocation(new ClassPathResource("quartz.properties"));
         schedulerFactory.setJobFactory(springBeanJobFactory());

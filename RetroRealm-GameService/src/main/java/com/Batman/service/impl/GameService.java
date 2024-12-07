@@ -81,7 +81,7 @@ public class GameService implements IGameService {
 	}
 
 	@Override
-	@Cacheable(value = GAME_PAGE_RESPONSE,key = GAME_PAGE_RESPONSE, condition = "#result != null && !#result.isEmpty()")
+	@Cacheable(value = GAME_PAGE_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_PAGE_RESPONSE")
 	@CacheDistribute
 	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
 		log.info("Entering getAllGames... ");

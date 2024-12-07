@@ -72,21 +72,6 @@ services:
       - service-registry
       - config-server
     restart: always
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    networks:
-          - retro-main
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-    ports:
-      - "33067:3306"
-    volumes: 
-      - ./init:/docker-entrypoint-initdb.d
-    depends_on:
-      - admin-server
-      - service-registry
-      - api-gateway
   user-service:
     container_name: user-service
     build:

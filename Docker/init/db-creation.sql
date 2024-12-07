@@ -1,2 +1,4 @@
 CREATE DATABASE IF NOT EXISTS `retro_users`;
 CREATE DATABASE IF NOT EXISTS `retro_games`;
+CREATE DATABASE IF NOT EXISTS `retro_discounts`;
+CREATE DATABASE IF NOT EXISTS `retro_schedulers`;

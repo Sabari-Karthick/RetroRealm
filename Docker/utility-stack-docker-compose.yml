@@ -122,7 +122,19 @@ services:
       - elasticsearch
     networks:
       - elastic-net
-  
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    networks:
+        - retro-main
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "33067:3306"
+    restart: unless-stopped
+    volumes: 
+      - ./init:/docker-entrypoint-initdb.d
+      - ./db_data:/var/lib/mysql
 networks:
   kafka-network:
     external: true
