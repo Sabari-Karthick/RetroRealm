@@ -5,12 +5,12 @@ import java.time.LocalTime;
 import java.util.Set;
 
 import com.batman.enums.DiscountType;
+import com.batman.validators.FutureTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,21 +27,25 @@ public class DiscountRequest {
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@FutureOrPresent
+	@NotNull(message = "Discount From Date cannot be null or empty")
 	private LocalDate fromDate;
 
+	@NotNull(message = "Discount From Time cannot be null or empty")
 	@JsonSerialize(using = LocalTimeSerializer.class)
 	@JsonFormat(pattern = "HH:mm:ss")
-	@Future
+//	@FutureTime(message = "Discount From Time is not a future Value")
 	private LocalTime fromTime;
 
+	@NotNull(message = "Discount To Date cannot be null or empty")
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@FutureOrPresent
 	private LocalDate toDate;
 
+	@NotNull(message = "Discount To Time cannot be null or empty")
 	@JsonSerialize(using = LocalTimeSerializer.class)
 	@JsonFormat(pattern = "HH:mm:ss")
-	@Future
+//	@FutureTime(message = "Discount To Time is not a future Value")
 	private LocalTime toTime;
 
 	@NotNull(message = "Discount Value must be provided")

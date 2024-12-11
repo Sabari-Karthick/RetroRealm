@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +33,7 @@ public class DiscountController {
 	@PostMapping("/create")
 	public ResponseEntity<?> createDiscount(@Valid @RequestBody final DiscountRequest request,BindingResult bindingResult) {
 		Discount discount = service.createDiscount(request, bindingResult);
-		return new ResponseEntity<Discount>(discount,HttpStatus.CREATED);
+		return new ResponseEntity<>(discount,HttpStatus.CREATED);
 	}
 	
 	
@@ -39,6 +41,13 @@ public class DiscountController {
 	public ResponseEntity<?> fetchDiscounts(@RequestParam final Set<Integer> gameIds ) {
 		return ResponseEntity.ok(service.getDiscountByGameIds(gameIds));
 	}
+	
+	
+	@PatchMapping("/expire/{discountId}")
+	public ResponseEntity<?> expireDiscount(@PathVariable final Integer discountId) {
+		return ResponseEntity.ok(service.expireDiscount(discountId));
+	}
+	
 	
 	
 	

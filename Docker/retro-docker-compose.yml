@@ -29,6 +29,7 @@ services:
       - SERVER_PORT=8761
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
       - TRACE_URL=http://tempo:9411
+      - LOG_URL=http://loki:3100/loki/api/v1/push
     depends_on:
       - admin-server
     restart: always
@@ -88,7 +89,5 @@ services:
       - DB_PASSWORD=1234
       - EUREKA_URI=http://eureka:8761/eureka
       - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
-    depends_on:
-      - mysql
     restart: on-failure:2
      

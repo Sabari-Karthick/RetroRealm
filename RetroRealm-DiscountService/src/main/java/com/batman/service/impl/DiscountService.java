@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class DiscountServiceImpl implements IDiscountService {
+public class DiscountService implements IDiscountService {
 
 	private final IDiscountRepository discountRepository;
 
@@ -127,6 +127,17 @@ public class DiscountServiceImpl implements IDiscountService {
 			}
 		});
 		return discountRepository.save(discount) ;
+	}
+
+	@Override
+	public Discount expireDiscount(Integer discountId) {
+		log.info("Entering expireDiscount ... ");
+		Discount discount = discountRepository.findById(discountId)
+				.orElseThrow(() -> new NoDiscountAvailableException("DISCOUNT_NOT_FOUND"));
+		discount.setIsExpired(true);
+		discount.setDiscountStatus(DiscountStatus.EXPIRED);
+		log.info("Leaving expireDiscount ... ");
+		return discountRepository.save(discount);
 	}
 
 }

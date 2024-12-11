@@ -13,4 +13,6 @@ public interface IDiscountService {
     List<Discount> getDiscountByGameIds(Set<Integer> gameIds);
     Discount activateDiscount(Integer discountId);
     Discount deActivateDiscount(Integer discountId);
+    Discount expireDiscount(Integer discountId);
 }
+

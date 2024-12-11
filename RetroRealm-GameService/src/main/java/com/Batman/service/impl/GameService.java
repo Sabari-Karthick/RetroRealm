@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -93,6 +94,7 @@ public class GameService implements IGameService {
 		log.info("Leaving getAllGames... ");
 		return response;
 	}
+	
 
 	@Override
 	@RateLimiter(name = SERVICE_NAME, fallbackMethod = "gameServiceFallBackMethod")
@@ -119,7 +121,7 @@ public class GameService implements IGameService {
 	@Override
 	@CircuitBreaker(name = SERVICE_NAME)
 	@KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
-	@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
+    @Caching(evict = {@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true),	@CacheEvict(value = GAME_RESPONSE, allEntries = true)})
 	public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
 		Set<Integer> gameIds = discountPlacedEvent.getGameIds();
 		Double discountValue = discountPlacedEvent.getDiscountValue();
@@ -130,6 +132,7 @@ public class GameService implements IGameService {
 			throw new GameNotFoundException("No Games Found");
 		}
 		games.forEach(game -> game.setGameDiscount(discountValue));
+	    games.forEach(game -> 	log.info("Updated Discounts of game {} with ID :: {} is {}%",game.getGameName(),game.getGameID(),game.getGameDiscount()));
 		games = gameRepository.saveAll(games);
 		log.info("Leaving Update Game Discount Request......");
 		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();

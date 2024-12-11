@@ -6,49 +6,48 @@ networks:
   kafka-network:
     external: true
 services:
-    game-service:
-      container_name: game-service
-      build:
-        context: ../RetroRealm-GameService
-        dockerfile: Dockerfile
-      networks:
-        - retro-main
-        - kafka-network
-      ports:
+  game-service:
+    container_name: game-service
+    build:
+      context: ../RetroRealm-GameService
+      dockerfile: Dockerfile
+    networks:
+      - retro-main
+      - kafka-network
+    ports:
       - "8082:8082"
-      environment:
-        - SERVER_PORT=8082
-        - DB_URL=jdbc:mysql://mysql:3306/retro_games
-        - DB_USERNAME=root
-        - DB_PASSWORD=1234
-        - EUREKA_URI=http://eureka:8761/eureka
-        - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
-        - REDIS_HOST=redis
-        - REDIS_PORT=6379
-        - REDIS_PASSWORD=mypass 
-        - KAFKA_HOST=kafka:9092
-        - TRACE_URL=http://tempo:9411
-      restart: on-failure:2
-    discount-service:
-      container_name: discount-service
-      build:
-        context: ../RetroRealm-DiscountService
-        dockerfile: Dockerfile
-      networks:
-        - retro-main
-        - kafka-network
-      ports:
+    environment:
+      - SERVER_PORT=8082
+      - DB_URL=jdbc:mysql://mysql:3306/retro_games
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=mypass
+      - KAFKA_HOST=kafka:9092
+      - TRACE_URL=http://tempo:9411
+      - LOG_URL=http://loki:3100/loki/api/v1/push
+    restart: on-failure:2
+  discount-service:
+    container_name: discount-service
+    build:
+      context: ../RetroRealm-DiscountService
+      dockerfile: Dockerfile
+    networks:
+      - retro-main
+      - kafka-network
+    ports:
       - "8083:8083"
-      environment:
-        - SERVER_PORT=8083
-        - DB_URL=jdbc:mysql://mysql:3306/retro_discounts
-        - QUARTZ_DB_URL=jdbc:mysql://mysql:3306/retro_schedulers
-        - DB_USERNAME=root
-        - DB_PASSWORD=1234
-        - EUREKA_URI=http://eureka:8761/eureka
-        - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
-        - KAFKA_HOST=kafka:9092
-        - TRACE_URL=http://tempo:9411
-      restart: on-failure:2
-
-        
+    environment:
+      - SERVER_PORT=8083
+      - DB_URL=jdbc:mysql://mysql:3306/retro_discounts
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - KAFKA_HOST=kafka:9092
+      - TRACE_URL=http://tempo:9411
+      - LOG_URL=http://loki:3100/loki/api/v1/push
+    restart: on-failure:2

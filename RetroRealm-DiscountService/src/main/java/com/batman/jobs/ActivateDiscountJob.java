@@ -23,7 +23,7 @@ public class ActivateDiscountJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		log.info("Entering Activate Discount Execute ...");
+		log.info("Entering Activate Discount Job Execute ...");
 	    log.info("Job ** {} ** fired @ {}", context.getJobDetail().getKey().getName(), context.getFireTime());
 
 
@@ -35,7 +35,7 @@ public class ActivateDiscountJob implements Job {
 		Discount discount = discountService.activateDiscount(discountId);
 
 		log.info("Discount :: {}", discount);
-		log.info("Leaving Activate Discount Execute ...");
+		log.info("Leaving Activate Discount job Execute ...");
 	}
 
 }

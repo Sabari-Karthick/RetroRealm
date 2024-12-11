@@ -8,6 +8,8 @@
     
     <!-- Defines a property for the application name, sourced from Spring's application.properties or application.yml -->
     <springProperty scope="context" name="appName" source="spring.application.name"/>
+    
+    <springProperty scope="context" name="lokiURL" source="loki.url"/>
 
     <!-- Configures a custom appender named 'LOKI' that sends logs to a Loki instance -->
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
@@ -15,7 +17,7 @@
         <!-- HTTP configuration for the Loki appender -->
         <http>
             <!-- The URL of the Loki server to which logs are pushed -->
-             <url>http://loki:3100/loki/api/v1/push</url>
+             <url>${lokiURL}</url>
         </http>
 
         <!-- Formatting options for the logs sent to Loki -->

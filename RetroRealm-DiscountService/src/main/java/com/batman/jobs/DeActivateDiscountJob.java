@@ -21,7 +21,7 @@ public class DeActivateDiscountJob implements Job{
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		log.info("Entering De-Activate Discount Execute ...");
+		log.info("Entering De-Activate Job Discount Execute ...");
 		log.info("Job ** {} ** fired @ {}", context.getJobDetail().getKey().getName(), context.getFireTime());
 		JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
 		Integer discountId = (Integer)jobDataMap.get("discountId");
@@ -30,7 +30,7 @@ public class DeActivateDiscountJob implements Job{
 		
 		log.info("Discount :: {}",discount);
 		
-		log.info("Leaving De-Activate Discount Execute ...");
+		log.info("Leaving De-Activate Job Discount Execute ...");
 	}
 
 }

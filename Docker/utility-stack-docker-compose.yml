@@ -24,9 +24,10 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_INTER_BROKER_LISTENER_NAME: CLIENT
+      KAFKA_INTER_BROKER_LISTENER_NAME: CLIENT 
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_LISTENERS: CLIENT://:9092,EXTERNAL://:29092
       KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka:9092,EXTERNAL://localhost:29092
@@ -44,7 +45,7 @@ services:
     ports:
       - "9000:9000"
     environment:
-      KAFKA_BROKERCONNECT: kafka:29092
+      KAFKA_BROKERCONNECT: kafka:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
     depends_on:
       - kafka
@@ -128,6 +129,7 @@ services:
     networks:
         - retro-main
     environment:
+      # TZ: Asia/Kolkata
       MYSQL_ROOT_PASSWORD: 1234
     ports:
       - "33067:3306"
