@@ -1,5 +1,5 @@
 # RetroRealm
-Welcome to RetroRealm - A Digital Game Purchasing Platform designed  by leveraging advanced micro-service architecture. Built with Spring Boot, RetroRealm integrates a wide range of cutting-edge technologies and frameworks to ensure scalability, performance, and reliability.
+RetroRealm is a modular, scalable game store application built to explore high-performance web application design and implementation. It features a microservice-based architecture with backend services for user management, game catalog, and purchase workflows. Advanced features like HATEOAS and caching strategies are planned for efficient data handling. The project also focuses on best practices in system design, including concurrency, fallback mechanisms, and schema optimization. It's a sandbox for experimenting with modern development patterns and robust application workflows.
 
 ## Features
 ## Microservice Architecture
