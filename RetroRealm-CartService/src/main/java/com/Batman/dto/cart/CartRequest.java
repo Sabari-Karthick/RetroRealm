@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CartRequestDto {
+public class CartRequest {
 	@NotNull(message = "User Id cannot Be Empty")
 	private Integer userId;
 	

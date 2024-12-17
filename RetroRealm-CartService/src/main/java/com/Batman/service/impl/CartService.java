@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
-import com.Batman.dto.cart.CartRequestDto;
+import com.Batman.dto.cart.CartRequest;
 import com.Batman.dto.cart.CartValueResponse;
 import com.Batman.entity.Cart;
 import com.Batman.exception.wrapper.InputFieldException;
@@ -36,7 +36,7 @@ public class CartService implements ICartService {
 	private static final String SERVICE_NAME = "cartService";
 
 	@Override
-	public Cart addToCart(CartRequestDto cartRequest, BindingResult bindingResult) {
+	public Cart addToCart(CartRequest cartRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
 		}
@@ -58,6 +58,12 @@ public class CartService implements ICartService {
 				cart.setTotalPrice(calculatePrice(cartItems));
 				return cartRepository.save(cart);
 			}
+			/**
+			 * May need to throw an exception
+			 * 
+			 */
+			log.info("Cart Already Contains the Game ...");
+			return cart;
 		} else {
 			Set<Integer> cartItems = new HashSet<>();
 			Set<Integer> selectedCartItems = new HashSet<>();
@@ -67,7 +73,6 @@ public class CartService implements ICartService {
 					.totalPrice(calculatePrice(selectedCartItems)).build();
 			return cartRepository.save(cart);
 		}
-		return userCartOptional.get();
 	}
 
 	@Override
@@ -76,8 +81,9 @@ public class CartService implements ICartService {
 		/**
 		 * 
 		 * Consideration Needed whether to store total amount 
-		 * and Do we need to update the cart when discount is applied
+		 * and whether we need to update the cart when discount is applied
 		 * and whether an notification needs to be send when cart price is dropped
+		 * and whether an cart needs to be created when user is registered
 		 */
 		
 		

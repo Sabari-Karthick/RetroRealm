@@ -1,6 +1,7 @@
 package com.Batman.service.impl;
 
 import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
+import static com.Batman.constants.GameConstants.GAME_ALL_RESPONSE;
 import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
@@ -82,17 +83,26 @@ public class GameService implements IGameService {
 	}
 
 	@Override
-	@Cacheable(value = GAME_PAGE_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_PAGE_RESPONSE")
 	@CacheDistribute
-	public Page<GameResponse> getAllGames(PageableRequestDto pageableRequest) {
-		log.info("Entering getAllGames... ");
+	public Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest) {
+		log.info("Entering getAllGames by page... ");
 		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
 				pageableRequest.getAsc() ? Direction.ASC : Direction.DESC, pageableRequest.getProperty());
 		Page<Game> gamePages = gameRepository.findAll(pageRequest);
 		Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
 		log.debug("Game Counts :: {}",response.getSize());
-		log.info("Leaving getAllGames... ");
+		log.info("Leaving getAllGames by page... ");
 		return response;
+	}
+	
+	@Override
+	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
+	public List<GameResponse> getAllGames() {
+		log.info("Entering getAllGames... ");
+		List<Game> allGames = gameRepository.findAll();
+		log.debug("Game Counts :: {}",allGames.size());
+		log.info("Leaving getAllGames... ");
+		return allGames.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
 	}
 	
 

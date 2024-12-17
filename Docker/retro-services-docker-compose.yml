@@ -51,3 +51,22 @@ services:
       - TRACE_URL=http://tempo:9411
       - LOG_URL=http://loki:3100/loki/api/v1/push
     restart: on-failure:2
+  cart-service:
+    container_name: cart-service
+    build:
+      context: ../RetroRealm-CartService
+      dockerfile: Dockerfile
+    networks:
+      - retro-main
+    ports:
+      - "8084:8084"
+    environment:
+      - SERVER_PORT=8084
+      - DB_URL=jdbc:mysql://mysql:3306/retro_carts
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - TRACE_URL=http://tempo:9411
+      - LOG_URL=http://loki:3100/loki/api/v1/push
+    restart: on-failure:2

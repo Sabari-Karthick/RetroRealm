@@ -9,6 +9,7 @@ public class GameConstants {
        public static final String GAME_OWNER = "gameOwner";
        public static final String GAME_RESPONSE = "gameResponse";
        public static final String GAME_PAGE_RESPONSE = "gamePageResponse";
+       public static final String GAME_ALL_RESPONSE = "gameAllResponse";
        
        
 }

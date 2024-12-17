@@ -12,7 +12,7 @@
 	<groupId>Batman</groupId>
 	<artifactId>RetroRealm-CartService</artifactId>
 	<version>1.0</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>RetroRealm-CartService</name>
 	<description>A Digital Game Selling Platform Cart Service </description>
 	<properties>

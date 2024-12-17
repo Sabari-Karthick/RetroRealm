@@ -15,7 +15,8 @@ import com.Batman.projections.GameName;
 public interface IGameService {
 	GameResponse registerGame(GameRequest gameRequest,BindingResult bindingResult);
 	GameResponse searchById(Integer gameId);
-	Page<GameResponse> getAllGames(PageableRequestDto pageableRequest);
+	Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest);
+	List<GameResponse> getAllGames();
 	Double getTotalCostOfGames(Set<Integer> gameIds);
     List<GameName> suggestAllGameNameWithPrefix(String namePrefix);
     List<GameName> getAllGameNameWithIds(Set<Integer> gameIds);

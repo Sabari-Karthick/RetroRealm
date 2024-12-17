@@ -10,7 +10,7 @@ management:
         include: '*'
 is-local: false
 allowed:
-  paths: /oauth2/**,/swagger-ui/**,/v3/api-docs/**,/login,/home,/actuator/**,/api/v1/auth/**,/eureka/**,/api/v1/users/register
+  paths: /oauth2/**,/swagger-ui/**,/v3/api-docs/**,/login,/home,/actuator/**,/api/v1/auth/**,/eureka/**,/api/v1/users/register,/api/v1/game/all
 server:
   port: 8080
   servlet:

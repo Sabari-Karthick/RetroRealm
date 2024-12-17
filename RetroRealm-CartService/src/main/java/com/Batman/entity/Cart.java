@@ -34,6 +34,7 @@ public class Cart {
 	
 	@Column(nullable = false)
 	private Integer userId;
+	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "cart_items",joinColumns = @JoinColumn(name="cart_id",referencedColumnName = "cartId"))
 	private Set<Integer> cartItems;

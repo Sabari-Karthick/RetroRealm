@@ -60,8 +60,8 @@ public class GameController {
 	
 	
 	@PostMapping("/all")
-	public ResponseEntity<?> fetchAllGames(@RequestBody PageableRequestDto pageableRequest){
-		return ResponseEntity.ok(gameService.getAllGames(pageableRequest));
+	public ResponseEntity<?> fetchAllGames(@RequestBody(required = false) PageableRequestDto pageableRequest){
+		return ResponseEntity.ok(gameService.getAllGames());
 	}
 	
 	@GetMapping("/calculate/price")
