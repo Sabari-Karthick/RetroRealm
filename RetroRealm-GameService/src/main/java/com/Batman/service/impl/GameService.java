@@ -96,7 +96,8 @@ public class GameService implements IGameService {
 	}
 	
 	@Override
-	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
+//	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
+	@Cacheable(value = GAME_ALL_RESPONSE)
 	public List<GameResponse> getAllGames() {
 		log.info("Entering getAllGames... ");
 		List<Game> allGames = gameRepository.findAll();

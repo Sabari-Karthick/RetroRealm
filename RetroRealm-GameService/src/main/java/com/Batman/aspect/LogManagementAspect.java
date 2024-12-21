@@ -15,7 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogManagementAspect {
 
-	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..)) || execution(* com.Batman.exception.*.*(..))")
+	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..))")
+//	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..)) /*|| execution(* com.Batman.exception.*.*(..))")
 	public void executeLogs() {
 
 	}
@@ -29,7 +30,9 @@ public class LogManagementAspect {
 
 		log.info(className + methodName + " REQUEST: ");
 		if (joinPoint.getArgs().length > 0) {
-			Arrays.stream(joinPoint.getArgs()).forEach(args -> log.info(args.toString()));
+			Arrays.stream(joinPoint.getArgs()).forEach(args -> {
+				   if(args != null) log.info(args.toString());
+				});
 		} else {
 			log.info("[]");
 		}

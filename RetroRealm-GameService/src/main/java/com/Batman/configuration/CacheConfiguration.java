@@ -22,15 +22,13 @@ public class CacheConfiguration {
                 .disableCachingNullValues()
                 .serializeValuesWith( RedisSerializationContext.SerializationPair
                                 .fromSerializer(new GenericJackson2JsonRedisSerializer()));
+                
     }
 	
 	@Bean
 	RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() { // Cache Specific Configurations
-	    return builder -> builder
-	      .withCacheConfiguration(GAME_OWNER,
-	        RedisCacheConfiguration
-	            .defaultCacheConfig()
-	            .entryTtl(Duration.ofMinutes(300)));
+		return builder -> builder.withCacheConfiguration(GAME_OWNER,
+				RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(300)));
 	}
 
 }
