@@ -3,6 +3,7 @@ package com.Batman.entity;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.List;
 
 import com.Batman.enums.AuthenticationProiver;
 import com.Batman.enums.Role;
@@ -32,21 +33,26 @@ public class User {
 	private Integer userID;
 	
 	
+	@Column(nullable = false)
 	private String name;
 	
-	@Column(name = "dob")
+	@Column(name = "dob",nullable = false)
 	private LocalDate dateOfBirth;
 	
+	@Column(nullable = false)
 	private String email;
 	
 	@Enumerated(EnumType.STRING)
 	private AuthenticationProiver authenticationProvider;
 	
+	@Column(nullable = false)
 	private String password;
 	
 	@ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
 	@CollectionTable(name = "user_roles",joinColumns = @JoinColumn(name="user_ID", referencedColumnName = "userID"))
 	@Enumerated(EnumType.STRING)
-	Set<Role> roles;
+	private Set<Role> roles;
+	
+	private List<Integer> gameIds;
 	
 }

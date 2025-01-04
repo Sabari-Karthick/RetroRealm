@@ -6,6 +6,7 @@ import java.util.Set;
 import com.Batman.enums.GameGenre;
 
 import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,10 +40,13 @@ public class Game {
 	@ManyToOne
 	@JoinColumn(name = "game_owner_id",nullable = false)
 	private GameOwner gameOwner;
+	@Column(nullable = false)
 	private Double gamePrice;
 	private Double gameVersion;
 	private LocalDate gameReleasedDate;
 	private Double gameDiscount;
+	private String gameDescription;
+	private Double gameRating;
 	
 	@ElementCollection(targetClass = GameGenre.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id", referencedColumnName = "gameID"))
