@@ -53,6 +53,5 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private Set<Role> roles;
 	
-	private List<Integer> gameIds;
-	
+//	private List<Integer> gameIds; // User Library.
 }
