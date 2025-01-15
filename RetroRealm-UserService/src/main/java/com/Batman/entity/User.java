@@ -3,7 +3,6 @@ package com.Batman.entity;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.List;
 
 import com.Batman.enums.AuthenticationProiver;
 import com.Batman.enums.Role;

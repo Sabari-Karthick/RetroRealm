@@ -36,6 +36,7 @@ public class UserServiceImpl implements IUserService {
 
 	private final CommonMapper mapper;
 
+	@SuppressWarnings("null")
 	@Override
 	public String registerUser(RegistrationRequest user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -77,10 +78,12 @@ public class UserServiceImpl implements IUserService {
 		return userRepository.findAll();
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public User updateUserProviderDetails(UpdateProviderRequest user, BindingResult bindingResult) {
 		log.info("Entering updateUserProviderDetails ...");
 		if (bindingResult.hasErrors()) {
+			// Need to fix this possible null
 			log.error("Input field Exception in {}",
 					bindingResult.getFieldError() + " " + bindingResult.getFieldError().getDefaultMessage());
 			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
