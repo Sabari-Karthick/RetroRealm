@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.OrderDetailsDto;
-import com.Batman.enums.Entity;
+import com.Batman.mail.EmailDetails;
 import com.Batman.service.IMailService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class MailServiceImpl implements IMailService{
 	private String fromEmail;
 	
 	@Override
-	public void sendMail(Integer entityID, Entity entityName) {
+	public void sendMail(EmailDetails emailDetails) {
 		log.info("Entering Send Mail...");
 		javaMailSender.send(javaMailSender.createMimeMessage());
 	}

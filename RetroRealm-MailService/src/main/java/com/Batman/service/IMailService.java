@@ -1,7 +1,7 @@
 package com.Batman.service;
 
-import com.Batman.enums.Entity;
+import com.Batman.mail.EmailDetails;
 
 public interface IMailService {
-    void sendMail(Integer entityID,Entity entityName);
+    void sendMail(EmailDetails emailDetails);
 }

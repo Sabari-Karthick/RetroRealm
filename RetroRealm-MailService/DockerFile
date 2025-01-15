@@ -1,0 +1,21 @@
+# Build Stage
+FROM maven:3.8.5-openjdk-17-slim AS build 
+
+WORKDIR /RetroRealm-MailService
+
+COPY pom.xml .
+RUN mvn dependency:resolve
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+
+# Run Stage
+FROM openjdk:17
+WORKDIR /RetroRealm-MailService
+
+COPY --from=build /RetroRealm-MailService/target/RetroRealm-MailService-1.0.jar /RetroRealm-MailService/RetroRealm-MailService.jar
+
+
+EXPOSE ${SERVER_PORT}
+ENTRYPOINT ["java", "-jar", "/RetroRealm-UserService/RetroRealm-UserService.jar", "--server.port=${SERVER_PORT}"]

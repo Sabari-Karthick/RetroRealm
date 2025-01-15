@@ -26,7 +26,7 @@ public class MailController {
 	@PostMapping("/{id}/{entityName}")
 	public ResponseEntity<?> sendNotification(@PathVariable(value = "id")Integer id,@PathVariable("entityName") Entity entityName){
 		log.info("Mail Sending Request Arrived For {} with Id :: {} ",entityName,id);
-		mailService.sendMail(id, entityName);
+		mailService.sendMail(null);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
