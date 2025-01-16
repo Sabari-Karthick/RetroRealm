@@ -5,6 +5,7 @@ import static com.Batman.constants.GameConstants.GAME_ALL_RESPONSE;
 import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,6 +18,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.Batman.annotations.CacheDistribute;
 import com.Batman.constants.KafkaConstants;
@@ -59,9 +61,12 @@ public class GameService implements IGameService {
 	@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
 	@CacheDistribute
 	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
-		}
+		 if (bindingResult.hasErrors()) {
+		        String errorMessage = Optional.ofNullable(bindingResult.getFieldError())
+		                                      .map(FieldError::getDefaultMessage)
+		                                      .orElse("Unknown error in Gaming Request");
+		        throw new InputFieldException(errorMessage);
+		    }
 		GameOwner gameOwner = gameOwnerRepository.findById(gameRequest.getGameOwnerID())
 				.orElseThrow(() -> new GameOwnerNotFoundException("OWNER_NOT_FOUND_FOR_ID"));
 		Game game = mapper.convertToEntity(gameRequest, Game.class);

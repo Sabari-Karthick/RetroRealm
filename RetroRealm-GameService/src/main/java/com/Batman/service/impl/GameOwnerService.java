@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.Batman.dto.gameowner.GameOwnerRequest;
 import com.Batman.dto.gameowner.GameOwnerResponse;
@@ -18,10 +19,12 @@ import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.service.IGameOwnerService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service("GameOwnerService")
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class GameOwnerService implements IGameOwnerService {
 
 	private final CommonMapper mapper;
@@ -30,8 +33,11 @@ public class GameOwnerService implements IGameOwnerService {
 
 	@Override
 	public GameOwnerResponse registerOwner(GameOwnerRequest gameOwnerRequest, BindingResult bindingResult) {
+		log.info("Entering registerOwner in GameOwner Service ..." );
 		if (bindingResult.hasErrors()) {
-			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
+			log.error("Game Owner Request Has Binding Error...");
+			String errorMessage = Optional.ofNullable(bindingResult.getFieldError()).map(FieldError::getDefaultMessage).orElse("Unknown Error in GameOwner Request");
+			throw new InputFieldException(errorMessage);
 		}
 		if (!gameOwnerRequest.getIsVerified())
 			throw new VerificationMissingException("NOT_VERIFIED_USER");
@@ -43,7 +49,9 @@ public class GameOwnerService implements IGameOwnerService {
 
 		GameOwner savedGameowner = gameOwnerRepository.save(gameOwner);
 
-		return mapper.convertToResponse(savedGameowner, GameOwnerResponse.class);
+		GameOwnerResponse gameOwnerResponse = mapper.convertToResponse(savedGameowner, GameOwnerResponse.class);
+		log.info("Entering registerOwner in GameOwner Service ..." );
+		return gameOwnerResponse;
 	}
 
 	@Override
