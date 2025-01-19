@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +26,11 @@ import com.Batman.service.IGameService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/api/v1/game")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 public class GameController {
+
 	private final IGameOwnerService gameOwnerService;
 
 	private final IGameService gameService;
@@ -42,47 +40,44 @@ public class GameController {
 		GameResponse game = gameService.registerGame(gameRequest, bindingResult);
 		return new ResponseEntity<>(game, HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getGameById(@PathVariable final Integer id){
+	public ResponseEntity<?> getGameById(@PathVariable final Integer id) {
 		return ResponseEntity.ok(gameService.searchById(id));
 	}
-	
-	
+
 	@PostMapping("/owner")
-	public ResponseEntity<?> registerOwner(@Valid @RequestBody final GameOwnerRequest gameOwnerRequest,BindingResult bindingResult){
-		GameOwnerResponse registerOwner = gameOwnerService.registerOwner(gameOwnerRequest,bindingResult);
-		return new ResponseEntity<>(registerOwner,HttpStatus.CREATED);
+	public ResponseEntity<?> registerOwner(@Valid @RequestBody final GameOwnerRequest gameOwnerRequest,
+			BindingResult bindingResult) {
+		GameOwnerResponse registerOwner = gameOwnerService.registerOwner(gameOwnerRequest, bindingResult);
+		return new ResponseEntity<>(registerOwner, HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping("/owner/{id}")
-	public ResponseEntity<?> getById(@PathVariable final Integer id){
+	public ResponseEntity<?> getById(@PathVariable final Integer id) {
 		return ResponseEntity.ok(gameOwnerService.getGameOwnerById(id));
 	}
-	
-	
+
 	@PostMapping("/all")
-	public ResponseEntity<?> fetchAllGames(@RequestBody(required = false) PageableRequestDto pageableRequest){
+	public ResponseEntity<?> fetchAllGames(@RequestBody(required = false) PageableRequestDto pageableRequest) {
 		return ResponseEntity.ok(gameService.getAllGames());
 	}
-	
+
 	@GetMapping("/calculate/price")
 	public ResponseEntity<?> getCostOfGames(@RequestParam("ids[]") final Set<Integer> gameIds) {
 		return ResponseEntity.ok(gameService.getTotalCostOfGames(gameIds));
 	}
-	
+
 	@GetMapping("/names")
 	public List<String> getNamesByGameId(@RequestParam("ids[]") final Set<Integer> gameIds) {
 		return gameService.getAllGameNameWithIds(gameIds).stream().map(GameName::getGameName).toList();
 	}
-	
-	
+
 	@GetMapping("/search")
 	public ResponseEntity<?> findGamesWithPrefix(@RequestParam("name") final String gamePrefix) {
 		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gamePrefix));
 	}
-	
-	
+
 //	@PutMapping("/add/discount")
 //	public ResponseEntity<?> addDiscountToGames(@RequestParam final Set<Integer> gameIds,@RequestParam Double discountValue){
 //		return ResponseEntity.ok(gameService.updateDiscountOfGames(gameIds,discountValue));

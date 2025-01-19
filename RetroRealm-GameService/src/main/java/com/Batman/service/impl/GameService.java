@@ -1,7 +1,7 @@
 package com.Batman.service.impl;
 
 import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
-import static com.Batman.constants.GameConstants.GAME_ALL_RESPONSE;
+//import static com.Batman.constants.GameConstants.GAME_ALL_RESPONSE;
 import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
@@ -102,7 +102,8 @@ public class GameService implements IGameService {
 	
 	@Override
 //	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
-	@Cacheable(value = GAME_ALL_RESPONSE)
+//	@Cacheable(value = GAME_ALL_RESPONSE)
+//  TODO --> Either Fix the Serialization Issue or switch to ES. 
 	public List<GameResponse> getAllGames() {
 		log.info("Entering getAllGames... ");
 		List<Game> allGames = gameRepository.findAll();
