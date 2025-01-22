@@ -10,11 +10,11 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>Batman</groupId>
-	<artifactId>RetroRealm-ProxyServer</artifactId>
+	<artifactId>RetroRealm-ApiGateway</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-	<name>RetroRealm-ProxyServer</name>
-	<description>A Digital Game Selling Platform Proxy Server</description>
+	<name>RetroRealm-ApiGateway</name>
+	<description>A Digital Game Selling Platform Api Gateway</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.0</spring-cloud.version>

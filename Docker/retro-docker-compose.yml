@@ -55,7 +55,7 @@ services:
   api-gateway:
     container_name: api-gateway
     build:
-      context: ../RetroRealm-ProxyServer
+      context: ../RetroRealm-ApiGatewaty
       dockerfile: Dockerfile
     networks:
           - retro-main
