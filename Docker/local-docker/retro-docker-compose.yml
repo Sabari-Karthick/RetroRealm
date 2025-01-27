@@ -1,0 +1,93 @@
+version: '4'
+name: retro_realm
+networks:
+  retro-main:
+    external: true
+services:
+  admin-server:
+    container_name: admin-server
+    build:
+      context: ../RetroRealm-AdminServer
+      dockerfile: Dockerfile
+    networks:
+        - retro-main
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVER_PORT=8000
+    restart: always
+  service-registry:
+    container_name: eureka
+    build:
+      context: ../RetroRealm-ServiceRegistry
+      dockerfile: Dockerfile
+    networks:
+          - retro-main
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - TRACE_URL=http://tempo:9411
+      - LOG_URL=http://loki:3100/loki/api/v1/push
+    depends_on:
+      - admin-server
+    restart: always
+  config-server:
+    container_name: config-server
+    build:
+      context: ../RetroRealm-Config-Server
+      dockerfile: Dockerfile
+    networks:
+          - retro-main
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVER_PORT=8001
+      - GITHUB_USERNAME=${GIT_USERNAME}
+      - GITHUB_ACCESS_TOKEN=${GIT_PASSWORD}
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+    depends_on:
+      - admin-server
+      - service-registry
+    restart: always
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ../RetroRealm-ApiGatewaty
+      dockerfile: Dockerfile
+    networks:
+          - retro-main
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=mypass
+    depends_on:
+      - admin-server
+      - service-registry
+      - config-server
+    restart: always
+  user-service:
+    container_name: user-service
+    build:
+      context: ../RetroRealm-UserService
+      dockerfile: Dockerfile
+    networks:
+        - retro-main
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - DB_URL=jdbc:mysql://mysql:3306/retro_users
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - EUREKA_URI=http://eureka:8761/eureka
+      - ADMIN_SERVER_URL=http://admin-server:8000/Retro/admin/
+    restart: on-failure:2
+     

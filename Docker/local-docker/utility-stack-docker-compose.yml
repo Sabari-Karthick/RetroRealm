@@ -4,15 +4,17 @@ services:
   redis:
     image: redis:6.0
     container_name: redis
-    expose:
-      - ${REDIS_PORT} # expose the port to other services wont be available outside the network
-    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    ports:
+      - "16379:6379"
+    command: [ "redis-server", "--requirepass", "mypass" ]
     restart: unless-stopped
     networks:
       - retro-main
   zookeeper:
     image: zookeeper:3.8
     container_name: zookeeper
+    # ports:
+    #   - "2181:2181"
     expose:
       - ${ZOOKEEPER_CLIENT_PORT}
     environment:
@@ -23,14 +25,15 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
-    expose:
-      - ${KAFKA_PORT}
+    ports:
+      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:${ZOOKEEPER_CLIENT_PORT}'
       KAFKA_INTER_BROKER_LISTENER_NAME: CLIENT
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT
-      KAFKA_LISTENERS: CLIENT://:${KAFKA_PORT}
-      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka:${KAFKA_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: CLIENT://:9092,EXTERNAL://:29092 # Where the kafka server listens (A network interface)
+      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka:9092,EXTERNAL://localhost:29092 # Where the clients connect to the kafka server
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -43,9 +46,9 @@ services:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
     ports:
-      - "${LOCAL_HOST_IP}:${KAFDROP_PORT}:${KAFDROP_PORT}"
+      - "9000:9000"
     environment:
-      KAFKA_BROKERCONNECT: kafka:${KAFKA_PORT}
+      KAFKA_BROKERCONNECT: kafka:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
     depends_on:
       - kafka
@@ -59,9 +62,9 @@ services:
     volumes:
       - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
       - ./tempo-data:/tmp/tempo
-    expose:
-      - ${JAEGER_PORT}
-      - ${ZIPKIN_PORT}
+    ports:
+      - "14268" # jaeger ingest
+      - "9411:9411" # zipkin
     networks:
       - retro-main
   loki:
@@ -69,11 +72,11 @@ services:
     container_name: loki
     extra_hosts: [ 'host.docker.internal:host-gateway' ]
     command: [ "-config.file=/etc/loki/local-config.yaml" ]
-    expose: # loki needs to be exposed so it receives logs
-      - ${LOKI_PORT}
+    ports:
+      - "3100:3100" # loki needs to be exposed so it receives logs
     environment:
       - JAEGER_AGENT_HOST=tempo
-      - JAEGER_ENDPOINT=http://tempo:${JAEGER_PORT}/api/traces # send traces to Tempo
+      - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
       - JAEGER_SAMPLER_TYPE=const
       - JAEGER_SAMPLER_PARAM=1
     networks:
@@ -87,8 +90,8 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    expose:
-      - ${PROMETHEUS_PORT}
+    ports:
+      - "9090:9090"
     networks:
       - retro-main
   grafana:
@@ -102,8 +105,8 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-    expose:
-      - ${GRAFANA_PORT}
+    ports:
+      - "3000:3000"
     networks:
       - retro-main
   # elasticsearch:

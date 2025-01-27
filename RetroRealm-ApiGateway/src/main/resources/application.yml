@@ -76,11 +76,11 @@ spring:
       - id: user_route
         predicates:
         - Path=/api/v1/users/**
-        uri: lb://USER-SERVICE
-      - id: client_route
-        predicates:
-        - Path=/app/**
-        uri: lb://proxy-client
+        uri: lb://user-service
+#      - id: client_route
+#        predicates:
+#        - Path=/app/**
+#        uri: lb://proxy-client
       - id: game_route
         predicates:
         - Path=/api/v1/game/**
