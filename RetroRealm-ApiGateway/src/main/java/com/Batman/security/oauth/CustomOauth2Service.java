@@ -31,52 +31,52 @@ import reactor.core.publisher.Mono;
 public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 
 	private final UserServiceUrlResolver userServiceUrlResolver;
-	
 
 	@Override
 	public Mono<OAuth2User> loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-		log.info("Entering loadUser...");
+		log.info("Entering CustomOauth2Service loadUser...");
 		String provider = userRequest.getClientRegistration().getRegistrationId();
 		Mono<OAuth2User> oAuth2User = super.loadUser(userRequest);
-		return oAuth2User.flatMap(oauth2User ->{
+		return oAuth2User.flatMap(oauth2User -> {
 			Map<String, Object> oauthAttributes = oauth2User.getAttributes();
-			if(Objects.isNull(oauthAttributes)) {
+			if (Objects.isNull(oauthAttributes)) {
 				throw new OAuth2AuthenticationException("FAILED_TO_RETRIEVE_ATTRIBUTES");
-			}			
+			}
 			OAuth2UserInfo oAuth2UserInfo = OAuth2UserFactory.getOAuth2UserInfo(provider, oauthAttributes);
 			Mono<User> userMono = WebClient.create().post().uri(userServiceUrlResolver.getUserByMailUrl())
-					.contentType(MediaType.APPLICATION_JSON) 
-					.bodyValue(Map.of("userMail", oAuth2UserInfo.getEmail())).retrieve()
-					.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
+					.contentType(MediaType.APPLICATION_JSON).bodyValue(Map.of("userMail", oAuth2UserInfo.getEmail()))
+					.retrieve().onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
 					.bodyToMono(User.class);
 			return userMono.flatMap(user -> {
-				 if (Objects.isNull(user.getEmail())) {
-						 User newUser = new User();
-						 newUser.setName(oAuth2UserInfo.getFirstName());
-						 newUser.setEmail(oAuth2UserInfo.getEmail());
-						 newUser.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
-						 newUser.setRoles(Collections.singleton(Role.GAMER));
-						 log.info("Creating new User ... ");
-						 return updateUser(newUser).doOnError(e -> {
-							 throw new UserRegistrationException(e.getMessage());
-					     }).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}",newUser.getName(),newUser.getAuthenticationProvider()));
-				 } else {
-					 String existingProvider = user.getAuthenticationProvider().toString();
-					 if(existingProvider.equalsIgnoreCase(provider.toUpperCase())) {
-						 log.info("User is already registered with the provider :: {}",existingProvider);
-						 return Mono.just(user);
-					 }
-					 log.info("Updating the User...");
-					 user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
-					 return updateUser(user).doOnError(e -> {
-						 log.error("Load User, User Update Error ...");
-						 throw new UserRegistrationException(e.getMessage());
-				     }).doOnNext(result -> log.info("User Updated ::: {} with Provider ::: {}",user.getName(),user.getAuthenticationProvider()));
-				 }
-			 }).map(user -> new UserPrincipal(user, oauthAttributes))
-			 .doOnTerminate(() -> log.info("Leaving loadUser..."));
+				if (Objects.isNull(user.getEmail())) {
+					User newUser = new User();
+					newUser.setName(oAuth2UserInfo.getFirstName());
+					newUser.setEmail(oAuth2UserInfo.getEmail());
+					newUser.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
+					newUser.setRoles(Collections.singleton(Role.GAMER));
+					log.info("Creating new User ... ");
+					return updateUser(newUser).doOnError(e -> {
+						throw new UserRegistrationException(e.getMessage());
+					}).doOnNext(result -> log.info("User Added ::: {} with Provider ::: {}", newUser.getName(),
+							newUser.getAuthenticationProvider()));
+				} else {
+					String existingProvider = user.getAuthenticationProvider().toString();
+					if (existingProvider.equalsIgnoreCase(provider.toUpperCase())) {
+						log.info("User is already registered with the provider :: {}", existingProvider);
+						return Mono.just(user);
+					}
+					log.info("Updating the User...");
+					user.setAuthenticationProvider(AuthenticationProiver.valueOf(provider.toUpperCase()));
+					return updateUser(user).doOnError(e -> {
+						log.error("Load User, User Update Error ...");
+						throw new UserRegistrationException(e.getMessage());
+					}).doOnNext(result -> log.info("User Updated ::: {} with Provider ::: {}", user.getName(),
+							user.getAuthenticationProvider()));
+				}
+			}).map(user -> new UserPrincipal(user, oauthAttributes))
+					.doOnTerminate(() -> log.info("Leaving  CustomOauth2Service loadUser..."));
 		});
-			//Since feign is the client it is blocking by default
+		// Since feign is the client it is blocking by default
 //			 return Mono.fromCallable(() -> userClient.getUserByMail(Map.of("userMail",oAuth2UserInfo.getEmail())).orElse(null))
 //					 .flatMap(user -> {
 //						 if (Objects.isNull(user)) {
@@ -98,23 +98,20 @@ public class CustomOauth2Service extends DefaultReactiveOAuth2UserService {
 //						 }
 //					 }).map(user -> new UserPrincipal(user, oauthAttributes))
 //					 .doOnTerminate(() -> log.info("Leaving loadUser..."));
-		
+
 	}
-	
-	private Mono<User> updateUser(User user){
-		 log.info("Entering updateUser ...");
-		 Mono<User> userMono = WebClient.create().put().uri(userServiceUrlResolver.getUpdateUserUrl())
-				.bodyValue(user).retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+
+	private Mono<User> updateUser(User user) {
+		log.info("Entering updateUser ...");
+		Mono<User> userMono = WebClient.create().put().uri(userServiceUrlResolver.getUpdateUserAuthProviderUrl())
+				.bodyValue(user).retrieve().onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
 					log.error("Error While retrieving User Details ...");
 					throw new UsernameNotFoundException("AUTHENTICATION_ERROR");
-				 })
-				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+				}).onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
 					log.error("Error While retrieving User Details ...");
 					throw new UserRegistrationException("ERROR_WHILE_USER_UPDATE");
-				 })
-				.bodyToMono(User.class);
-		 log.info("Leaving updateUser ...");
-		 return userMono;
+				}).bodyToMono(User.class);
+		log.info("Leaving updateUser ...");
+		return userMono;
 	}
 }
