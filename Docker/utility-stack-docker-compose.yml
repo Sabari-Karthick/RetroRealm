@@ -42,8 +42,10 @@ services:
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
-    ports:
-      - "${LOCAL_HOST_IP}:${KAFDROP_PORT}:${KAFDROP_PORT}"
+    # ports:
+    #   - "${LOCAL_HOST_IP}:${KAFDROP_PORT}:${KAFDROP_PORT}"
+    expose:
+      - ${KAFDROP_PORT}
     environment:
       KAFKA_BROKERCONNECT: kafka:${KAFKA_PORT}
       JVM_OPTS: "-Xms32M -Xmx64M"

@@ -13,10 +13,8 @@ services:
   zookeeper:
     image: zookeeper:3.8
     container_name: zookeeper
-    # ports:
-    #   - "2181:2181"
-    expose:
-      - ${ZOOKEEPER_CLIENT_PORT}
+    ports:
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
       ZOOKEEPER_TICK_TIME: 2000
@@ -58,7 +56,7 @@ services:
     image: grafana/tempo
     extra_hosts: [ 'host.docker.internal:host-gateway' ]
     command: [ "-config.file=/etc/tempo.yaml" ]
-    container_name: tempo
+    container_name: tempo-local
     volumes:
       - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
       - ./tempo-data:/tmp/tempo
@@ -141,7 +139,7 @@ services:
       - retro-main
     environment:
       # TZ: Asia/Kolkata
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 1234
     expose:
       - ${MYSQL_PORT}
     restart: unless-stopped
