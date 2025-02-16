@@ -40,11 +40,12 @@ public class SecurityConfig {
 	@Bean
 	SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
-        http
+            http
                 .csrf(CsrfSpec::disable)
                 .authorizeExchange(request -> request
                         .pathMatchers(allowedPaths).permitAll()
                         .anyExchange().authenticated())
+                .authorizeExchange(request -> request.pathMatchers("/actuator/shutdown").hasRole("ADMIN"))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .httpBasic(HttpBasicSpec::disable)
                 .oauth2Login(oauth2 -> oauth2

@@ -6,10 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class RetroRealmProxyServerApplication {
+public class RetroRealmApiGatewayApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RetroRealmProxyServerApplication.class, args);
+		SpringApplication.run(RetroRealmApiGatewayApplication.class, args);
 	}
 
 }
