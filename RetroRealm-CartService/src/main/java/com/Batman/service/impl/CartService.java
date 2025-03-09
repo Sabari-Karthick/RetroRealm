@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.Batman.dto.cart.CartRequest;
 import com.Batman.dto.cart.CartValueResponse;
@@ -38,8 +39,12 @@ public class CartService implements ICartService {
 	@Override
 	public Cart addToCart(CartRequest cartRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
+		    log.error("Input Field Invalid Error ...");
+		    FieldError fieldError = bindingResult.getFieldError();
+		    String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid input field";
+		    throw new InputFieldException(errorMessage);
 		}
+
 
 		Integer userId = cartRequest.getUserId();
 		Integer newCartItem = cartRequest.getGameId();
