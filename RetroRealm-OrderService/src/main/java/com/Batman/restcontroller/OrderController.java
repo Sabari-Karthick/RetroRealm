@@ -24,11 +24,11 @@ public class OrderController {
 
 	private final IOrderService orderService;
 
-	@PostMapping("/createOrder")
+	@PostMapping("/create")
 	public ResponseEntity<?> checkout(@Valid @RequestBody final OrderRequest orderRequest,
 			BindingResult bindingResult) {
 		Order order = orderService.placeOrder(orderRequest, bindingResult);
-		return new ResponseEntity<Order>(order, HttpStatus.CREATED);
+		return new ResponseEntity<>(order, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/user/{userId}")

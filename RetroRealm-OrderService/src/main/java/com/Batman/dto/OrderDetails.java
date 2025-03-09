@@ -1,22 +1,26 @@
 package com.Batman.dto;
 
-import java.util.List;
+import java.util.Set;
+
+import com.Batman.enums.PaymentType;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class OrderDetailsDto {
+public class OrderDetails {
  
 	  private Integer orderId;
 	  
-	  private String userMail;
+	  private Integer userId;
 	  
-	  private List<String> gameNames;
+	  private Set<Integer> gameIds;
 	  
 	  private String orderStatus;
 	  
 	  private Double totalPrice;
+	  
+	  private PaymentType paymentType;
 	
 }
