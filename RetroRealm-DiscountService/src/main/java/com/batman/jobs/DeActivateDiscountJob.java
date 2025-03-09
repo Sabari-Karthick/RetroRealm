@@ -4,20 +4,20 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.batman.entity.Discount;
 import com.batman.service.IDiscountService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeActivateDiscountJob implements Job{
 	
-	@Autowired
-	private IDiscountService discountService;
+	private final IDiscountService discountService;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {

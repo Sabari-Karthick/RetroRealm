@@ -14,6 +14,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.batman.constants.KafkaConstants;
 import com.batman.dto.discount.DiscountRequest;
@@ -45,15 +46,17 @@ public class DiscountService implements IDiscountService {
 	private final ApplicationEventPublisher applicationEventPublisher;
 
 	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
-//	private final GameFeignClient gameFeignClient;
 
 	@Override
 	public Discount createDiscount(DiscountRequest discountRequest, BindingResult bindingResult) {
 		log.info("Entering Create Discount ...");
 		if (bindingResult.hasErrors()) {
-			log.error("Error in Discount Request ...");
-			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
+		    log.error("Input Field Invalid Error ...");
+		    FieldError fieldError = bindingResult.getFieldError();
+		    String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid input field";
+		    throw new InputFieldException(errorMessage);
 		}
+
 		List<Discount> list = discountRepository.findActiveDiscountsOfGames(discountRequest.getGameIds(),false);
 		if (!list.isEmpty()) {
 			throw new DiscountAlreadyExistException(
