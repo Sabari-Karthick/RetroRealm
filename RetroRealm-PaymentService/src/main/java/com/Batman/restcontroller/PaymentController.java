@@ -24,9 +24,9 @@ public class PaymentController {
 	ResponseEntity<?> pay(@RequestBody PaymentRequest paymentRequest) {
 		Payment payment = paymentService.pay(paymentRequest.getAmount(), paymentRequest.getPaymentType());
 		if(payment.getPaymentStatus().equals(PaymentStatus.COMPLETED)) {
-			return ResponseEntity.ok(payment.getId());
+			return ResponseEntity.ok(payment.getPaymentId());
 		}else {
-			return ResponseEntity.internalServerError().body(payment.getId());
+			return ResponseEntity.internalServerError().body(payment.getPaymentId());
 		}
 	}
 	

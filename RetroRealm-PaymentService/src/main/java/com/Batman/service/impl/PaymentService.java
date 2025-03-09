@@ -3,8 +3,16 @@ package com.Batman.service.impl;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
+import com.Batman.constants.KafkaConstants;
+import com.Batman.dto.OrderDetails;
+import com.Batman.dto.PaymentDetails;
 import com.Batman.entity.Payment;
 import com.Batman.enums.PaymentStatus;
 import com.Batman.enums.PaymentType;
@@ -21,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentService implements IPaymentService{
 	
 	private final IPaymentRepository paymentRepository;  
+	
+	private KafkaTemplate<String, PaymentDetails> kafkaTemplate;
 
 	@Override
 	public Payment pay(Double amount, PaymentType paymentType) {
@@ -43,6 +53,37 @@ public class PaymentService implements IPaymentService{
 		payment.setPaymentType(paymentType);
 		payment.setAmount(amount);
 		return paymentRepository.save(payment);
+	}
+	
+	
+	@KafkaListener(topics = KafkaConstants.ORDERS_TOPIC, groupId = KafkaConstants.GROUP_ID)
+	public void processPayment(@Payload OrderDetails orderDetails,@Header(value = KafkaHeaders.RECEIVED_PARTITION) int partition) {
+		log.info("Entering Process Payment ....");
+		
+		Integer orderId = orderDetails.getOrderId();
+		Integer userId = orderDetails.getUserId();
+		log.info("Processing Order Id :: {} For User :: {}",orderId,userId);
+		
+		//Needs to Decide How the Payment Details going to be do 
+		Payment payment = pay(orderDetails.getTotalPrice(), orderDetails.getPaymentType());
+		
+		sendPaymentEvent(payment);
+		
+		log.info("Leaving Process Payment ....");
+	}
+
+
+	private void sendPaymentEvent(Payment payment) {
+		
+		log.info("Entering Send Payment Event ....");
+		
+		log.info("Payment ID :: {}",payment.getPaymentId());
+		
+		if(-5 > Math.random())
+		   kafkaTemplate.send(KafkaConstants.TOPIC,null);
+		
+		log.info("Leaving  Send Payment Event ....");
+		
 	}
 
 }

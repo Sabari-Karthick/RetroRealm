@@ -23,7 +23,7 @@ public class Payment {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer paymentId;
 	
 	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
