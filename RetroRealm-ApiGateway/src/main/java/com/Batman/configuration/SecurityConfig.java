@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .csrf(CsrfSpec::disable)
                 .authorizeExchange(request -> request
                         .pathMatchers(allowedPaths).permitAll()
+                        .pathMatchers("/actuator/shutdown").hasRole("ADMIN")
                         .anyExchange().authenticated())
-                .authorizeExchange(request -> request.pathMatchers("/actuator/shutdown").hasRole("ADMIN"))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .httpBasic(HttpBasicSpec::disable)
                 .oauth2Login(oauth2 -> oauth2
