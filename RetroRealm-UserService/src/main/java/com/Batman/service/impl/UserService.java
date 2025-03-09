@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.Batman.dto.RegistrationRequest;
 import com.Batman.dto.UpdateProviderRequest;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserServiceImpl implements IUserService {
+public class UserService implements IUserService {
 
 	private final IUserRepository userRepository;
 
@@ -78,15 +79,14 @@ public class UserServiceImpl implements IUserService {
 		return userRepository.findAll();
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public User updateUserProviderDetails(UpdateProviderRequest user, BindingResult bindingResult) {
 		log.info("Entering updateUserProviderDetails ...");
 		if (bindingResult.hasErrors()) {
-			// Need to fix this possible null
-			log.error("Input field Exception in {}",
-					bindingResult.getFieldError() + " " + bindingResult.getFieldError().getDefaultMessage());
-			throw new InputFieldException(bindingResult.getFieldError().getDefaultMessage());
+			log.error("Input Field Invalid Error ...");
+			FieldError fieldError = bindingResult.getFieldError();
+			String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid input field";
+			throw new InputFieldException(errorMessage);
 		}
 		User userEntity = mapper.convertToEntity(user, User.class);
 		log.info("Updating user {}", user.getName());
