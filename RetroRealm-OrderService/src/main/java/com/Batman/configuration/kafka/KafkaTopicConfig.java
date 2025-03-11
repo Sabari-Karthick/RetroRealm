@@ -32,7 +32,7 @@ public class KafkaTopicConfig {
 	@Bean
 	NewTopic topic() {
 		log.info("Entering Topic Creation ...");
-		return new NewTopic(TOPIC, 1, (short) 1);
+		return new NewTopic(TOPIC, 3, (short) 2);
 	}
 
 }

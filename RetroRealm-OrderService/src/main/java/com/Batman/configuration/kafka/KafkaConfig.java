@@ -29,12 +29,13 @@ public class KafkaConfig {
 		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,host);
 		configuration.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configuration.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+		configuration.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomOrderPartitioner.class.getName());
 
 		return new DefaultKafkaProducerFactory<>(configuration);
 	}
 
 	@Bean
-	KafkaTemplate<String, OrderDetails> getTemplate() {
+	KafkaTemplate<String, OrderDetails> kafkaTemplate() {
 		return new KafkaTemplate<>(producerFactory());
 	}
 

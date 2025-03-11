@@ -39,6 +39,7 @@ public class KafkaConfig {
 		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,host);
 		configuration.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configuration.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+//		configuration.put(ProducerConfig.PARTITIONER_CLASS_CONFIG,RoundRobinPartitioner.class.getName()); //For Setting the Partition Strategy
 
 		return new DefaultKafkaProducerFactory<>(configuration);
 	}
@@ -64,13 +65,13 @@ public class KafkaConfig {
 
 	@Bean
 	ConcurrentKafkaListenerContainerFactory<String, OrderDetails> kafkaListenerContainerFactory(){
-		ConcurrentKafkaListenerContainerFactory<String, OrderDetails> factory = new ConcurrentKafkaListenerContainerFactory<String, OrderDetails>();
+		ConcurrentKafkaListenerContainerFactory<String, OrderDetails> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(getConsumerFactory());
 		return factory;
 	}
 
 	@Bean
-	KafkaTemplate<String, PaymentDetails> getTemplate() {
+	KafkaTemplate<String, PaymentDetails> kafkaTemplate() {
 		return new KafkaTemplate<>(producerFactory());
 	}
 
