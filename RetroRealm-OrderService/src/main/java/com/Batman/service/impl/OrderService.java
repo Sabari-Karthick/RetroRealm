@@ -4,8 +4,10 @@ import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.CartValueResponse;
 import com.Batman.dto.OrderDetails;
 import com.Batman.dto.OrderRequest;
+import com.Batman.dto.PaymentDetails;
 import com.Batman.entity.Order;
 import com.Batman.enums.OrderStatus;
+import com.Batman.enums.PaymentStatus;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.InvalidCartDetailsException;
 import com.Batman.exception.wrapper.RecordNotAvailableException;
@@ -18,8 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -70,7 +76,7 @@ public class OrderService implements IOrderService {
 
         OrderDetails orderDetails = OrderDetails.builder().gameIds(order.getOrderItems())
                 .orderId(order.getOrderId()).orderStatus(order.getOrderStatus().toString())
-                .totalPrice(order.getOrderPrice()).userId(order.getUserId()).paymentType(order.getPaymentType()).orderType(order.getOrderType()).build();
+                .totalPrice(order.getOrderPrice()).userId(order.getUserId()).paymentType(order.getPaymentType()).orderType(order.getOrderType().getType()).build();
 
         //Assuming the Payment Details are already available
         //If no this event no needs to be published
@@ -82,7 +88,7 @@ public class OrderService implements IOrderService {
 
     private ProducerRecord<String, OrderDetails> frameProducerRecord(OrderDetails orderDetails) {
         log.info("Framing Producer Record for Order ID {} ...", orderDetails.getOrderId());
-        ProducerRecord<String, OrderDetails> producerRecord = new ProducerRecord<>(KafkaConstants.TOPIC, orderDetails.getOrderId().toString(), orderDetails);
+        ProducerRecord<String, OrderDetails> producerRecord = new ProducerRecord<>(KafkaConstants.TOPIC, orderDetails.getOrderType(), orderDetails);
         log.info("Producer Record is Framed for Order ID {} with Key {}...", orderDetails.getOrderId(), producerRecord.key());
         return producerRecord;
     }
@@ -117,6 +123,36 @@ public class OrderService implements IOrderService {
                 .orElseThrow(() -> new RecordNotAvailableException("ORDER_NOT_FOUND_FOR_ID"));
         log.info("Leaving Get Order By Id in Order Service...");
         return order;
+    }
+
+
+    @KafkaListener(topics = KafkaConstants.PAYMENT_TOPIC, groupId = KafkaConstants.GROUP_ID)
+    public void updateOrderAfterPaymentEvent(@Payload PaymentDetails paymentDetails, @Header(KafkaHeaders.RECEIVED_PARTITION) int partition) {
+        log.info("Entering updateOrderAfterPaymentEvent in Order Service ...");
+        Integer paymentId = paymentDetails.getPaymentId();
+        Integer orderId = paymentDetails.getOrderId();
+
+        log.info("Received Payment Event for Payment Id :: {} for Order Id :: {} from partition {}",paymentId,orderId,partition);
+
+        Order order = getOrderById(orderId);
+        order.getPaymentIds().add(paymentId);
+        PaymentStatus paymentStatus = paymentDetails.getPaymentStatus();
+        switch (paymentStatus){
+            case PENDING -> {
+                log.info("A Pending Payment is Received ...");
+                //Need to Decide What to Do .....
+            }
+            case  COMPLETED -> {
+                log.info("A Completed Payment is Received ...");
+                order.setOrderStatus(OrderStatus.COMPLETED);
+            }
+            case FAILED -> {
+                log.info("A Failed Payment is Received ...");
+                order.setOrderStatus(OrderStatus.FAILED);
+            }
+        }
+        orderRepository.save(order);
+        log.info("Leaving updateOrderAfterPaymentEvent in Order Service ...");
     }
 
     @Retry(name = SERVICE_NAME, fallbackMethod = "retryFallback")

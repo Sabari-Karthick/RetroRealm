@@ -24,6 +24,6 @@ public class OrderDetails {
 	  
 	  private PaymentType paymentType;
 
-	  private OrderType orderType;
+	  private String orderType;
 	
 }

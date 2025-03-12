@@ -20,4 +20,6 @@ public class OrderDetails {
 	  private Double totalPrice;
 	
 	  private PaymentType paymentType;
+	  
+	  private String orderType;
 }
