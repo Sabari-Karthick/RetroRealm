@@ -2,6 +2,7 @@ package com.Batman.dto;
 
 import java.util.Set;
 
+import com.Batman.enums.OrderType;
 import com.Batman.enums.PaymentType;
 
 import lombok.Builder;
@@ -22,5 +23,7 @@ public class OrderDetails {
 	  private Double totalPrice;
 	  
 	  private PaymentType paymentType;
+
+	  private OrderType orderType;
 	
 }

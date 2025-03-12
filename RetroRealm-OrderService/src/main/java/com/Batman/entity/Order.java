@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.Batman.enums.OrderStatus;
+import com.Batman.enums.OrderType;
 import com.Batman.enums.PaymentType;
 
 import jakarta.persistence.CollectionTable;
@@ -61,6 +62,10 @@ public class Order {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
+
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private OrderType orderType;
 
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdDate;

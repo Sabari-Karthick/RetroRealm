@@ -22,6 +22,12 @@ public class KafkaTopicConfig {
 	@Value("${kafka.host}")
 	private String host;
 
+	@Value("${kafka.topic.partitions}")
+	private int partitions;
+
+	@Value("${kafka.topic.replication-factor}")
+	private short replicationFactor;
+
 	@Bean
 	KafkaAdmin kafkaAdmin() {
 		Map<String, Object> configs = new HashMap<>();
@@ -32,7 +38,7 @@ public class KafkaTopicConfig {
 	@Bean
 	NewTopic topic() {
 		log.info("Entering Topic Creation ...");
-		return new NewTopic(TOPIC, 3, (short) 2);
+		return new NewTopic(TOPIC, partitions, replicationFactor);
 	}
 
 }
