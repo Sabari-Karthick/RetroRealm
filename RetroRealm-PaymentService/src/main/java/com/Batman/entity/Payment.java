@@ -25,6 +25,8 @@ public class Payment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer paymentId;
 	
+	private Integer orderId;
+	
 	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
 	

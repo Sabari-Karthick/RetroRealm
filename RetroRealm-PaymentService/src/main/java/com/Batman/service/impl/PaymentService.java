@@ -33,7 +33,7 @@ public class PaymentService implements IPaymentService{
 	private KafkaTemplate<String, PaymentDetails> kafkaTemplate;
 
 	@Override
-	public Payment pay(Double amount, PaymentType paymentType) {
+	public Payment pay(Double amount, PaymentType paymentType,Integer orderId) {
 		ZonedDateTime initiatedTime = ZonedDateTime.now(ZoneId.systemDefault());
 		log.info("Payment Request Arrived for amount {} with Type {} initated at {}",amount,paymentType,initiatedTime);
 		
@@ -52,6 +52,7 @@ public class PaymentService implements IPaymentService{
 		payment.setCompletedTime(completedTime);
 		payment.setPaymentType(paymentType);
 		payment.setAmount(amount);
+		payment.setOrderId(orderId);
 		return paymentRepository.save(payment);
 	}
 	
@@ -65,8 +66,7 @@ public class PaymentService implements IPaymentService{
 		log.info("Processing Order Id :: {} For User :: {}",orderId,userId);
 		
 		//Needs to Decide How the Payment Details going to be do 
-		Payment payment = pay(orderDetails.getTotalPrice(), orderDetails.getPaymentType());
-		
+		Payment payment = pay(orderDetails.getTotalPrice(), orderDetails.getPaymentType(),orderId);
 		sendPaymentEvent(payment);
 		
 		log.info("Leaving Process Payment ....");
