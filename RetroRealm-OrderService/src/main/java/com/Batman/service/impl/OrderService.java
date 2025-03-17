@@ -88,7 +88,7 @@ public class OrderService implements IOrderService {
 
     private ProducerRecord<String, OrderDetails> frameProducerRecord(OrderDetails orderDetails) {
         log.info("Framing Producer Record for Order ID {} ...", orderDetails.getOrderId());
-        ProducerRecord<String, OrderDetails> producerRecord = new ProducerRecord<>(KafkaConstants.TOPIC, orderDetails.getOrderType(), orderDetails);
+        ProducerRecord<String, OrderDetails> producerRecord = new ProducerRecord<>(KafkaConstants.TOPIC, orderDetails.getOrderId().toString(), orderDetails);
         log.info("Producer Record is Framed for Order ID {} with Key {}...", orderDetails.getOrderId(), producerRecord.key());
         return producerRecord;
     }

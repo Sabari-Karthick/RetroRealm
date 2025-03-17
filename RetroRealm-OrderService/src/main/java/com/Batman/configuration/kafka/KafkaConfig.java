@@ -7,6 +7,7 @@ import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.PaymentDetails;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.RoundRobinPartitioner;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,8 @@ public class KafkaConfig {
 		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,host);
 		configuration.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configuration.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-		configuration.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomOrderPartitioner.class.getName());
+//		configuration.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomOrderPartitioner.class.getName());
+		configuration.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class.getName());
 
 		return new DefaultKafkaProducerFactory<>(configuration);
 	}
