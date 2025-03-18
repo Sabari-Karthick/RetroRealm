@@ -10,7 +10,7 @@ public class PaymentDetails {
 	
 	private Integer paymentId;
 	
-	private Integer orderId;
+	private String orderId;
 	
 	private PaymentType paymentType;
 	
