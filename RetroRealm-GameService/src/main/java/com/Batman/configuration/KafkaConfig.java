@@ -29,49 +29,46 @@ import lombok.extern.slf4j.Slf4j;
 @EnableKafka
 @Slf4j
 public class KafkaConfig {
-	
+
 	@Value("${kafka.host}")
 	private String host;
 
-	
 	@Bean
-	ConsumerFactory<String, DiscountPlacedEvent> getConsumerFactory(){
-		
+	ConsumerFactory<String, DiscountPlacedEvent> getConsumerFactory() {
+
 		HashMap<String, Object> config = new HashMap<>();
-		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,host);
-		config.put(ConsumerConfig.GROUP_ID_CONFIG,KafkaConstants.GROUP_ID);
+		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, host);
+		config.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.GROUP_ID);
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-		config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS,"false");
+		config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, "false");
 		config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.Batman.dto.events.DiscountPlacedEvent");
 		config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-		
-		
+
 		return new DefaultKafkaConsumerFactory<>(config);
-		
+
 	}
-	
+
 	@Bean
-	ConcurrentKafkaListenerContainerFactory<String, DiscountPlacedEvent> kafkaListenerContainerFactory(){
+	ConcurrentKafkaListenerContainerFactory<String, DiscountPlacedEvent> kafkaListenerContainerFactory() {
 		ConcurrentKafkaListenerContainerFactory<String, DiscountPlacedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(getConsumerFactory());
 		factory.setCommonErrorHandler(errorHandler());
 		factory.getContainerProperties().setAckMode(AckMode.RECORD);
 		return factory;
 	}
-	
-	
+
 	@Bean
-    DefaultErrorHandler errorHandler() {
-        BackOff fixedBackOff = new FixedBackOff(KafkaConstants.INTERVAL, KafkaConstants.MAX_FAILURE);
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler((consumerRecord, e) -> {
-        	log.error("Consumer Record {} Failed to Process Because of this exception {}",consumerRecord.toString(),e.getClass().getName());
-        }, fixedBackOff);
-        errorHandler.addRetryableExceptions(SocketTimeoutException.class,RuntimeException.class);
-        errorHandler.addNotRetryableExceptions(NullPointerException.class,GameNotFoundException.class,CallNotPermittedException.class);
-        return errorHandler;
-    }
-	
-	
+	DefaultErrorHandler errorHandler() {
+		BackOff fixedBackOff = new FixedBackOff(KafkaConstants.INTERVAL, KafkaConstants.MAX_FAILURE);
+		DefaultErrorHandler errorHandler = new DefaultErrorHandler(
+				(consumerRecord, e) -> log.error("Consumer Record {} Failed to Process Because of this exception {}",
+						consumerRecord.toString(), e.getClass().getName()),
+				fixedBackOff);
+		errorHandler.addRetryableExceptions(SocketTimeoutException.class, RuntimeException.class);
+		errorHandler.addNotRetryableExceptions(NullPointerException.class, GameNotFoundException.class,
+				CallNotPermittedException.class);
+		return errorHandler;
+	}
 
 }
