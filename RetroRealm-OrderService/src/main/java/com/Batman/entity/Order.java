@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import com.Batman.annotations.OrderId;
 import com.Batman.enums.OrderStatus;
 import com.Batman.enums.OrderType;
 import com.Batman.enums.PaymentType;
@@ -15,8 +16,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
@@ -38,8 +37,8 @@ import lombok.Setter;
 public class Order {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer orderId;
+	@OrderId
+	private String orderId;
 
 	@Column(nullable = false)
 	private Integer userId;
@@ -83,5 +82,15 @@ public class Order {
 	protected void onUpdate() {
 		updatedDate = LocalDateTime.now();
 	}
+
+	@Override
+	public String toString() {
+		return "Order [orderId=" + orderId + ", userId=" + userId + ", orderItems=" + orderItems + ", orderPrice="
+				+ orderPrice + ", paymentIds=" + paymentIds + ", orderStatus=" + orderStatus + ", paymentType="
+				+ paymentType + ", orderType=" + orderType + ", createdDate=" + createdDate + ", updatedDate="
+				+ updatedDate + "]";
+	}
+	
+	
 
 }

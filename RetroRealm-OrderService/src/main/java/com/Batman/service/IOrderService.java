@@ -13,5 +13,5 @@ public interface IOrderService {
 
 	List<Order> getOrdersOfUser(Integer userId);
 
-	Order getOrderById(Integer orderId);
+	Order getOrderById(String orderId);
 }
