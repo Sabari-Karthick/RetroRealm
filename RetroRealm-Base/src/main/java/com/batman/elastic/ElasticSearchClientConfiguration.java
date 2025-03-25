@@ -1,5 +1,6 @@
 package com.batman.elastic;
 
+import lombok.Getter;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -19,10 +20,11 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import nl.altindag.ssl.SSLFactory;
+//import nl.altindag.ssl.SSLFactory;
 
 @Component
 @Slf4j
+@Getter
 public class ElasticSearchClientConfiguration {
     
     private RestClient restClient;
@@ -44,18 +46,18 @@ public class ElasticSearchClientConfiguration {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, pwd));
 
-            RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, scheme))
-                .setHttpClientConfigCallback(httpClientBuilder -> {
-                    SSLFactory sslFactory = SSLFactory.builder()
-                        .withUnsafeTrustMaterial()
-                        .withUnsafeHostnameVerifier()
-                        .build();
-                    return httpClientBuilder
-                        .setSSLContext(sslFactory.getSslContext())
-                        .setSSLHostnameVerifier(sslFactory.getHostnameVerifier())
-                        .disableAuthCaching()
-                        .setDefaultCredentialsProvider(credentialsProvider);
-                });
+            RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, scheme));
+//                .setHttpClientConfigCallback(httpClientBuilder -> {
+//                    SSLFactory sslFactory = SSLFactory.builder()
+//                        .withUnsafeTrustMaterial()
+//                        .withUnsafeHostnameVerifier()
+//                        .build();
+//                    return httpClientBuilder
+//                        .setSSLContext(sslFactory.getSslContext())
+//                        .setSSLHostnameVerifier(sslFactory.getHostnameVerifier())
+//                        .disableAuthCaching()
+//                        .setDefaultCredentialsProvider(credentialsProvider);
+//                });
 
             restClient = builder.build();
             ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
@@ -63,13 +65,9 @@ public class ElasticSearchClientConfiguration {
 
             log.info("Elasticsearch Client initialized successfully.");
         } catch (Exception e) {
-            log.error("Failed to initialize Elasticsearch Client", ExceptionUtils.getStackTrace(e));
+            log.error("Failed to initialize Elasticsearch Client {}", ExceptionUtils.getStackTrace(e));
             throw new InternalException("Error initializing Elasticsearch Client", e);
         }
-    }
-
-    public ElasticsearchClient getElasticsearchClient() {
-        return elasticsearchClient;
     }
 
     @PreDestroy
@@ -80,7 +78,7 @@ public class ElasticSearchClientConfiguration {
                 log.info("Elasticsearch Client closed.");
             }
         } catch (Exception e) {
-            log.error("Error closing Elasticsearch Client", ExceptionUtils.getStackTrace(e));
+            log.error("Error closing Elasticsearch Client {}", ExceptionUtils.getStackTrace(e));
         }
     }
 
