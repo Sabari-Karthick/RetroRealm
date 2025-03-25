@@ -74,8 +74,8 @@ public class GameController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<?> findGamesWithPrefix(@RequestParam("name") final String gamePrefix) {
-		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gamePrefix));
+	public ResponseEntity<?> suggestGame(@RequestParam("name") final String gameName) {
+		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gameName));
 	}
 
 //	@PutMapping("/add/discount")

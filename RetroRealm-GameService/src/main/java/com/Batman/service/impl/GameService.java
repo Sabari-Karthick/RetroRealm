@@ -43,7 +43,7 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service("GameService")
+@Service("gameService")
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
@@ -128,9 +128,9 @@ public class GameService implements IGameService {
 	}
 
 	@Override
-	public List<GameName> suggestAllGameNameWithPrefix(String namePrefix) {
+	public List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery) {
 		log.info("Fetching Game By Prefix ...");
-		List<GameName> games = gameRepository.findByGameNameStartsWith(namePrefix, GameName.class);
+		List<GameName> games = gameRepository.findByGameNameStartsWith(gameNameQuery, GameName.class);
 		log.info("Fetched Game By Prefix ...");
 		return games;
 	}
