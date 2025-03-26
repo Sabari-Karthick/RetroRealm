@@ -11,4 +11,7 @@ public class BaseModel {
     @Transient
     private String indexName;
 
+    @Transient
+    private String type;
+
 }

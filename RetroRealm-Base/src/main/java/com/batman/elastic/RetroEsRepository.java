@@ -1,5 +1,6 @@
 package com.batman.elastic;
 
+import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -8,6 +9,9 @@ import java.util.List;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.batman.criteria.FilterComponent;
 import com.batman.exception.InternalException;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +30,28 @@ public class RetroEsRepository<T extends BaseModel> implements IRetroESBaseRepos
     private final ElasticSearchClientConfiguration elasticSearchClientConfiguration;
 
     @Override
-    public List<T> findAll(List<FilterComponent> filterComponents) {
+    public List<T> findAll(List<FilterComponent> filterComponents, int start, int size, Class<T> clazz) {
         log.info("Entering ElasticSearchRepository find All ...");
-
+        SearchRequest searchRequest = ElasticSearchUtil.buildSearchRequest(filterComponents, start, size, clazz);
+        try {
+            SearchResponse<T> searchResponse = elasticSearchClientConfiguration.getElasticsearchClient().search(searchRequest, clazz);
+            List<Hit<T>> hits = searchResponse.hits().hits();
+            log.info("Hit Count :: {}", hits.size());
+            return hits.stream().map(Hit::source).toList();
+        } catch (ElasticsearchException e) {
+            log.error("Elastic Search Exception in RetroEsRepository findAll :: {}", e.getMessage());
+            handleElasticSearchException(e);
+        } catch (IOException e) {
+            log.error("IO-Exception in RetroEsRepository findAll :: {}", e.getMessage());
+            throw new InternalException(e.getMessage());
+        }
         return Collections.emptyList();
     }
 
     @Override
     public T save(T model) {
         log.info("Entering ElasticSearchRepository save ...");
-        String indexName = getIndexName(model);
+        String indexName = ElasticSearchUtil.getIndexName(model.getClass());
         indexDocument(indexName, model);
         log.info("Exiting ElasticSearchRepository save ...");
         return model;
@@ -63,20 +79,24 @@ public class RetroEsRepository<T extends BaseModel> implements IRetroESBaseRepos
 
     }
 
-    private String getIndexName(T model) {
-        try {
-            BaseModel baseModel = model.getClass().getConstructor().newInstance();
-            return baseModel.getIndexName();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                 InvocationTargetException e) {
-            log.error("Elastic Search Exception in getIndexName :: {}", e.getMessage());
-            throw new InternalException(e.getMessage());
-        }
-    }
 
     @Override
     public List<T> saveBatch(List<T> models) {
         return List.of();
+    }
+
+    private void handleElasticSearchException(ElasticsearchException e) {
+        if (e.status() == 404) {
+            log.error("Index Not Found :: {}", e.getMessage());
+            throw new InternalException("Index Not Found");
+        } else if (e.status() == 400) {
+            log.error("Bad Request :: {}", e.getMessage());
+            throw new InternalException("Bad Request");
+        } else {
+            log.error("Internal Server Error :: {}", e.getMessage());
+            throw new InternalException("Internal Server Error");
+        }
+
     }
 
 }

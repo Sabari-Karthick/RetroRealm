@@ -1,0 +1,101 @@
+package com.batman.elastic;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.util.ObjectBuilder;
+import com.batman.DefaultBaseConstants;
+import com.batman.criteria.EsFilterGroup;
+import com.batman.criteria.FilterComponent;
+import com.batman.criteria.FilterGroup;
+import com.batman.criteria.QueryCondition;
+import com.batman.exception.InternalException;
+import com.batman.model.BaseModel;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+
+@Slf4j
+public final class ElasticSearchUtil {
+
+    private ElasticSearchUtil() {
+    }
+
+    public static String getIndexName(Class<? extends BaseModel> clazz) {
+        try {
+            BaseModel baseModel = clazz.getConstructor().newInstance();
+            return baseModel.getIndexName();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            log.error("Elastic Search Exception in getIndexName :: {}", e.getMessage());
+            throw new InternalException(e.getMessage());
+        }
+    }
+
+    public static String getTypeForModel(Class<? extends BaseModel> clazz) {
+        try {
+            BaseModel baseModel = clazz.getConstructor().newInstance();
+            return baseModel.getType();
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            log.error("Elastic Search Exception in getTypeForModel :: {}", e.getMessage());
+            throw new InternalException(e.getMessage());
+        }
+    }
+
+    public static SearchRequest buildSearchRequest(List<FilterComponent> filterComponents, int start, int size, Class<? extends BaseModel> clazz) {
+        log.info("Entering ElasticSearchUtil buildSearchRequest ...");
+        String indexName = getIndexName(clazz);
+        String type = getTypeForModel(clazz);
+        if (StringUtils.isNotBlank(type)) {
+            filterComponents.add(new QueryCondition(DefaultBaseConstants.TYPE, type));
+        }
+
+        List<EsFilterGroup> queries = convertFilterComponentsToEsFilterGroups(filterComponents);
+
+        return new SearchRequest.Builder().query(buildQuery(queries)).size(size).from(start)
+                .index(indexName).build();
+
+    }
+
+    private static Function<Query.Builder, ObjectBuilder<Query>> buildQuery(List<EsFilterGroup> esFilterGroups) {
+        return query -> {
+            return null;
+        };
+    }
+
+    private static List<EsFilterGroup> convertFilterComponentsToEsFilterGroups(List<FilterComponent> filterComponents) {
+        log.info("Entering ElasticSearchUtil convertFilterComponentsToEsFilterGroups ...");
+        List<EsFilterGroup> esFilterGroups = new ArrayList<>();
+        if (CollectionUtils.isEmpty(filterComponents)) {
+            log.debug("No Filter Components Found ... Returning Empty List");
+        } else {
+            for (FilterComponent filterComponent : filterComponents) {
+                EsFilterGroup esFilterGroup = new EsFilterGroup();
+                if (filterComponent instanceof QueryCondition queryCondition) {
+                    esFilterGroup = getEsFilterGroupFromQueryCondition(queryCondition);
+                } else if (filterComponent instanceof FilterGroup<?> filterGroup) {
+                    esFilterGroup = getEsFilterGroupFromFilterGroup(filterGroup);
+                }
+                esFilterGroups.add(esFilterGroup);
+            }
+        }
+        log.info("Exiting ElasticSearchUtil convertFilterComponentsToEsFilterGroups ...");
+        return esFilterGroups;
+    }
+
+    private static EsFilterGroup getEsFilterGroupFromFilterGroup(FilterGroup<?> filterGroup) {
+        return null;
+    }
+
+    private static EsFilterGroup getEsFilterGroupFromQueryCondition(QueryCondition queryCondition) {
+        return null;
+    }
+
+
+}
