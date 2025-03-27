@@ -1,17 +1,16 @@
 package com.batman.elastic;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.ObjectBuilder;
 import com.batman.DefaultBaseConstants;
-import com.batman.criteria.EsFilterGroup;
-import com.batman.criteria.FilterComponent;
-import com.batman.criteria.FilterGroup;
-import com.batman.criteria.QueryCondition;
+import com.batman.criteria.*;
 import com.batman.exception.InternalException;
 import com.batman.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -79,7 +78,7 @@ public final class ElasticSearchUtil {
                 EsFilterGroup esFilterGroup = new EsFilterGroup();
                 if (filterComponent instanceof QueryCondition queryCondition) {
                     esFilterGroup = getEsFilterGroupFromQueryCondition(queryCondition);
-                } else if (filterComponent instanceof FilterGroup<?> filterGroup) {
+                } else if (filterComponent instanceof FilterGroup filterGroup) {
                     esFilterGroup = getEsFilterGroupFromFilterGroup(filterGroup);
                 }
                 esFilterGroups.add(esFilterGroup);
@@ -89,12 +88,47 @@ public final class ElasticSearchUtil {
         return esFilterGroups;
     }
 
-    private static EsFilterGroup getEsFilterGroupFromFilterGroup(FilterGroup<?> filterGroup) {
+    private static EsFilterGroup getEsFilterGroupFromFilterGroup(FilterGroup filterGroup) {
+        log.info("Entering ElasticSearchUtil getEsFilterGroupFromFilterGroup ...");
+        List<Query> queries = new ArrayList<>();
+
+
         return null;
     }
 
     private static EsFilterGroup getEsFilterGroupFromQueryCondition(QueryCondition queryCondition) {
-        return null;
+        log.info("Entering ElasticSearchUtil getEsFilterGroupFromQueryCondition ...");
+        EsFilterGroup esFilterGroup = new EsFilterGroup();
+        List<Query> queryList = new ArrayList<>();
+        Query query = getESQueryForQueryCondition(queryCondition);
+        queryList.add(query);
+        esFilterGroup.setQueries(queryList);
+        log.info("Exiting ElasticSearchUtil getEsFilterGroupFromQueryCondition ...");
+        return esFilterGroup;
+    }
+
+
+    private static Query getESQueryForQueryCondition(@NonNull QueryCondition queryCondition) {
+        log.info("Entering ElasticSearchUtil getESQueryForQueryCondition ...");
+        String field = queryCondition.getField();
+        Object value = queryCondition.getValue();
+        QueryOperator queryOperator = queryCondition.getQueryOperator();
+        log.debug("Field :: {} and Value :: {} and Query Operator :: {}", field, value, queryOperator);
+        QueryVariant queryVariant = switch (queryOperator) {
+            case EQUAL -> MatchQuery.of(m -> m.field(field).query(FieldValue.of(value)));
+            case NOT_EQUAL ->
+                    BoolQuery.of(b -> b.mustNot(q -> q.match(m -> m.field(field).query(FieldValue.of(value)))));
+            case GREATER_THAN -> RangeQuery.of(r -> r.untyped(u -> u.field(field).gt(FieldValue.of(value).anyValue())));
+            case LESS_THAN -> RangeQuery.of(r -> r.untyped(u -> u.field(field).lt(FieldValue.of(value).anyValue())));
+            case GREATER_THAN_OR_EQUAL ->
+                    RangeQuery.of(r -> r.untyped(u -> u.field(field).gte(FieldValue.of(value).anyValue())));
+            case LESS_THAN_OR_EQUAL ->
+                    RangeQuery.of(r -> r.untyped(u -> u.field(field).lte(FieldValue.of(value).anyValue())));
+            case CONTAINS -> WildcardQuery.of(w -> w.field(field).wildcard("*" + value + "*"));
+        };
+
+        log.info("Exiting ElasticSearchUtil getESQueryForQueryCondition ...");
+        return queryVariant._toQuery();
     }
 
 
