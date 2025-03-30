@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.ObjectBuilder;
-import com.batman.DefaultBaseConstants;
+import com.batman.constants.DefaultBaseConstants;
 import com.batman.criteria.*;
 import com.batman.exception.InternalException;
 import com.batman.model.BaseModel;
@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Slf4j
@@ -63,10 +62,19 @@ public final class ElasticSearchUtil {
     }
 
     private static Function<Query.Builder, ObjectBuilder<Query>> buildQuery(List<EsFilterGroup> esFilterGroups) {
-        return query -> {
-            return null;
+        log.info("Entering ElasticSearchUtil buildQuery ...");
+        List<Query> allQueries = esFilterGroups.stream()
+                .flatMap(group -> group.getQueries().stream())
+                .toList();
+        return q -> {
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+            if (!allQueries.isEmpty()) {
+                boolQueryBuilder.must(allQueries);
+            }
+            return q.bool(boolQueryBuilder.build());
         };
     }
+
 
     private static List<EsFilterGroup> convertFilterComponentsToEsFilterGroups(List<FilterComponent> filterComponents) {
         log.info("Entering ElasticSearchUtil convertFilterComponentsToEsFilterGroups ...");
@@ -91,10 +99,30 @@ public final class ElasticSearchUtil {
     private static EsFilterGroup getEsFilterGroupFromFilterGroup(FilterGroup filterGroup) {
         log.info("Entering ElasticSearchUtil getEsFilterGroupFromFilterGroup ...");
         List<Query> queries = new ArrayList<>();
-
-
-        return null;
+        QueryCondition queryCondition1 = filterGroup.getQueryCondition1();
+        QueryCondition queryCondition2 = filterGroup.getQueryCondition2();
+        LogicalOperator logicalOperator = filterGroup.getLogicalOperator();
+        Query esQueryForQueryCondition = getESQueryForQueryCondition(queryCondition1);
+        Query esQueryForQueryCondition2 = getESQueryForQueryCondition(queryCondition2);
+        Query esFilterGroupFromQueryCondition = getEsFilterGroupFromQueryConditions(esQueryForQueryCondition, esQueryForQueryCondition2, logicalOperator);
+        queries.add(esFilterGroupFromQueryCondition);
+        EsFilterGroup esFilterGroup = new EsFilterGroup();
+        esFilterGroup.setQueries(queries);
+        log.info("Exiting ElasticSearchUtil getEsFilterGroupFromFilterGroup ...");
+        return esFilterGroup;
     }
+
+    private static Query getEsFilterGroupFromQueryConditions(Query esQueryForQueryCondition, Query esQueryForQueryCondition2, LogicalOperator logicalOperator) {
+        log.info("Entering ElasticSearchUtil getEsFilterGroupFromQueryConditions ...");
+        QueryVariant queryVariant = switch (logicalOperator) {
+            case AND -> BoolQuery.of(b -> b.must(esQueryForQueryCondition, esQueryForQueryCondition2));
+            case OR -> BoolQuery.of(b -> b.should(esQueryForQueryCondition, esQueryForQueryCondition2));
+            default -> throw new InternalException("Invalid Logical Operator");
+        };
+        log.info("Exiting ElasticSearchUtil getEsFilterGroupFromQueryConditions ...");
+        return queryVariant._toQuery();
+    }
+
 
     private static EsFilterGroup getEsFilterGroupFromQueryCondition(QueryCondition queryCondition) {
         log.info("Entering ElasticSearchUtil getEsFilterGroupFromQueryCondition ...");

@@ -9,5 +9,4 @@ import java.util.List;
 public class EsFilterGroup implements FilterComponent{
 
     private List<Query> queries;
-    private LogicalOperator logicalOperator = LogicalOperator.AND;
 }

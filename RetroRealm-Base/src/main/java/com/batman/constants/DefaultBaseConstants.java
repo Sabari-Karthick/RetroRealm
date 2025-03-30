@@ -1,4 +1,4 @@
-package com.batman;
+package com.batman.constants;
 
 public class DefaultBaseConstants {
 
