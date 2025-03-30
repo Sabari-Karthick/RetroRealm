@@ -1,28 +1,16 @@
 package com.Batman.entity;
 
-import java.time.LocalDate;
-import java.util.Set;
-
+import com.Batman.annotations.GameId;
 import com.Batman.enums.GameGenre;
-
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.batman.model.BaseModel;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -30,11 +18,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"gameName"}))
-public class Game {
+public class Game extends BaseModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer gameID;
+	@GameId
+	private String gameId;
 
 	private String gameName;
 	@ManyToOne
@@ -51,7 +39,7 @@ public class Game {
 	@ElementCollection(targetClass = GameGenre.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id", referencedColumnName = "gameID"))
 	@Enumerated(EnumType.STRING)
-	private Set<GameGenre> gameGenere;
+	private Set<GameGenre> gameGenre;
 	
 	public double getDiscountedGamePrice() {
 	    return this.gamePrice * (1 - this.gameDiscount / 100.0);

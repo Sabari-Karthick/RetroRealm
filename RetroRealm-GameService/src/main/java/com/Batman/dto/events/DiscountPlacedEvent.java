@@ -7,6 +7,6 @@ import lombok.Data;
 
 @Data
 public class DiscountPlacedEvent {
-	Set<Integer> gameIds;
+	Set<String> gameIds;
 	Double discountValue;
 }

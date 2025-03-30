@@ -14,20 +14,25 @@ import lombok.Data;
 
 @Data
 public class GameRequest {
-	
-	@NotNull(message = "Owner ID cannot be empty")
-	private Integer gameOwnerID;
-	
-	@NotBlank(message = "Game name cannot be empty")
-	private String gameName;
-	@NotNull(message = "Price cannot be empty")
-	private Double gamePrice;
-	@NotNull(message = "Version cannot be empty")
-	private Double gameVersion;
-	@NotNull(message = "Release Date cannot be empty")
-	@JsonSerialize(using = LocalDateSerializer.class)
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate gameReleasedDate;
-	@NotNull(message = "Genre cannot be empty")
-	private Set<GameGenre> gameGenere;
+
+    @NotNull(message = "Owner ID cannot be empty")
+    private Integer gameOwnerID;
+
+    @NotBlank(message = "Game name cannot be empty")
+    private String gameName;
+
+    @NotNull(message = "Price cannot be empty")
+    private Double gamePrice;
+
+    @NotNull(message = "Version cannot be empty")
+    private Double gameVersion;
+
+    @NotNull(message = "Release Date cannot be empty")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+
+    private LocalDate gameReleasedDate;
+
+    @NotNull(message = "Genre cannot be empty")
+    private Set<GameGenre> gameGenre;
 }

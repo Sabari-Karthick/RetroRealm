@@ -14,11 +14,11 @@ import com.Batman.projections.GameName;
 
 public interface IGameService {
 	GameResponse registerGame(GameRequest gameRequest,BindingResult bindingResult);
-	GameResponse searchById(Integer gameId);
+	GameResponse searchById(String gameId);
 	Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest);
 	List<GameResponse> getAllGames();
-	Double getTotalCostOfGames(Set<Integer> gameIds);
+	Double getTotalCostOfGames(Set<String> gameIds);
     List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery);
-    List<GameName> getAllGameNameWithIds(Set<Integer> gameIds);
+    List<GameName> getAllGameNameWithIds(Set<String> gameIds);
     List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent);
 }

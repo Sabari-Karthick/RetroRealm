@@ -42,7 +42,7 @@ public class GameController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getGameById(@PathVariable final Integer id) {
+	public ResponseEntity<?> getGameById(@PathVariable final String id) {
 		return ResponseEntity.ok(gameService.searchById(id));
 	}
 
@@ -64,12 +64,12 @@ public class GameController {
 	}
 
 	@GetMapping("/calculate/price")
-	public ResponseEntity<?> getCostOfGames(@RequestParam("ids[]") final Set<Integer> gameIds) {
+	public ResponseEntity<?> getCostOfGames(@RequestParam("ids[]") final Set<String> gameIds) {
 		return ResponseEntity.ok(gameService.getTotalCostOfGames(gameIds));
 	}
 
 	@GetMapping("/names")
-	public List<String> getNamesByGameId(@RequestParam("ids[]") final Set<Integer> gameIds) {
+	public List<String> getNamesByGameId(@RequestParam("ids[]") final Set<String> gameIds) {
 		return gameService.getAllGameNameWithIds(gameIds).stream().map(GameName::getGameName).toList();
 	}
 

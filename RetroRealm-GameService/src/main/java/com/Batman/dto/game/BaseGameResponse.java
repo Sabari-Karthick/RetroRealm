@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Data
 public class BaseGameResponse {
-	private Integer gameID;
+	private String gameId;
 
 	private String gameName;
 	private Double gamePrice;
@@ -25,7 +25,7 @@ public class BaseGameResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	private LocalDate gameReleasedDate;
 	private Double gameDiscount;
-	private Set<GameGenre> gameGenere;
+	private Set<GameGenre> gameGenre;
 	
 	public double getDiscountedGamePrice() {
 	    return this.gamePrice * (1 - this.gameDiscount / 100.0);
