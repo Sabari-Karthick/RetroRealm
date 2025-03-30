@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.Batman.events.GameEvent;
+import com.batman.constants.CrudAction;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -49,121 +52,131 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GameService implements IGameService {
 
-	private final IGameRepository gameRepository;
+    private final IGameRepository gameRepository;
 
-	private final IGameOwnerRepository gameOwnerRepository;
+    private final IGameOwnerRepository gameOwnerRepository;
 
-	private final CommonMapper mapper;
+    private final CommonMapper mapper;
 
-	private static final String SERVICE_NAME = "game-service";
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-	@Override
-	@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
-	@CacheDistribute
-	public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
-		 if (bindingResult.hasErrors()) {
-		        String errorMessage = Optional.ofNullable(bindingResult.getFieldError())
-		                                      .map(FieldError::getDefaultMessage)
-		                                      .orElse("Unknown error in Gaming Request");
-		        throw new InputFieldException(errorMessage);
-		    }
-		GameOwner gameOwner = gameOwnerRepository.findById(gameRequest.getGameOwnerID())
-				.orElseThrow(() -> new GameOwnerNotFoundException("OWNER_NOT_FOUND_FOR_ID"));
-		Game game = mapper.convertToEntity(gameRequest, Game.class);
-		game.setGameOwner(gameOwner);
-		game.setGameDiscount(0.0);
-		return mapper.convertToResponse(gameRepository.save(game), GameResponse.class);
-	}
+    private static final String SERVICE_NAME = "game-service";
 
-	@Override
-	@Cacheable(value = GAME_RESPONSE, key = "#gameId")
-	@CacheDistribute
-	public GameResponse searchById(Integer gameId) {
-		log.info("Entering get Game By Id for Id :: {}", gameId);
-		Game game = gameRepository.findById(gameId)
-				.orElseThrow(() -> new GameNotFoundException("GAME_NOT_FOUND_FOR_ID"));
-		GameResponse gameResponse = mapper.convertToResponse(game, GameResponse.class);
-		log.info("Leaving Get Game By Id ...");
-		return gameResponse;
-	}
+    @Override
+    @CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
+    @CacheDistribute
+    public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
+        log.info("Entering Game Service Register Game ...");
+        if (bindingResult.hasErrors()) {
+            String errorMessage = Optional.ofNullable(bindingResult.getFieldError())
+                    .map(FieldError::getDefaultMessage)
+                    .orElse("Unknown error in Gaming Request");
+            log.error("Binding Error in Game Service {}", errorMessage);
+            throw new InputFieldException(errorMessage);
+        }
+        GameOwner gameOwner = gameOwnerRepository.findById(gameRequest.getGameOwnerID())
+                .orElseThrow(() -> new GameOwnerNotFoundException("OWNER_NOT_FOUND_FOR_ID"));
+        Game game = mapper.convertToEntity(gameRequest, Game.class);
+        game.setGameOwner(gameOwner);
+        game.setGameDiscount(0.0);
+        Game savedGame = gameRepository.save(game);
+        log.info("Game Saved With Id :: {}", savedGame.getGameId());
+        GameResponse gameResponse = mapper.convertToResponse(savedGame, GameResponse.class);
+        GameEvent gameEvent = new GameEvent(this, savedGame, CrudAction.CREATE);
+        applicationEventPublisher.publishEvent(gameEvent);
+        log.info("Leaving Game Service Register Game ...");
+        return gameResponse;
+    }
 
-	@Override
-	@CacheDistribute
-	public Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest) {
-		log.info("Entering getAllGames by page... ");
-		PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
-				pageableRequest.getAsc() ? Direction.ASC : Direction.DESC, pageableRequest.getProperty());
-		Page<Game> gamePages = gameRepository.findAll(pageRequest);
-		Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
-		log.debug("Game Counts :: {}",response.getSize());
-		log.info("Leaving getAllGames by page... ");
-		return response;
-	}
-	
-	@Override
+    @Override
+    @Cacheable(value = GAME_RESPONSE, key = "#gameId")
+    @CacheDistribute
+    public GameResponse searchById(String gameId) {
+        log.info("Entering get Game By Id for Id :: {}", gameId);
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException("GAME_NOT_FOUND_FOR_ID"));
+        GameResponse gameResponse = mapper.convertToResponse(game, GameResponse.class);
+        log.info("Leaving Get Game By Id ...");
+        return gameResponse;
+    }
+
+    @Override
+    @CacheDistribute
+    public Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest) {
+        log.info("Entering getAllGames by page... ");
+        PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
+                pageableRequest.getAsc() ? Direction.ASC : Direction.DESC, pageableRequest.getProperty());
+        Page<Game> gamePages = gameRepository.findAll(pageRequest);
+        Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
+        log.debug("Game Counts for Game Service getAllGamesAsPages :: {}", response.getSize());
+        log.info("Leaving getAllGames by page... ");
+        return response;
+    }
+
+    @Override
 //	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
 //	@Cacheable(value = GAME_ALL_RESPONSE)
 //  TODO --> Either Fix the Serialization Issue or switch to ES. 
-	public List<GameResponse> getAllGames() {
-		log.info("Entering getAllGames... ");
-		List<Game> allGames = gameRepository.findAll();
-		log.debug("Game Counts :: {}",allGames.size());
-		log.info("Leaving getAllGames... ");
-		return allGames.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
-	}
-	
+    public List<GameResponse> getAllGames() {
+        log.info("Entering getAllGames... ");
+        List<Game> allGames = gameRepository.findAll();
+        log.debug("Game Counts for Game Service getAllGames :: {}", allGames.size());
+        log.info("Leaving getAllGames... ");
+        return allGames.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
+    }
 
-	@Override
-	@RateLimiter(name = SERVICE_NAME, fallbackMethod = "gameServiceFallBackMethod")
-	@CircuitBreaker(name = SERVICE_NAME)
-	public Double getTotalCostOfGames(Set<Integer> gameIds) {
-		log.info("Entering getTotalCostOfGames ...");
-		List<Game> games = gameRepository.findAllById(gameIds);
-		if (games.isEmpty()) {
-			return 0.0;
-		}
-		double totalCost = games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
-		log.info("Leaving getTotalCostOfGames ...");
-		return totalCost;
-	}
 
-	@Override
-	public List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery) {
-		log.info("Fetching Game By Prefix ...");
-		List<GameName> games = gameRepository.findByGameNameStartsWith(gameNameQuery, GameName.class);
-		log.info("Fetched Game By Prefix ...");
-		return games;
-	}
+    @Override
+    @RateLimiter(name = SERVICE_NAME, fallbackMethod = "gameServiceFallBackMethod")
+    @CircuitBreaker(name = SERVICE_NAME)
+    public Double getTotalCostOfGames(Set<String> gameIds) {
+        log.info("Entering getTotalCostOfGames ...");
+        List<Game> games = gameRepository.findAllById(gameIds);
+        if (games.isEmpty()) {
+            return 0.0;
+        }
+        double totalCost = games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
+        log.info("Leaving getTotalCostOfGames ...");
+        return totalCost;
+    }
 
-	@Override
-	@CircuitBreaker(name = SERVICE_NAME)
-	@KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
-    @Caching(evict = {@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true),	@CacheEvict(value = GAME_RESPONSE, allEntries = true)})
-	public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
-		Set<Integer> gameIds = discountPlacedEvent.getGameIds();
-		Double discountValue = discountPlacedEvent.getDiscountValue();
-		log.info("Update Request For {} with value {}", gameIds, discountValue);
-		List<Game> games = gameRepository.findAllById(gameIds);
-		if (games.isEmpty()) {
-			log.error("No Games Found with the provided Ids...");
-			throw new GameNotFoundException("No Games Found");
-		}
-		games.forEach(game -> game.setGameDiscount(discountValue));
-	    games.forEach(game -> 	log.info("Updated Discounts of game {} with ID :: {} is {}%",game.getGameName(),game.getGameID(),game.getGameDiscount()));
-		games = gameRepository.saveAll(games);
-		log.info("Leaving Update Game Discount Request......");
-		return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
-	}
+    @Override
+    public List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery) {
+        log.info("Fetching Game By Prefix ...");
+        List<GameName> games = gameRepository.findByGameNameStartsWith(gameNameQuery, GameName.class);
+        log.info("Fetched Game By Prefix ...");
+        return games;
+    }
 
-	public Double gameServiceFallBackMethod(Throwable ex) {
-		log.error(ex.getMessage());
-		log.info("Entering Game Service Fall Back Method ...");
-		throw new TooManyRequestException("REQUEST_OVERLOADED");
-	}
+    @Override
+    @CircuitBreaker(name = SERVICE_NAME)
+    @KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
+    @Caching(evict = {@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true), @CacheEvict(value = GAME_RESPONSE, allEntries = true)})
+    public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
+        Set<String> gameIds = discountPlacedEvent.getGameIds();
+        Double discountValue = discountPlacedEvent.getDiscountValue();
+        log.info("Update Request For {} with value {}", gameIds, discountValue);
+        List<Game> games = gameRepository.findAllById(gameIds);
+        if (games.isEmpty()) {
+            log.error("No Games Found with the provided Ids...");
+            throw new GameNotFoundException("No Games Found");
+        }
+        games.forEach(game -> game.setGameDiscount(discountValue));
+        games.forEach(game -> log.info("Updated Discounts of game {} with ID :: {} is {}%", game.getGameName(), game.getGameId(), game.getGameDiscount()));
+        games = gameRepository.saveAll(games);
+        log.info("Leaving Update Game Discount Request......");
+        return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
+    }
 
-	@Override
-	public List<GameName> getAllGameNameWithIds(Set<Integer> gameIds) {
-		return gameRepository.findByGameIDIn(gameIds, GameName.class);
-	}
+    public Double gameServiceFallBackMethod(Throwable ex) {
+        log.error(ex.getMessage());
+        log.info("Entering Game Service Fall Back Method ...");
+        throw new TooManyRequestException("REQUEST_OVERLOADED");
+    }
+
+    @Override
+    public List<GameName> getAllGameNameWithIds(Set<String> gameIds) {
+        return gameRepository.findByGameIDIn(gameIds, GameName.class);
+    }
 
 }
