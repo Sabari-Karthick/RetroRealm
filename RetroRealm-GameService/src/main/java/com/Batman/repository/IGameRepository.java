@@ -10,5 +10,5 @@ import com.Batman.projections.View;
 
 public interface IGameRepository extends JpaRepository<Game, String>{
 	<T extends View> List<T> findByGameNameStartsWith(String namePrefix,Class<T> clazz);
-	<T extends View> List<T> findByGameIDIn(Set<String> gameIds,Class<T> clazz);
+	<T extends View> List<T> findByGameIdIn(Set<String> gameIds,Class<T> clazz);
 }

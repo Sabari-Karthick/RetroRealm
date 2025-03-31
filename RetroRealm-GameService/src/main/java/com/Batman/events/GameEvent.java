@@ -10,7 +10,12 @@ import lombok.Setter;
 @Setter
 public class GameEvent extends CrudEvent<Game> {
 
-    public GameEvent(Object source, Game game, CrudAction crudAction) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public GameEvent(Object source, Game game, CrudAction crudAction) {
         super(source, game, crudAction);
     }
 }

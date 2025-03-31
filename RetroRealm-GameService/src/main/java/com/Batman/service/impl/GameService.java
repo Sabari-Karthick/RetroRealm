@@ -176,7 +176,7 @@ public class GameService implements IGameService {
 
     @Override
     public List<GameName> getAllGameNameWithIds(Set<String> gameIds) {
-        return gameRepository.findByGameIDIn(gameIds, GameName.class);
+        return gameRepository.findByGameIdIn(gameIds, GameName.class);
     }
 
 }

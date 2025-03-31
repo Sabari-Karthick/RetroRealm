@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CartService implements ICartService {
 
+	private static final String USER_CART_IS_EMPTY = "USER_CART_IS_EMPTY";
+
 	private final ICartRespository cartRepository;
 
 	private final GameFeignClinet gameFeignClinet;
@@ -93,7 +95,7 @@ public class CartService implements ICartService {
 		
 		
 		Cart cart = cartRepository.findByUserId(userId)
-				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
+				.orElseThrow(() -> new NoCartAvailableException(USER_CART_IS_EMPTY));
 		log.info("Leaving Get Cart of User {} ...",userId);
 		return cart;
 	}
@@ -117,7 +119,7 @@ public class CartService implements ICartService {
 				return cartRepository.save(cart);
 			}
 		} else {
-			throw new NoCartAvailableException("USER_CART_IS_EMPTY");
+			throw new NoCartAvailableException(USER_CART_IS_EMPTY);
 		}
 		return userCartOptional.get();
 	}
@@ -150,7 +152,7 @@ public class CartService implements ICartService {
 				return cartRepository.save(cart);
 			}
 		} else {
-			throw new NoCartAvailableException("USER_CART_IS_EMPTY");
+			throw new NoCartAvailableException(USER_CART_IS_EMPTY);
 		}
 		return userCartOptional.get();
 	}
@@ -159,7 +161,7 @@ public class CartService implements ICartService {
 	public CartValueResponse getCartItems(Integer userId) {
 		log.info("Entering getCartItems ...");
 		Cart cart = cartRepository.findByUserId(userId)
-				.orElseThrow(() -> new NoCartAvailableException("USER_CART_IS_EMPTY"));
+				.orElseThrow(() -> new NoCartAvailableException(USER_CART_IS_EMPTY));
 		CartValueResponse cartValueResponse = new CartValueResponse(cart.getSelectedCartItems(), cart.getTotalPrice());
 		log.info("Leaving getCartItems ...");
 		return cartValueResponse;
