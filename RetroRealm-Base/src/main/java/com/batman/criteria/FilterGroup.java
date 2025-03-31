@@ -1,9 +1,9 @@
 package com.batman.criteria;
 
-import lombok.Data;
+import org.springframework.util.Assert;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.Assert;
 
 /**
  * FilterGroup represents a group of filter conditions combined with a logical operator.

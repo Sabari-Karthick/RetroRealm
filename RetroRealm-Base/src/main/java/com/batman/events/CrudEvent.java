@@ -12,7 +12,12 @@ import org.springframework.context.ApplicationEvent;
 @ToString
 public class CrudEvent<T extends BaseModel> extends ApplicationEvent {
 
-    private final T baseModel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private final transient T baseModel;
 
     private final CrudAction crudAction;
 

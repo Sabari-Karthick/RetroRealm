@@ -1,6 +1,5 @@
 package com.batman.criteria;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
