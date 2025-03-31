@@ -12,6 +12,6 @@ public class CartRequest {
 	private Integer userId;
 	
 	@NotNull(message = "Game Id cannot be Empty")
-	private Integer  gameId;
+	private String  gameId;
 
 }

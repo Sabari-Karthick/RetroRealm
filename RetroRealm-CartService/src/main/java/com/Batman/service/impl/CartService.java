@@ -24,7 +24,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service("Cart Service")
+@Service("cartService")
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
@@ -34,7 +34,7 @@ public class CartService implements ICartService {
 
 	private final GameFeignClinet gameFeignClinet;
 	
-	private static final String SERVICE_NAME = "cartService";
+	private static final String SERVICE_NAME = "cart-service";
 
 	@Override
 	public Cart addToCart(CartRequest cartRequest, BindingResult bindingResult) {
@@ -47,14 +47,14 @@ public class CartService implements ICartService {
 
 
 		Integer userId = cartRequest.getUserId();
-		Integer newCartItem = cartRequest.getGameId();
+		String newCartItem = cartRequest.getGameId();
 
 		Optional<Cart> userCartOptional = cartRepository.findByUserId(userId);
 		Cart cart;
 		if (userCartOptional.isPresent()) {
 			cart = userCartOptional.get();
-			Set<Integer> cartItems = cart.getCartItems();
-			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
+			Set<String> cartItems = cart.getCartItems();
+			Set<String> selectedCartItems = cart.getSelectedCartItems();
 			if (!cartItems.contains(newCartItem)) {
 				cartItems.add(newCartItem);
 				selectedCartItems.add(newCartItem);
@@ -70,8 +70,8 @@ public class CartService implements ICartService {
 			log.info("Cart Already Contains the Game ...");
 			return cart;
 		} else {
-			Set<Integer> cartItems = new HashSet<>();
-			Set<Integer> selectedCartItems = new HashSet<>();
+			Set<String> cartItems = new HashSet<>();
+			Set<String> selectedCartItems = new HashSet<>();
 			cartItems.add(newCartItem);
 			selectedCartItems.add(newCartItem);
 			cart = Cart.builder().userId(userId).cartItems(cartItems).selectedCartItems(selectedCartItems)
@@ -99,13 +99,13 @@ public class CartService implements ICartService {
 	}
 
 	@Override
-	public Cart removeItemFromCart(Integer userId, Integer gameId) {
+	public Cart removeItemFromCart(Integer userId, String gameId) {
 		Optional<Cart> userCartOptional = cartRepository.findByUserId(userId);
 		Cart cart;
 		if (userCartOptional.isPresent()) {
 			cart = userCartOptional.get();
-			Set<Integer> cartItems = cart.getCartItems();
-			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
+			Set<String> cartItems = cart.getCartItems();
+			Set<String> selectedCartItems = cart.getSelectedCartItems();
 			if (cartItems.contains(gameId)) {
 				if (selectedCartItems.contains(gameId)) {
 					selectedCartItems.remove(gameId);
@@ -123,7 +123,7 @@ public class CartService implements ICartService {
 	}
 
 	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
-	private Double calculatePrice(Set<Integer> gameIds) {
+	private Double calculatePrice(Set<String> gameIds) {
 		log.info("Sending Get Total Price Request For Game Service ...");
 		 Double totalPrice = gameFeignClinet.getTotalPrice(gameIds);
 		 log.info("Leaving Get Total Price Request For Game Service ...");
@@ -131,13 +131,13 @@ public class CartService implements ICartService {
 	}
 
 	@Override
-	public Cart updateSelectedItemsCart(Integer userId, Integer gameId) {
+	public Cart updateSelectedItemsCart(Integer userId, String gameId) {
 		Optional<Cart> userCartOptional = cartRepository.findByUserId(userId);
 		Cart cart;
 		if (userCartOptional.isPresent()) {
 			cart = userCartOptional.get();
-			Set<Integer> cartItems = cart.getCartItems();
-			Set<Integer> selectedCartItems = cart.getSelectedCartItems();
+			Set<String> cartItems = cart.getCartItems();
+			Set<String> selectedCartItems = cart.getSelectedCartItems();
 			if (cartItems.contains(gameId)) {
 				if (selectedCartItems.contains(gameId)) {
 					selectedCartItems.remove(gameId);

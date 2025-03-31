@@ -9,6 +9,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CartValueResponse {
-	Set<Integer> cartItems;
+	Set<String> cartItems;
 	Double totalPrice;
 }

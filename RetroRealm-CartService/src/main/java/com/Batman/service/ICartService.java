@@ -7,9 +7,14 @@ import com.Batman.dto.cart.CartValueResponse;
 import com.Batman.entity.Cart;
 
 public interface ICartService {
-       Cart addToCart(CartRequest cartRequest,BindingResult bindingResult);
-       Cart getCartOfUser(Integer userId);
-       Cart removeItemFromCart(Integer userId,Integer gameId);
-       Cart updateSelectedItemsCart(Integer userId,Integer gameId);
-       CartValueResponse getCartItems(Integer userId);
+	
+	Cart addToCart(CartRequest cartRequest, BindingResult bindingResult);
+
+	Cart getCartOfUser(Integer userId);
+
+	Cart removeItemFromCart(Integer userId, String gameId);
+
+	Cart updateSelectedItemsCart(Integer userId, String gameId);
+
+	CartValueResponse getCartItems(Integer userId);
 }

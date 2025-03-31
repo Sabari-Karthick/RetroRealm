@@ -20,51 +20,49 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
-
-
 @RestController
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
 public class CartController {
-	
-	private final  ICartService cartService;
-	
+
+	private final ICartService cartService;
+
 	/**
 	 * Service Name needs to be in an standard across all the services
 	 * 
 	 */
-	private static final String SERVICE_NAME = "cartService";
-	
+	private static final String SERVICE_NAME = "cart-service";
+
 	@PostMapping("/add")
 	@RateLimiter(name = SERVICE_NAME)
-	public ResponseEntity<?> addItemToCart(@Valid @RequestBody final CartRequest cartRequest,BindingResult bindingResult) {
-		return new ResponseEntity<>( cartService.addToCart(cartRequest, bindingResult),HttpStatus.CREATED);
+	public ResponseEntity<?> addItemToCart(@Valid @RequestBody final CartRequest cartRequest,
+			BindingResult bindingResult) {
+		return new ResponseEntity<>(cartService.addToCart(cartRequest, bindingResult), HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<?> getUserCart(@PathVariable @NotNull(message="user Id cannot be empty") final Integer userId){
+	public ResponseEntity<?> getUserCart(
+			@PathVariable @NotNull(message = "user Id cannot be empty") final Integer userId) {
 		return ResponseEntity.ok(cartService.getCartOfUser(userId));
 	}
-	
+
 	@GetMapping("/value/{userId}")
-	public ResponseEntity<?> getUserCartValue(@PathVariable @NotNull(message="user Id cannot be empty")  final Integer userId){
-		 return ResponseEntity.ok(cartService.getCartItems(userId));
+	public ResponseEntity<?> getUserCartValue(
+			@PathVariable @NotNull(message = "user Id cannot be empty") final Integer userId) {
+		return ResponseEntity.ok(cartService.getCartItems(userId));
 	}
-	
+
 	@PatchMapping("user/{userId}/remove/{gameId}")
-	public ResponseEntity<?> removeItemFromCart(@NotNull(message="user Id cannot be empty") final Integer userId,@PathVariable @NotNull(message="game Id cannot be empty") final Integer gameId){
-		return ResponseEntity.ok(cartService.removeItemFromCart(userId,gameId));
+	public ResponseEntity<?> removeItemFromCart(@NotNull(message = "user Id cannot be empty") final Integer userId,
+			@PathVariable @NotNull(message = "game Id cannot be empty") final String gameId) {
+		return ResponseEntity.ok(cartService.removeItemFromCart(userId, gameId));
 	}
-	
-	
+
 	@PutMapping("user/{userId}/update/{gameId}")
-	public  ResponseEntity<?> updateCart(@PathVariable final  @NotNull(message="user Id cannot be empty")  Integer userId,@PathVariable  @NotNull(message="game Id cannot be empty")  final Integer gameId){
-		return ResponseEntity.ok(cartService.updateSelectedItemsCart(userId,gameId));
+	public ResponseEntity<?> updateCart(
+			@PathVariable final @NotNull(message = "user Id cannot be empty") Integer userId,
+			@PathVariable @NotNull(message = "game Id cannot be empty") final String gameId) {
+		return ResponseEntity.ok(cartService.updateSelectedItemsCart(userId, gameId));
 	}
-	
-	
-	
-	
-	
 
 }

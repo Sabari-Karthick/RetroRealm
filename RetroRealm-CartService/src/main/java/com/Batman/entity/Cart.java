@@ -37,11 +37,11 @@ public class Cart {
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "cart_items",joinColumns = @JoinColumn(name="cart_id",referencedColumnName = "cartId"))
-	private Set<Integer> cartItems;
+	private Set<String> cartItems;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "selected_cart_items",joinColumns = @JoinColumn(name="cart_id",referencedColumnName = "cartId"))
-	private Set<Integer> selectedCartItems;
+	private Set<String> selectedCartItems;
 	
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
