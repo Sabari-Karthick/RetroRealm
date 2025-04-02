@@ -10,11 +10,14 @@ import java.util.Set;
 
 import com.Batman.events.GameEvent;
 import com.batman.constants.CrudAction;
+import com.batman.elastic.IRetroESBaseRepository;
+import com.batman.helpers.BaseHelper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -25,7 +28,7 @@ import org.springframework.validation.FieldError;
 
 import com.Batman.annotations.CacheDistribute;
 import com.Batman.constants.KafkaConstants;
-import com.Batman.dto.PageableRequestDto;
+import com.Batman.dto.PageableRequest;
 import com.Batman.dto.events.DiscountPlacedEvent;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
@@ -55,6 +58,8 @@ public class GameService implements IGameService {
     private final IGameRepository gameRepository;
 
     private final IGameOwnerRepository gameOwnerRepository;
+
+    private final IRetroESBaseRepository<Game> gameEsRepository;
 
     private final CommonMapper mapper;
 
@@ -102,11 +107,10 @@ public class GameService implements IGameService {
 
     @Override
     @CacheDistribute
-    public Page<GameResponse> getAllGamesAsPages(PageableRequestDto pageableRequest) {
+    public Page<GameResponse> getAllGamesAsPages(PageableRequest pageableRequest) {
         log.info("Entering getAllGames by page... ");
-        PageRequest pageRequest = PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(),
-                pageableRequest.getAsc() ? Direction.ASC : Direction.DESC, pageableRequest.getProperty());
-        Page<Game> gamePages = gameRepository.findAll(pageRequest);
+        List<Game> games = gameEsRepository.findAll(BaseHelper.getQueryConditionsFromFilters(pageableRequest.getFilters()), pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Game.class);
+        Page<Game> gamePages = new PageImpl<>(games, PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Direction.ASC, pageableRequest.getSortField()), games.size());
         Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
         log.debug("Game Counts for Game Service getAllGamesAsPages :: {}", response.getSize());
         log.info("Leaving getAllGames by page... ");

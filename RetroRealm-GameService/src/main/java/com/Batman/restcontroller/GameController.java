@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Batman.dto.PageableRequestDto;
+import com.Batman.dto.PageableRequest;
 import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.dto.gameowner.GameOwnerRequest;
@@ -59,8 +59,9 @@ public class GameController {
 	}
 
 	@PostMapping("/all")
-	public ResponseEntity<?> fetchAllGames(@RequestBody(required = false) PageableRequestDto pageableRequest) {
-		return ResponseEntity.ok(gameService.getAllGames());
+	public ResponseEntity<?> fetchAllGames(@RequestBody(required = false) PageableRequest pageableRequest) {
+		return ResponseEntity.ok(gameService.getAllGamesAsPages(pageableRequest));
+//		return ResponseEntity.ok(gameService.getAllGames());
 	}
 
 	@GetMapping("/calculate/price")

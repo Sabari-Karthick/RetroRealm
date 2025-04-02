@@ -7,6 +7,8 @@ import java.util.Set;
 import com.Batman.annotations.GameId;
 import com.Batman.enums.GameGenre;
 import com.batman.model.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -58,10 +60,15 @@ public class Game extends BaseModel {
 	@Enumerated(EnumType.STRING)
 	private Set<GameGenre> gameGenre;
 
-	public double getDiscountedGamePrice() {
-		return this.gamePrice * (1 - this.gameDiscount / 100.0);
-	}
+    @JsonProperty("discountedGamePrice") 
+    public double getDiscountedGamePrice() {
+        return this.gamePrice * (1 - this.gameDiscount / 100.0);
+    }
 
+    @JsonIgnore 
+    public void setDiscountedGamePrice(double value){
+        //This is just a dummy setter, and is ignored.
+    }
 	@Override
 	public String getPrimaryKeyValue() {
 		return this.gameId;

@@ -23,7 +23,8 @@ public class CrudEventListener<T extends BaseModel> {
         CrudAction crudAction = event.getCrudAction();
         log.info("Received Event for {} for Model {}", crudAction, model.getClass());
         if (crudAction == CrudAction.CREATE) {
-            retroEsRepository.save(model);
+            T save = retroEsRepository.save(model);
+            log.info("Document Indexed Successfully with ID :: {}", save.getPrimaryKeyValue());
         }
         log.info("Exiting CrudEventListener onCrudEvent ...");
     }

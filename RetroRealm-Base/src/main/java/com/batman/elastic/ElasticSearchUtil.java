@@ -56,13 +56,16 @@ public final class ElasticSearchUtil {
 
         List<EsFilterGroup> queries = convertFilterComponentsToEsFilterGroups(filterComponents);
 
-        return new SearchRequest.Builder().query(buildQuery(queries)).size(size).from(start)
-                .index(indexName).build();
+        SearchRequest.Builder searchRequestBuilder = new SearchRequest.Builder().size(size).from(start).index(indexName);
+        if(!CollectionUtils.isEmpty(queries)){
+            searchRequestBuilder.query(buildQuery(queries));
+        }
+        log.info("Exiting ElasticSearchUtil buildSearchRequest ...");
+        return searchRequestBuilder.build();
 
     }
 
     private static Function<Query.Builder, ObjectBuilder<Query>> buildQuery(List<EsFilterGroup> esFilterGroups) {
-        log.info("Entering ElasticSearchUtil buildQuery ...");
         List<Query> allQueries = esFilterGroups.stream()
                 .flatMap(group -> group.getQueries().stream())
                 .toList();
