@@ -1,14 +1,14 @@
 package com.Batman.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import com.Batman.annotations.GameId;
 import com.Batman.enums.GameGenre;
 import com.batman.model.BaseModel;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -32,73 +32,68 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "gameName" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"gameName"}))
 public class Game extends BaseModel {
 
-	public Game() {
-		this.setIndexName("idx_game");
-	}
+    public Game() {
+        this.setIndexName("idx_game");
+        this.setFlattenFieldsConfig(Map.of("gameOwner", List.of("gameOwnerID", "companyName", "email")));
+    }
 
-	@Id
-	@GameId
-	private String gameId;
+    @Id
+    @GameId
+    private String gameId;
 
-	private String gameName;
-	@ManyToOne
-	@JoinColumn(name = "game_owner_id", nullable = false)
-	private GameOwner gameOwner;
-	@Column(nullable = false)
-	private Double gamePrice;
-	private Double gameVersion;
-	private LocalDate gameReleasedDate;
-	private Double gameDiscount;
-	private String gameDescription;
-	private Double gameRating;
+    private String gameName;
+    @ManyToOne
+    @JoinColumn(name = "game_owner_id", nullable = false)
+    private GameOwner gameOwner;
+    @Column(nullable = false)
+    private Double gamePrice;
+    private Double gameVersion;
+    private LocalDate gameReleasedDate;
+    private Double gameDiscount;
+    private String gameDescription;
+    private Double gameRating;
 
-	@ElementCollection(targetClass = GameGenre.class, fetch = FetchType.EAGER)
-	@CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id", referencedColumnName = "gameID"))
-	@Enumerated(EnumType.STRING)
-	private Set<GameGenre> gameGenre;
+    @ElementCollection(targetClass = GameGenre.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id", referencedColumnName = "gameID"))
+    @Enumerated(EnumType.STRING)
+    private Set<GameGenre> gameGenre;
 
-    @JsonProperty("discountedGamePrice") 
     public double getDiscountedGamePrice() {
         return this.gamePrice * (1 - this.gameDiscount / 100.0);
     }
 
-    @JsonIgnore 
-    public void setDiscountedGamePrice(double value){
-        //This is just a dummy setter, and is ignored.
+    @Override
+    public String getPrimaryKeyValue() {
+        return this.gameId;
     }
-	@Override
-	public String getPrimaryKeyValue() {
-		return this.gameId;
-	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(gameDescription, gameDiscount, gameGenre, gameId, gameName, gameOwner,
-				gamePrice, gameRating, gameReleasedDate, gameVersion);
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(gameDescription, gameDiscount, gameGenre, gameId, gameName, gameOwner,
+                gamePrice, gameRating, gameReleasedDate, gameVersion);
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Game other = (Game) obj;
-		return Objects.equals(gameDescription, other.gameDescription)
-				&& Objects.equals(gameDiscount, other.gameDiscount) && Objects.equals(gameGenre, other.gameGenre)
-				&& Objects.equals(gameId, other.gameId) && Objects.equals(gameName, other.gameName)
-				&& Objects.equals(gameOwner, other.gameOwner) && Objects.equals(gamePrice, other.gamePrice)
-				&& Objects.equals(gameRating, other.gameRating)
-				&& Objects.equals(gameReleasedDate, other.gameReleasedDate)
-				&& Objects.equals(gameVersion, other.gameVersion);
-	}
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Game other = (Game) obj;
+        return Objects.equals(gameDescription, other.gameDescription)
+                && Objects.equals(gameDiscount, other.gameDiscount) && Objects.equals(gameGenre, other.gameGenre)
+                && Objects.equals(gameId, other.gameId) && Objects.equals(gameName, other.gameName)
+                && Objects.equals(gameOwner, other.gameOwner) && Objects.equals(gamePrice, other.gamePrice)
+                && Objects.equals(gameRating, other.gameRating)
+                && Objects.equals(gameReleasedDate, other.gameReleasedDate)
+                && Objects.equals(gameVersion, other.gameVersion);
+    }
 }

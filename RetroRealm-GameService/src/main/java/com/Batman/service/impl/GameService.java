@@ -10,6 +10,7 @@ import java.util.Set;
 
 import com.Batman.events.GameEvent;
 import com.batman.constants.CrudAction;
+import com.batman.criteria.Sort;
 import com.batman.elastic.IRetroESBaseRepository;
 import com.batman.helpers.BaseHelper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -109,8 +110,7 @@ public class GameService implements IGameService {
     @CacheDistribute
     public Page<GameResponse> getAllGamesAsPages(PageableRequest pageableRequest) {
         log.info("Entering getAllGames by page... ");
-        List<Game> games = gameEsRepository.findAll(BaseHelper.getQueryConditionsFromFilters(pageableRequest.getFilters()), pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Game.class);
-        Page<Game> gamePages = new PageImpl<>(games, PageRequest.of(pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Direction.ASC, pageableRequest.getSortField()), games.size());
+        Page<Game> gamePages =  gameEsRepository.getAllByPage(BaseHelper.getQueryConditionsFromFilters(pageableRequest.getFilters()),BaseHelper.buildSort(pageableRequest.getSortField(),pageableRequest.isAsc()), pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Game.class);
         Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
         log.debug("Game Counts for Game Service getAllGamesAsPages :: {}", response.getSize());
         log.info("Leaving getAllGames by page... ");

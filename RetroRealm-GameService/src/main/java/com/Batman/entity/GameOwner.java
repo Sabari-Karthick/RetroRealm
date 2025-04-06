@@ -23,6 +23,7 @@ public class GameOwner {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer gameOwnerID;
+
 	@Column(unique = true)
 	private String companyName;
 	
