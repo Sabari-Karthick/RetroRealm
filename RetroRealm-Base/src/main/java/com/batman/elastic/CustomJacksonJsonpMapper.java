@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 
-public class CustomJacksonpMapper extends JacksonJsonpMapper{
+public class CustomJacksonJsonpMapper extends JacksonJsonpMapper{
 
-	public CustomJacksonpMapper(ObjectMapper mapper) {
+	public CustomJacksonJsonpMapper(ObjectMapper mapper) {
 		super(mapper);
 	}
 

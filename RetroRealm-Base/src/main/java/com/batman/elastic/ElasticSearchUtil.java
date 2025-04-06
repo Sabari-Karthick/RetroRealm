@@ -1,6 +1,8 @@
 package com.batman.elastic;
 
+import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.ObjectBuilder;
@@ -10,6 +12,7 @@ import com.batman.exception.InternalException;
 import com.batman.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.query.SortDirection;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 
@@ -46,7 +49,7 @@ public final class ElasticSearchUtil {
         }
     }
 
-    public static SearchRequest buildSearchRequest(List<FilterComponent> filterComponents, int start, int size, Class<? extends BaseModel> clazz) {
+    public static SearchRequest buildSearchRequest(List<FilterComponent> filterComponents,Sort sort, int start, int size, Class<? extends BaseModel> clazz) {
         log.info("Entering ElasticSearchUtil buildSearchRequest ...");
         String indexName = getIndexName(clazz);
         String type = getTypeForModel(clazz);
@@ -59,6 +62,11 @@ public final class ElasticSearchUtil {
         SearchRequest.Builder searchRequestBuilder = new SearchRequest.Builder().size(size).from(start).index(indexName);
         if(!CollectionUtils.isEmpty(queries)){
             searchRequestBuilder.query(buildQuery(queries));
+        }
+        if(sort!=null){
+            SortDirection direction = sort.getDirection();
+            SortOrder sortOrder = direction.equals(SortDirection.ASCENDING) ? SortOrder.Asc : SortOrder.Desc;
+            searchRequestBuilder.sort(s -> s.field(FieldSort.of(fs -> fs.field(sort.getField()).order(sortOrder))));
         }
         log.info("Exiting ElasticSearchUtil buildSearchRequest ...");
         return searchRequestBuilder.build();

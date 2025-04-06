@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import com.batman.criteria.Sort;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import com.batman.criteria.FilterComponent;
@@ -28,9 +32,9 @@ public class RetroEsRepository<T extends BaseModel> implements IRetroESBaseRepos
     private final ElasticSearchClientConfiguration elasticSearchClientConfiguration;
 
     @Override
-    public List<T> findAll(List<FilterComponent> filterComponents, int start, int size, Class<T> clazz) {
+    public List<T> findAll(List<FilterComponent> filterComponents,Sort sort, int start, int size, Class<T> clazz) {
         log.info("Entering ElasticSearchRepository find All ...");
-        SearchRequest searchRequest = ElasticSearchUtil.buildSearchRequest(filterComponents, start, size, clazz);
+        SearchRequest searchRequest = ElasticSearchUtil.buildSearchRequest(filterComponents,sort, start, size, clazz);
         try {
             SearchResponse<T> searchResponse = elasticSearchClientConfiguration.getElasticsearchClient()
                     .search(searchRequest, clazz);
@@ -45,6 +49,16 @@ public class RetroEsRepository<T extends BaseModel> implements IRetroESBaseRepos
             throw new InternalException(e.getMessage());
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public Page<T> getAllByPage(List<FilterComponent> filterComponents, Sort sort, int start, int size, Class<T> clazz) {
+        log.info("Entering ElasticSearchRepository getAppByPage ...");
+        List<T> results = findAll(filterComponents,sort, start, size, clazz);
+        log.info("Result Count :: {}",results.size());
+        Page<T> page = new PageImpl<>(results, PageRequest.of(start, size), results.size());
+        log.info("Exiting ElasticSearchRepository getAppByPage ...");
+        return page;
     }
 
     @Override

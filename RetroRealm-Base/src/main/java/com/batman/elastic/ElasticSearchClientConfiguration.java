@@ -63,7 +63,7 @@ public class ElasticSearchClientConfiguration {
 //                });
 
 			restClient = builder.build();
-			ElasticsearchTransport transport = new RestClientTransport(restClient, new CustomJacksonpMapper(mapper));
+			ElasticsearchTransport transport = new RestClientTransport(restClient, new CustomJacksonJsonpMapper(mapper));
 			elasticsearchClient = new ElasticsearchClient(transport);
 
 			log.info("Elasticsearch Client initialized successfully.");
