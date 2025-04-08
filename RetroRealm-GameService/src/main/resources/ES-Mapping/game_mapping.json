@@ -1,0 +1,98 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ngram_analyzer": {
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "normalizer": {
+          "lowercase_normalizer": {
+            "type": "custom",
+            "filter": [
+              "lowercase"
+            ]
+          }
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "gameId": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "gameName": {
+        "type": "text",
+        "analyzer": "ngram_analyzer",
+        "search_analyzer": "standard",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "gameOwner_gameOwnerID": {
+        "type": "long"
+      },
+      "gameOwner_companyName": {
+        "type": "text",
+        "analyzer": "ngram_analyzer",
+        "search_analyzer": "standard",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "gameOwner_email": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "gamePrice": {
+        "type": "double"
+      },
+      "gameVersion": {
+        "type": "integer"
+      },
+      "gameReleasedDate": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "gameDiscount": {
+        "type": "integer"
+      },
+      "gameDescription": {
+        "type": "text"
+      },
+      "gameRating": {
+        "type": "double"
+      },
+      "gameGenre": {
+        "type": "keyword"
+      }
+    }
+  }
+}
