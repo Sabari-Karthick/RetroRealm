@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>Batman</groupId>
-	<artifactId>RetroRealmPaymentService</artifactId>
+	<artifactId>RetroRealm-PaymentService</artifactId>
 	<version>1.0</version>
-	<packaging>war</packaging>
-	<name>RetroRealmPaymentService</name>
+	<packaging>jar</packaging>
+	<name>RetroRealm-PaymentService</name>
 	<description>A Digital Game Selling Platform Payment Service </description>
 	<properties>
 		<java.version>17</java.version>
