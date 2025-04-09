@@ -10,6 +10,6 @@ public class GameConstants {
        public static final String GAME_RESPONSE = "gameResponse";
        public static final String GAME_PAGE_RESPONSE = "gamePageResponse";
        public static final String GAME_ALL_RESPONSE = "gameAllResponse";
-       
-       
+       public static final String GAME_INDEX_NAME = "idx_game";
+
 }

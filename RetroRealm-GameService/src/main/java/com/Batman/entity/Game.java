@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.Batman.annotations.GameId;
+import com.Batman.constants.GameConstants;
 import com.Batman.enums.GameGenre;
 import com.batman.model.BaseModel;
 
@@ -27,6 +28,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.Batman.constants.GameConstants.GAME_INDEX_NAME;
+import static com.Batman.constants.GameConstants.GAME_OWNER;
+
 @Entity
 @AllArgsConstructor
 @Getter
@@ -36,8 +40,8 @@ import lombok.ToString;
 public class Game extends BaseModel {
 
     public Game() {
-        this.setIndexName("idx_game");
-        this.setFlattenFieldsConfig(Map.of("gameOwner", List.of("gameOwnerID", "companyName", "email")));
+        this.setIndexName(GAME_INDEX_NAME);
+        this.setFlattenFieldsConfig(Map.of(GAME_OWNER, List.of("gameOwnerID", "companyName", "email")));
     }
 
     @Id

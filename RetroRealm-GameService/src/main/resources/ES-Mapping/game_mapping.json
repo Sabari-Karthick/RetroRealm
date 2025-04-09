@@ -7,20 +7,20 @@
           "filter": [
             "lowercase"
           ]
-        },
-        "normalizer": {
-          "lowercase_normalizer": {
-            "type": "custom",
-            "filter": [
-              "lowercase"
-            ]
-          }
+        }
+      },
+      "normalizer": {
+        "lowercase_normalizer": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ]
         }
       },
       "tokenizer": {
         "ngram_tokenizer": {
           "type": "edge_ngram",
-          "min_gram": 2,
+          "min_gram": 1,
           "max_gram": 20,
           "token_chars": [
             "letter",
