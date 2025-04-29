@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -124,7 +125,8 @@ public class CartService implements ICartService {
 		return userCartOptional.get();
 	}
 
-	@Retry(name = SERVICE_NAME,fallbackMethod = "retryFallback")
+	@Retry(name = SERVICE_NAME)
+	@CircuitBreaker(name = SERVICE_NAME,fallbackMethod = "retryFallback")
 	private Double calculatePrice(Set<String> gameIds) {
 		log.info("Sending Get Total Price Request For Game Service ...");
 		 Double totalPrice = gameFeignClinet.getTotalPrice(gameIds);
