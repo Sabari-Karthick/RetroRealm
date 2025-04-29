@@ -1,4 +1,4 @@
-package com.Batman.helper;
+package com.batman.helpers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -18,8 +18,5 @@ public class CommonMapper {
     public <T, S> S convertToResponse(T data, Class<S> type) {
         return mapper.map(data, type);
     }
-
-   
-
 
 }
