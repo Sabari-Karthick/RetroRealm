@@ -1,7 +1,6 @@
 package com.Batman.service.impl;
 
 import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
-//import static com.Batman.constants.GameConstants.GAME_ALL_RESPONSE;
 import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
@@ -10,20 +9,18 @@ import java.util.Set;
 
 import com.Batman.events.GameEvent;
 import com.batman.constants.CrudAction;
-import com.batman.criteria.Sort;
 import com.batman.elastic.IRetroESBaseRepository;
 import com.batman.helpers.BaseHelper;
+import com.batman.helpers.CommonMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -39,7 +36,6 @@ import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
 import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.TooManyRequestException;
-import com.Batman.helper.CommonMapper;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.repository.IGameRepository;
@@ -107,7 +103,6 @@ public class GameService implements IGameService {
     }
 
     @Override
-    @CacheDistribute
     public Page<GameResponse> getAllGamesAsPages(PageableRequest pageableRequest) {
         log.info("Entering getAllGames by page... ");
         Page<Game> gamePages =  gameEsRepository.getAllByPage(BaseHelper.getQueryConditionsFromFilters(pageableRequest.getFilters()),BaseHelper.buildSort(pageableRequest.getSortField(),pageableRequest.isAsc()), pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Game.class);
@@ -118,29 +113,17 @@ public class GameService implements IGameService {
     }
 
     @Override
-//	@Cacheable(value = GAME_ALL_RESPONSE,key = "T(com.Batman.constants.GameConstants).GAME_ALL_RESPONSE")
-//	@Cacheable(value = GAME_ALL_RESPONSE)
-//  TODO --> Either Fix the Serialization Issue or switch to ES. 
-    public List<GameResponse> getAllGames() {
-        log.info("Entering getAllGames... ");
-        List<Game> allGames = gameRepository.findAll();
-        log.debug("Game Counts for Game Service getAllGames :: {}", allGames.size());
-        log.info("Leaving getAllGames... ");
-        return allGames.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
-    }
-
-
-    @Override
-    @RateLimiter(name = SERVICE_NAME, fallbackMethod = "gameServiceFallBackMethod")
-    @CircuitBreaker(name = SERVICE_NAME)
     public Double getTotalCostOfGames(Set<String> gameIds) {
-        log.info("Entering getTotalCostOfGames ...");
+        log.info("Entering GameService getTotalCostOfGames ...");
+        log.debug("Game Ids :: {}",gameIds);
         List<Game> games = gameRepository.findAllById(gameIds);
-        if (games.isEmpty()) {
-            return 0.0;
+        if (CollectionUtils.isEmpty(games)) {
+            log.error("Game Ids are not found in the system for Ids {}",gameIds);
+            throw new GameNotFoundException("GAME_NOT_FOUND_FOR_ID");
         }
         double totalCost = games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
-        log.info("Leaving getTotalCostOfGames ...");
+        log.debug("Total Cost Calculated :: {}",totalCost);
+        log.info("Leaving GameService getTotalCostOfGames ...");
         return totalCost;
     }
 
