@@ -13,7 +13,6 @@ import com.Batman.dto.gameowner.GameOwnerResponse;
 import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.AlreadyExistsException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
-import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.VerificationMissingException;
 import com.Batman.repository.IGameOwnerRepository;
 import com.Batman.service.IGameOwnerService;

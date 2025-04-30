@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.util.CollectionUtils;
 
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 
 import lombok.extern.slf4j.Slf4j;
 

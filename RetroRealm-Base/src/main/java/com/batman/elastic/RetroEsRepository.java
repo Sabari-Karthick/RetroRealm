@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import com.batman.criteria.FilterComponent;
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 import com.batman.model.BaseModel;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;

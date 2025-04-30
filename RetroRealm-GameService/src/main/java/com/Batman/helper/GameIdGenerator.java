@@ -4,7 +4,7 @@ import java.io.Serial;
 import java.time.Year;
 import java.util.Properties;
 
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.MappingException;

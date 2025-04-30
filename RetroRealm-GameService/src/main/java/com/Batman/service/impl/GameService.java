@@ -1,7 +1,5 @@
 package com.Batman.service.impl;
 
-import static com.Batman.constants.GameConstants.GAME_PAGE_RESPONSE;
-import static com.Batman.constants.GameConstants.GAME_RESPONSE;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,22 +7,19 @@ import java.util.Set;
 
 import com.Batman.events.GameEvent;
 import com.batman.constants.CrudAction;
+import com.batman.dao.BaseSqlDao;
 import com.batman.elastic.IRetroESBaseRepository;
+import com.batman.exception.wrapper.InputFieldException;
 import com.batman.helpers.BaseHelper;
 import com.batman.helpers.CommonMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
-import com.Batman.annotations.CacheDistribute;
 import com.Batman.constants.KafkaConstants;
 import com.Batman.dto.PageableRequest;
 import com.Batman.dto.events.DiscountPlacedEvent;
@@ -34,29 +29,24 @@ import com.Batman.entity.Game;
 import com.Batman.entity.GameOwner;
 import com.Batman.exception.wrapper.GameNotFoundException;
 import com.Batman.exception.wrapper.GameOwnerNotFoundException;
-import com.Batman.exception.wrapper.InputFieldException;
 import com.Batman.exception.wrapper.TooManyRequestException;
 import com.Batman.projections.GameName;
 import com.Batman.repository.IGameOwnerRepository;
-import com.Batman.repository.IGameRepository;
 import com.Batman.service.IGameService;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service("gameService")
 @RequiredArgsConstructor
-@Transactional
-@Slf4j
 public class GameService implements IGameService {
-
-    private final IGameRepository gameRepository;
 
     private final IGameOwnerRepository gameOwnerRepository;
 
     private final IRetroESBaseRepository<Game> gameEsRepository;
+
+    private final BaseSqlDao<Game,String> gameDao;
 
     private final CommonMapper mapper;
 
@@ -65,8 +55,6 @@ public class GameService implements IGameService {
     private static final String SERVICE_NAME = "game-service";
 
     @Override
-    @CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true)
-    @CacheDistribute
     public GameResponse registerGame(GameRequest gameRequest, BindingResult bindingResult) {
         log.info("Entering Game Service Register Game ...");
         if (bindingResult.hasErrors()) {
@@ -81,7 +69,7 @@ public class GameService implements IGameService {
         Game game = mapper.convertToEntity(gameRequest, Game.class);
         game.setGameOwner(gameOwner);
         game.setGameDiscount(0.0);
-        Game savedGame = gameRepository.save(game);
+        Game savedGame = gameDao.save(game);
         log.info("Game Saved With Id :: {}", savedGame.getGameId());
         GameResponse gameResponse = mapper.convertToResponse(savedGame, GameResponse.class);
         GameEvent gameEvent = new GameEvent(this, savedGame, CrudAction.CREATE);
@@ -91,11 +79,9 @@ public class GameService implements IGameService {
     }
 
     @Override
-    @Cacheable(value = GAME_RESPONSE, key = "#gameId")
-    @CacheDistribute
     public GameResponse searchById(String gameId) {
         log.info("Entering get Game By Id for Id :: {}", gameId);
-        Game game = gameRepository.findById(gameId)
+        Game game = gameDao.getById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("GAME_NOT_FOUND_FOR_ID"));
         GameResponse gameResponse = mapper.convertToResponse(game, GameResponse.class);
         log.info("Leaving Get Game By Id ...");
@@ -116,7 +102,7 @@ public class GameService implements IGameService {
     public Double getTotalCostOfGames(Set<String> gameIds) {
         log.info("Entering GameService getTotalCostOfGames ...");
         log.debug("Game Ids :: {}",gameIds);
-        List<Game> games = gameRepository.findAllById(gameIds);
+        List<Game> games = gameDao.getAllByIds(gameIds);
         if (CollectionUtils.isEmpty(games)) {
             log.error("Game Ids are not found in the system for Ids {}",gameIds);
             throw new GameNotFoundException("GAME_NOT_FOUND_FOR_ID");
@@ -128,29 +114,26 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Deprecated
     public List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery) {
-        log.info("Fetching Game By Prefix ...");
-        List<GameName> games = gameRepository.findByGameNameStartsWith(gameNameQuery, GameName.class);
-        log.info("Fetched Game By Prefix ...");
-        return games;
+//        return gameRepository.findByGameNameStartsWith(gameNameQuery, GameName.class);
+          return null;
     }
 
     @Override
-    @CircuitBreaker(name = SERVICE_NAME)
     @KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
-    @Caching(evict = {@CacheEvict(value = GAME_PAGE_RESPONSE, allEntries = true), @CacheEvict(value = GAME_RESPONSE, allEntries = true)})
     public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
         Set<String> gameIds = discountPlacedEvent.getGameIds();
         Double discountValue = discountPlacedEvent.getDiscountValue();
         log.info("Update Request For {} with value {}", gameIds, discountValue);
-        List<Game> games = gameRepository.findAllById(gameIds);
+        List<Game> games = gameDao.getAllByIds(gameIds);
         if (games.isEmpty()) {
             log.error("No Games Found with the provided Ids...");
             throw new GameNotFoundException("No Games Found");
         }
         games.forEach(game -> game.setGameDiscount(discountValue));
         games.forEach(game -> log.info("Updated Discounts of game {} with ID :: {} is {}%", game.getGameName(), game.getGameId(), game.getGameDiscount()));
-        games = gameRepository.saveAll(games);
+        games = gameDao.saveAll(games);
         log.info("Leaving Update Game Discount Request......");
         return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
     }
@@ -162,8 +145,10 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Deprecated
     public List<GameName> getAllGameNameWithIds(Set<String> gameIds) {
-        return gameRepository.findByGameIdIn(gameIds, GameName.class);
+//        return gameRepository.findByGameIdIn(gameIds, GameName.class);
+        return null;
     }
 
 }

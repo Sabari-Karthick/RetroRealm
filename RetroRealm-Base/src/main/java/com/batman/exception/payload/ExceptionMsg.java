@@ -1,6 +1,7 @@
-package com.Batman.exception.payload;
+package com.batman.exception.payload;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 public final class ExceptionMsg  implements Serializable {
 	
+	@Serial
 	private static final long serialVersionUID = 1L;
 	
 	@JsonSerialize(using = ZonedDateTimeSerializer.class)

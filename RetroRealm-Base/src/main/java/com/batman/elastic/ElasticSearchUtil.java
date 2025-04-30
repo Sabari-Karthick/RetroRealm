@@ -8,7 +8,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.ObjectBuilder;
 import com.batman.constants.DefaultBaseConstants;
 import com.batman.criteria.*;
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 import com.batman.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

@@ -1,6 +1,6 @@
 package com.batman.elastic;
 
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 import com.batman.model.BaseModel;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;

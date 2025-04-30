@@ -144,9 +144,10 @@ public class GameController {
 	 * @return List of game names.
 	 */
 
+	@Deprecated
 	@GetMapping("/names")
 	public List<String> getNamesByGameId(@RequestParam("ids[]") final Set<String> gameIds) {
-		return gameService.getAllGameNameWithIds(gameIds).stream().map(GameName::getGameName).toList();
+		throw new UnsupportedOperationException("DEPRECATED_SERVICE");
 	}
 
 	/**
@@ -157,9 +158,10 @@ public class GameController {
 	 * @return ResponseEntity with status OK(200) containing the suggested game names.
 	 */
 
+	@Deprecated
 	@GetMapping("/search")
 	public ResponseEntity<?> suggestGame(@RequestParam("name") final String gameName) {
-		return ResponseEntity.ok(gameService.suggestAllGameNameWithPrefix(gameName));
+		throw new UnsupportedOperationException("DEPRECATED_SERVICE");
 	}
 
 }

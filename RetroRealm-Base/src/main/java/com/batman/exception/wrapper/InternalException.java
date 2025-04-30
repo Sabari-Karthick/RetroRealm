@@ -1,4 +1,4 @@
-package com.batman.exception;
+package com.batman.exception.wrapper;
 
 public class InternalException extends RuntimeException {
 	

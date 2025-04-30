@@ -10,7 +10,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.stereotype.Component;
 
-import com.batman.exception.InternalException;
+import com.batman.exception.wrapper.InternalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
