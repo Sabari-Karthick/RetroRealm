@@ -1,4 +1,4 @@
-package com.Batman;
+package com.Batman.dao;
 
 import com.Batman.annotations.CacheDistribute;
 import com.Batman.entity.Game;
