@@ -7,15 +7,25 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Year;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+@Slf4j
 public class BaseEsDeserializer<T extends BaseModel> extends StdDeserializer<T> {
-
 
     private final Class<T> clazz;
 
@@ -25,7 +35,7 @@ public class BaseEsDeserializer<T extends BaseModel> extends StdDeserializer<T> 
     }
 
     @Override
-    public T deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public T deserialize(JsonParser p, DeserializationContext deserializationContext){
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             Map<String, Object> nestedObjects = new HashMap<>();
@@ -62,6 +72,7 @@ public class BaseEsDeserializer<T extends BaseModel> extends StdDeserializer<T> 
             }
             return instance;
         } catch (Throwable throwable) {
+            log.error("Error While Deserializing :: {}",ExceptionUtils.getStackTrace(throwable));
             throw new InternalException(throwable.getMessage());
         }
     }

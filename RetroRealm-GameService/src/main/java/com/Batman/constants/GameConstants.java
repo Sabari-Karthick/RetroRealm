@@ -11,5 +11,5 @@ public class GameConstants {
        public static final String GAME_PAGE_RESPONSE = "gamePageResponse";
        public static final String GAME_ALL_RESPONSE = "gameAllResponse";
        public static final String GAME_INDEX_NAME = "idx_game";
-
+       public static final String GAME_ES_INDEX_MAPPING_FILE_NAME ="game_mapping";
 }

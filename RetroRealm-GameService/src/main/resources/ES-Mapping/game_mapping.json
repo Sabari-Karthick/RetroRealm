@@ -1,5 +1,6 @@
 {
   "settings": {
+    "index.mapping.total_fields.limit": 3000,
     "analysis": {
       "analyzer": {
         "ngram_analyzer": {

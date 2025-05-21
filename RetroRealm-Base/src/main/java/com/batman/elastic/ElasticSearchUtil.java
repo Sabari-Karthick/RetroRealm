@@ -12,6 +12,7 @@ import com.batman.exception.wrapper.InternalException;
 import com.batman.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.query.SortDirection;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Slf4j
@@ -33,7 +35,7 @@ public final class ElasticSearchUtil {
             return baseModel.getIndexName();
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
                  InvocationTargetException e) {
-            log.error("Elastic Search Exception in getIndexName :: {}", e.getMessage());
+            log.error("Elastic Search Exception in getIndexName :: {}", ExceptionUtils.getStackTrace(e));
             throw new InternalException(e.getMessage());
         }
     }
@@ -44,7 +46,7 @@ public final class ElasticSearchUtil {
             return baseModel.getType();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
                  NoSuchMethodException e) {
-            log.error("Elastic Search Exception in getTypeForModel :: {}", e.getMessage());
+            log.error("Elastic Search Exception in getTypeForModel :: {}",ExceptionUtils.getStackTrace(e));
             throw new InternalException(e.getMessage());
         }
     }
@@ -63,7 +65,7 @@ public final class ElasticSearchUtil {
         if(!CollectionUtils.isEmpty(queries)){
             searchRequestBuilder.query(buildQuery(queries));
         }
-        if(sort!=null){
+        if(Objects.nonNull(sort)){
             SortDirection direction = sort.getDirection();
             SortOrder sortOrder = direction.equals(SortDirection.ASCENDING) ? SortOrder.Asc : SortOrder.Desc;
             searchRequestBuilder.sort(s -> s.field(FieldSort.of(fs -> fs.field(sort.getField()).order(sortOrder))));
@@ -79,7 +81,7 @@ public final class ElasticSearchUtil {
                 .toList();
         return q -> {
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-            if (!allQueries.isEmpty()) {
+            if (!CollectionUtils.isEmpty(allQueries)) {
                 boolQueryBuilder.must(allQueries);
             }
             return q.bool(boolQueryBuilder.build());
