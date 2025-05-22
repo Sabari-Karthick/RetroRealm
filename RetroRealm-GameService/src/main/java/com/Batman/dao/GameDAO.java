@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.Batman.constants.GameConstants.GAME;
 
@@ -71,6 +72,16 @@ public class GameDAO implements BaseSqlDao<Game,String> {
         log.debug("Saved Games :: {}",games);
         log.info("Leaving Game Dao saveAll ...");
         return games;
+    }
+
+    @Override
+    public Integer countAllByIdIn(Set<String> strings) {
+        log.info("Entering Game Dao countAllByIdIn ...");
+        log.debug("Game Ids are :: {}",strings);
+        Integer count = gameRepository.countAllByIdIn(strings);
+        log.debug("Fetched Count :: {}",count);
+        log.info("Leaving Game Dao countAllByIdIn ...");
+        return count;
     }
 }
 

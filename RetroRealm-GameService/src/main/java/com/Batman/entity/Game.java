@@ -41,7 +41,6 @@ public class Game extends BaseModel {
 
     public Game() {
         this.setIndexName(GAME_INDEX_NAME);
-        this.setFlattenFieldsConfig(Map.of(GAME_OWNER, List.of("gameOwnerID", "companyName", "email")));
     }
 
     @Id
@@ -99,5 +98,11 @@ public class Game extends BaseModel {
                 && Objects.equals(gameRating, other.gameRating)
                 && Objects.equals(gameReleasedDate, other.gameReleasedDate)
                 && Objects.equals(gameVersion, other.gameVersion);
+    }
+
+
+    @Override
+    public Map<String, List<String>> getFlattenFieldsConfig() {
+        return Map.of(GAME_OWNER, List.of("gameOwnerID", "companyName", "email"));
     }
 }

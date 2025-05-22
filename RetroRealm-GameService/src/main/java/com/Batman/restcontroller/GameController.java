@@ -164,4 +164,9 @@ public class GameController {
 		throw new UnsupportedOperationException("DEPRECATED_SERVICE");
 	}
 
+	@PostMapping("/validate/ids")
+	public ResponseEntity<?> validateGameIds(@RequestBody final Set<String> gameIds){
+		return ResponseEntity.ok(gameService.validateGameIds(gameIds));
+	}
+
 }

@@ -36,9 +36,9 @@ public class Discount {
 	@Enumerated(EnumType.STRING)
 	private DiscountStatus discountStatus;
 	
-	@ElementCollection(targetClass = Integer.class,fetch = FetchType.EAGER)
+	@ElementCollection(targetClass = String.class,fetch = FetchType.EAGER)
 	@CollectionTable(name = "game_ids",joinColumns = @JoinColumn(name="discount_id",referencedColumnName = "discountId"))
-	private Set<Integer> gameIds;
+	private Set<String> gameIds;
 
 	private LocalDate fromDate;
 

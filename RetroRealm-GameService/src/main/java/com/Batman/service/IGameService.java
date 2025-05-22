@@ -266,4 +266,5 @@ public interface IGameService {
     List<GameName> suggestAllGameNameWithPrefix(String gameNameQuery);
     List<GameName> getAllGameNameWithIds(Set<String> gameIds);
     List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent);
+	boolean validateGameIds(Set<String> gameIds);
 }

@@ -1,6 +1,6 @@
 package com.batman.exception.wrapper;
 
-public class InternalException extends RuntimeException {
+public class  InternalException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	

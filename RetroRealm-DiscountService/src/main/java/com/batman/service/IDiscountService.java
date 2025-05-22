@@ -10,7 +10,7 @@ import com.batman.entity.Discount;
 
 public interface IDiscountService {
     Discount createDiscount(DiscountRequest discountRequest,BindingResult bindingResult);
-    List<Discount> getDiscountByGameIds(Set<Integer> gameIds);
+    List<Discount> getDiscountByGameIds(Set<String> gameIds);
     Discount activateDiscount(Integer discountId);
     Discount deActivateDiscount(Integer discountId);
     Discount expireDiscount(Integer discountId);

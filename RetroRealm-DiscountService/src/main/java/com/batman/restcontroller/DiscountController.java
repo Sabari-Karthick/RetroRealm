@@ -28,24 +28,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DiscountController {
 
-	private final IDiscountService service;
+	private final IDiscountService discountService;
 	
 	@PostMapping("/create")
 	public ResponseEntity<?> createDiscount(@Valid @RequestBody final DiscountRequest request,BindingResult bindingResult) {
-		Discount discount = service.createDiscount(request, bindingResult);
+		Discount discount = discountService.createDiscount(request, bindingResult);
 		return new ResponseEntity<>(discount,HttpStatus.CREATED);
 	}
 	
 	
 	@GetMapping("/game/search")
-	public ResponseEntity<?> fetchDiscounts(@RequestParam final Set<Integer> gameIds ) {
-		return ResponseEntity.ok(service.getDiscountByGameIds(gameIds));
+	public ResponseEntity<?> fetchDiscounts(@RequestParam final Set<String> gameIds ) {
+		return ResponseEntity.ok(discountService.getDiscountByGameIds(gameIds));
 	}
 	
 	
 	@PatchMapping("/expire/{discountId}")
 	public ResponseEntity<?> expireDiscount(@PathVariable final Integer discountId) {
-		return ResponseEntity.ok(service.expireDiscount(discountId));
+		return ResponseEntity.ok(discountService.expireDiscount(discountId));
 	}
 	
 	

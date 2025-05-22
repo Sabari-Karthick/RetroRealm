@@ -138,6 +138,17 @@ public class GameService implements IGameService {
         return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();
     }
 
+    @Override
+    public boolean validateGameIds(Set<String> gameIds) {
+        log.info("Entering GameService validateGameIds ...");
+        log.debug("Game Ids are:: {}",gameIds);
+        boolean isValid = gameDao.existsAllById(gameIds);
+        log.debug("Is Valid :: {}",isValid);
+        log.info("Leaving GameService validateGameIds ...");
+        return isValid;
+
+    }
+
     public Double gameServiceFallBackMethod(Throwable ex) {
         log.error(ex.getMessage());
         log.info("Entering Game Service Fall Back Method ...");

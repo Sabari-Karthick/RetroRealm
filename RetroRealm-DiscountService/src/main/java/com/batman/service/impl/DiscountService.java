@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import com.batman.feignclients.GameFeignClient;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -13,6 +15,7 @@ import org.springframework.kafka.support.SendResult;
 //import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -47,6 +50,8 @@ public class DiscountService implements IDiscountService {
 
 	private final KafkaTemplate<String, DiscountPlacedEvent> kafkaTemplate;
 
+	private final GameFeignClient gameFeignClient;
+
 	@Override
 	public Discount createDiscount(DiscountRequest discountRequest, BindingResult bindingResult) {
 		log.info("Entering Create Discount ...");
@@ -77,10 +82,16 @@ public class DiscountService implements IDiscountService {
 	}
 
 	@Override
-	public List<Discount> getDiscountByGameIds(Set<Integer> gameIds) {
-		log.info("Discount Service Fetching Game Discounts For :::" + gameIds);
-		return discountRepository.findDiscountsOfGames(gameIds);
-
+	public List<Discount> getDiscountByGameIds(Set<String> gameIds) {
+		log.info("Entering Discount Service getDiscountByGameIds For :: {}",gameIds);
+		if(CollectionUtils.isEmpty(gameIds)){
+			log.error("Game Ids are Empty ....");
+			throw new IllegalArgumentException("Game Ids cannot be empty");
+		}
+		validateGameIds(gameIds);
+		List<Discount> discountsOfGames = discountRepository.findDiscountsOfGames(gameIds);
+        log.info("Leaving Discount Service getDiscountByGameIds....");
+		return null;
 	}
 
 	@Override
@@ -142,5 +153,15 @@ public class DiscountService implements IDiscountService {
 		log.info("Leaving expireDiscount ... ");
 		return discountRepository.save(discount);
 	}
+
+
+	private void validateGameIds(Set<String> gameIds) {
+		Boolean isValid = gameFeignClient.validateGameIds(gameIds).getBody();
+		if(BooleanUtils.isFalse(isValid)){
+			log.error("Game Ids are Invalid or Not Present in Game Repo");
+			throw new IllegalArgumentException("GAME_IDS_INVALID");
+		}
+ 	}
+
 
 }
