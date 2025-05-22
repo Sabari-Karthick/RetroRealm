@@ -78,7 +78,7 @@ public class GameDAO implements BaseSqlDao<Game,String> {
     public Integer countAllByIdIn(Set<String> strings) {
         log.info("Entering Game Dao countAllByIdIn ...");
         log.debug("Game Ids are :: {}",strings);
-        Integer count = gameRepository.countAllByIdIn(strings);
+        Integer count = gameRepository.countAllByGameIdIn(strings);
         log.debug("Fetched Count :: {}",count);
         log.info("Leaving Game Dao countAllByIdIn ...");
         return count;
