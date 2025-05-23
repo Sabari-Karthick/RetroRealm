@@ -1,8 +1,12 @@
 package com.batman.helpers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.batman.criteria.FilterComponent;
 import com.batman.criteria.QueryCondition;
@@ -12,7 +16,7 @@ import org.hibernate.query.SortDirection;
 import org.springframework.util.CollectionUtils;
 
 @Slf4j
-public class BaseHelper {
+public final class BaseHelper {
 
     private BaseHelper() {
     }
@@ -43,5 +47,14 @@ public class BaseHelper {
         log.info("Exiting BaseHelper buildSort ...");
         return sort;
     }
+
+    public static <T> Set<T> convertToSet(T[] elements) {
+        if (elements == null || elements.length == 0) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(Arrays.asList(elements));
+    }
+
+
 
 }

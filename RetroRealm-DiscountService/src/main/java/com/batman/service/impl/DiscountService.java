@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import com.batman.exception.wrapper.InvalidGameIdsException;
 import com.batman.feignclients.GameFeignClient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -61,7 +62,7 @@ public class DiscountService implements IDiscountService {
 		    String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Invalid input field";
 		    throw new InputFieldException(errorMessage);
 		}
-
+        validateGameIds(discountRequest.getGameIds());
 		List<Discount> list = discountRepository.findActiveDiscountsOfGames(discountRequest.getGameIds(),false);
 		if (!list.isEmpty()) {
 			throw new DiscountAlreadyExistException(
@@ -156,10 +157,14 @@ public class DiscountService implements IDiscountService {
 
 
 	private void validateGameIds(Set<String> gameIds) {
+		if(CollectionUtils.isEmpty(gameIds)){
+			log.error("Game Ids Cannot Be Empty....");
+			throw new IllegalArgumentException("Game Ids cannot be empty");
+		}
 		Boolean isValid = gameFeignClient.validateGameIds(gameIds).getBody();
 		if(BooleanUtils.isFalse(isValid)){
 			log.error("Game Ids are Invalid or Not Present in Game Repo");
-			throw new IllegalArgumentException("GAME_IDS_INVALID");
+			throw new InvalidGameIdsException("GAME_IDS_INVALID");
 		}
  	}
 

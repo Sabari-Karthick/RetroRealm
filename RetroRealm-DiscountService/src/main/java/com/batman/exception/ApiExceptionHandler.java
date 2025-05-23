@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletionException;
 
+import com.batman.exception.wrapper.InvalidGameIdsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +27,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(value = { InputFieldException.class})
 	public  ResponseEntity<ExceptionMsg> handleValidationException(final InputFieldException e) {
 
-		log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+		log.info("**ApiExceptionHandler controller, handle validation exception *");
 		final var badRequest = HttpStatus.BAD_REQUEST;
 
 		return new ResponseEntity<>(
@@ -35,7 +36,7 @@ public class ApiExceptionHandler {
 				badRequest);
 	}
 
-	@ExceptionHandler(value = {NoDiscountAvailableException.class,FailedToUpdateGameServiceException.class,DiscountAlreadyExistException.class})
+	@ExceptionHandler(value = {NoDiscountAvailableException.class,FailedToUpdateGameServiceException.class,DiscountAlreadyExistException.class, InvalidGameIdsException.class})
 	public <T extends RuntimeException> ResponseEntity<ExceptionMsg> handleApiRequestException(final T e) {
 
 		log.info("**ApiExceptionHandler controller, handle API request*\n");

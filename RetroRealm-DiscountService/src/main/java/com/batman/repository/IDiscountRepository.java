@@ -15,5 +15,5 @@ public interface IDiscountRepository extends JpaRepository<Discount, Integer> {
 	List<Discount> findDiscountsOfGames(Set<String> gameIds);
 
 	@Query( value = "Select d from Discount d join d.gameIds g where g IN :gameIds AND d.isExpired = :isExpired")
-	List<Discount> findActiveDiscountsOfGames(Set<Integer> gameIds, Boolean isExpired);
+	List<Discount> findActiveDiscountsOfGames(Set<String> gameIds, Boolean isExpired);
 }

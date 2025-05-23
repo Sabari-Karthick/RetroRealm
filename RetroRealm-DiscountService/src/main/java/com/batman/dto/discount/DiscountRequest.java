@@ -21,11 +21,11 @@ public class DiscountRequest {
 	private DiscountType discountType;
 
 	@NotEmpty(message = "Game Ids cannot be Empty")
-	private Set<Integer> gameIds;
+	private Set<String> gameIds;
 	
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@FutureOrPresent
+	@FutureOrPresent(message = "Discount From Date is not a future Value")
 	@NotNull(message = "Discount From Date cannot be null or empty")
 	private LocalDate fromDate;
 
@@ -38,7 +38,7 @@ public class DiscountRequest {
 	@NotNull(message = "Discount To Date cannot be null or empty")
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@FutureOrPresent
+	@FutureOrPresent(message = "Discount To Date is not a future Value")
 	private LocalDate toDate;
 
 	@NotNull(message = "Discount To Time cannot be null or empty")

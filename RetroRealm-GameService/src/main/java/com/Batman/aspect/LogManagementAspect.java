@@ -17,18 +17,16 @@ public class LogManagementAspect {
 
 	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..))")
 //	@Pointcut(value = "execution(* com.Batman.restcontroller.*.*(..)) /*|| execution(* com.Batman.exception.*.*(..))")
-	public void executeLogs() {
-
-	}
+	public void executeLogs() {}
 
 	@Around(value = "executeLogs()")
 	public Object logsAround(ProceedingJoinPoint joinPoint) throws Throwable {
 		String className = "CLASS: [" + joinPoint.getTarget().getClass().getSimpleName() + "],";
 		String methodName = " METHOD: [" + joinPoint.getSignature().getName() + "()],";
-		log.info("Entered" + className + "...." + methodName + ".......");
+		log.info("Entered {} ,,,,,,,,,, {} .........." ,className ,methodName);
 		Object response = joinPoint.proceed();
 
-		log.info(className + methodName + " REQUEST: ");
+		log.info("{}   {}  REQUEST: ",className,methodName);
 		if (joinPoint.getArgs().length > 0) {
 			Arrays.stream(joinPoint.getArgs()).forEach(args -> {
 				   if(args != null) log.info(args.toString());
@@ -36,7 +34,7 @@ public class LogManagementAspect {
 		} else {
 			log.info("[]");
 		}
-		log.info(className + methodName + " RESPONSE: " + response.toString());
+		log.info("{}  {}  RESPONSE: {}", className, methodName, response.toString());
 		return response;
 	}
 
