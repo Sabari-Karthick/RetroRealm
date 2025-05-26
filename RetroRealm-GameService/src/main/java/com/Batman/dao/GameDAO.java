@@ -37,12 +37,12 @@ public class GameDAO implements BaseSqlDao<Game,String> {
 
 
     @Override
-    @Cacheable(value = GAME, key = "#gameId")
+    @Cacheable(value = GAME, key = "#gameId",unless = "#result == null")
     @CacheDistribute
-    public Optional<Game> getById(String gameId) {
+    public Game getById(String gameId) {
         log.info("Entering Game Dao getById ...");
         log.debug("Game Id :: {}",gameId);
-        Optional<Game> game = gameRepository.findById(gameId);
+        Game game = gameRepository.findById(gameId).orElse(null);
         log.info("Leaving Game Dao getById ...");
         return game;
     }

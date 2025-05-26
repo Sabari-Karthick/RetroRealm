@@ -2,6 +2,7 @@ package com.Batman.service.impl;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -81,8 +82,11 @@ public class GameService implements IGameService {
     @Override
     public GameResponse searchById(String gameId) {
         log.info("Entering get Game By Id for Id :: {}", gameId);
-        Game game = gameDao.getById(gameId)
-                .orElseThrow(() -> new GameNotFoundException("GAME_NOT_FOUND_FOR_ID"));
+        Game game = gameDao.getById(gameId);
+        if(Objects.isNull(game)){
+            log.error("No Game Found for Game Id :: {}",gameId);
+            throw new GameNotFoundException("GAME_NOT_FOUND_FOR_ID");
+        }
         GameResponse gameResponse = mapper.convertToResponse(game, GameResponse.class);
         log.info("Leaving Get Game By Id ...");
         return gameResponse;

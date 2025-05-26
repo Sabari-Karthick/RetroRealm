@@ -16,7 +16,7 @@ public interface BaseSqlDao<T, ID> {
 
     T save(T model);
 
-    Optional<T> getById(ID id);
+    T getById(ID id);
 
     void delete(T model);
 
