@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Root element for the configuration -->
+<configuration>
+    
+    <!-- Includes the default Spring Boot logging configuration -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    
+    <!-- Defines a property for the application name, sourced from Spring's application.properties or application.yml -->
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+    
+    <springProperty scope="context" name="lokiURL" source="loki.url"/>
+
+    <!-- Configures a custom appender named 'LOKI' that sends logs to a Loki instance -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        
+        <!-- HTTP configuration for the Loki appender -->
+        <http>
+            <!-- The URL of the Loki server to which logs are pushed -->
+            <url>${lokiURL}</url>
+        </http>
+
+        <!-- Formatting options for the logs sent to Loki -->
+        <format>
+            <!-- Labels to include with each log message -->
+            <label>
+                <!-- Log label pattern: includes the application name, hostname, and log level -->
+                <pattern>application=${appName},host=${HOSTNAME},level=%level</pattern>
+            </label>
+            <!-- Message format pattern: uses the file log pattern defined elsewhere -->
+            <message>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </message>
+            <!-- Ensures logs are sorted by their timestamp before being sent to Loki -->
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
+
+    <!-- Sets the root logging level and attaches the 'LOKI' appender -->
+    <root level="INFO">
+        <appender-ref ref="LOKI"/>
+    </root>
+</configuration>

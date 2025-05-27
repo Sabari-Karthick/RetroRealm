@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AppConfig {
 
 	@Bean
-	RedisRateLimiter rateLimter() {
+	RedisRateLimiter rateLimiter() {
 		return new RedisRateLimiter(10, 20, 1);
 	}
 

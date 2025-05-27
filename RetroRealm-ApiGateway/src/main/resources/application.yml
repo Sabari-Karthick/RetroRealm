@@ -112,7 +112,7 @@ spring:
         filters:
         - name: RequestRateLimiter
           args:
-            rate-limiter: "#{@rateLimter}"
+            rate-limiter: "#{@rateLimiter}"
             key-resolver: "#{@proxyKeyResolver}"
       - id: discount-route
         predicates:
@@ -121,7 +121,7 @@ spring:
         filters:
         - name: RequestRateLimiter
           args:
-            rate-limiter: "#{@rateLimter}"
+            rate-limiter: "#{@rateLimiter}"
             key-resolver: "#{@proxyKeyResolver}"
   main:
     web-application-type: reactive 
@@ -141,7 +141,12 @@ springdoc:
 jwt:
   header: Authorization
   secret: ${jwt.secret}
-  expiration: 604800      
+  expiration: 604800
+logging:
+  pattern:
+    correlation: [${spring.application.name:},%X{traceId:-},%X{spanId:-}]
+loki:
+  url : ${LOG_URL:http://localhost:3100/loki/api/v1/push}
 #logging:
 #  level:
 #    org:
