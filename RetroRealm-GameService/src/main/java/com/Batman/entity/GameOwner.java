@@ -31,6 +31,7 @@ public class GameOwner {
 	private String email;
 	
 	@OneToMany(mappedBy = "gameOwner",cascade = CascadeType.ALL)
+//	@JsonSerialize(using = CustomCollectionSerializer.class)
 	private List<Game> games;
 	
 	private Boolean isVerified;

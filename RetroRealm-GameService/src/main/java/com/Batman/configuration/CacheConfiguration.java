@@ -2,6 +2,7 @@ package com.Batman.configuration;
 
 import java.time.Duration;
 
+import com.batman.helpers.CustomRedisJsonSerializer;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ public class CacheConfiguration {
 	RedisCacheConfiguration redisCacheConfiguration() { // Default Configuration for Redis-cache
 		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(60)).disableCachingNullValues()
 				.serializeValuesWith(RedisSerializationContext.SerializationPair
-						.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+						.fromSerializer(new CustomRedisJsonSerializer()));
 
 	}
 
