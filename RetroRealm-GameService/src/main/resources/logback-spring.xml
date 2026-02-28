@@ -38,6 +38,10 @@
 
     <!-- Sets the root logging level and attaches the 'LOKI' appender -->
     <root level="INFO">
-        <appender-ref ref="LOKI"/>
+        <springProfile name="prod">
+            <appender-ref ref="LOKI"/>
+        </springProfile>
+
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

@@ -95,6 +95,12 @@ public class GameService implements IGameService {
     @Override
     public Page<GameResponse> getAllGamesAsPages(PageableRequest pageableRequest) {
         log.info("Entering getAllGames by page... ");
+
+        if(Objects.isNull(pageableRequest)){
+            log.warn("Game Service :: getAllGamesAsPages received null pageableRequest, initializing with default values.");
+            pageableRequest = new PageableRequest();
+        }
+
         Page<Game> gamePages =  gameEsRepository.getAllByPage(BaseHelper.getQueryConditionsFromFilters(pageableRequest.getFilters()),BaseHelper.buildSort(pageableRequest.getSortField(),pageableRequest.isAsc()), pageableRequest.getPageNumber(), pageableRequest.getPageSize(), Game.class);
         Page<GameResponse> response = gamePages.map(game -> mapper.convertToResponse(game, GameResponse.class));
         log.debug("Game Counts for Game Service getAllGamesAsPages :: {}", response.getSize());

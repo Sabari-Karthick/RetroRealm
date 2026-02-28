@@ -2,6 +2,7 @@ package com.Batman.dto;
 
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -10,5 +11,6 @@ public class PageableRequest {
 	int pageSize = 5;
 	boolean asc = true;
 	String sortField = "gamePrice";
-	Map<String,Object> filters;
+	Map<String,Object> filters = new HashMap<>();
+
 }

@@ -4,6 +4,8 @@ import java.time.Duration;
 
 import com.batman.helpers.CustomRedisJsonSerializer;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -13,6 +15,11 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import static com.Batman.constants.GameConstants.GAME_OWNER;
 
 @Configuration
+@EnableCaching
+@ConditionalOnProperty(
+		name = "app.cache.enabled",
+		havingValue = "true"
+)
 public class CacheConfiguration {
 
 	@Bean

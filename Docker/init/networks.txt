@@ -1,2 +1,3 @@
 docker network create kafka-network
 docker network create retro-main
+docker network create elastic-net
