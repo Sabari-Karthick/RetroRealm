@@ -82,9 +82,6 @@
         "type": "date",
         "format": "yyyy-MM-dd"
       },
-      "gameDiscount": {
-        "type": "integer"
-      },
       "gameDescription": {
         "type": "text"
       },
