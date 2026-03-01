@@ -53,8 +53,8 @@ public class CartController {
 	}
 
 	@PatchMapping("user/{userId}/remove/{gameId}")
-	public ResponseEntity<?> removeItemFromCart(@NotNull(message = "user Id cannot be empty") final Integer userId,
-			@PathVariable @NotNull(message = "game Id cannot be empty") final String gameId) {
+	public ResponseEntity<?> removeItemFromCart(@PathVariable @NotNull(message = "user Id cannot be empty") final Integer userId,
+                                                @PathVariable @NotNull(message = "game Id cannot be empty") final String gameId) {
 		return ResponseEntity.ok(cartService.removeItemFromCart(userId, gameId));
 	}
 

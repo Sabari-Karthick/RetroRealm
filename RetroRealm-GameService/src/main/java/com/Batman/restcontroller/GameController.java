@@ -19,7 +19,6 @@ import com.Batman.dto.game.GameRequest;
 import com.Batman.dto.game.GameResponse;
 import com.Batman.dto.gameowner.GameOwnerRequest;
 import com.Batman.dto.gameowner.GameOwnerResponse;
-import com.Batman.projections.GameName;
 import com.Batman.service.IGameOwnerService;
 import com.Batman.service.IGameService;
 
@@ -74,13 +73,13 @@ public class GameController {
 	/**
 	 * Endpoint to retrieve a game by its ID.
 	 *
-	 * @param id The ID of the game to retrieve.
+	 * @param gameId The ID of the game to retrieve.
 	 * @return ResponseEntity with status OK(200) containing the game details.
 	 */
 
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getGameById(@PathVariable final String id) {
-		return ResponseEntity.ok(gameService.searchById(id));
+	@GetMapping("/{gameId}")
+	public ResponseEntity<GameResponse> getGameById(@PathVariable final String gameId) {
+		return ResponseEntity.ok(gameService.searchById(gameId));
 	}
 
 
@@ -132,8 +131,9 @@ public class GameController {
 	 */
 
 	@GetMapping("/calculate/price")
+	@Deprecated
 	public ResponseEntity<?> getCostOfGames(@RequestParam("ids[]") final Set<String> gameIds) {
-		return ResponseEntity.ok(gameService.getTotalCostOfGames(gameIds));
+		return new ResponseEntity<>("DEPRECATED_SERVICE", HttpStatus.GONE);
 	}
 
 	/**

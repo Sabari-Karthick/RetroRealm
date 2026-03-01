@@ -69,7 +69,6 @@ public class GameService implements IGameService {
                 .orElseThrow(() -> new GameOwnerNotFoundException("OWNER_NOT_FOUND_FOR_ID"));
         Game game = mapper.convertToEntity(gameRequest, Game.class);
         game.setGameOwner(gameOwner);
-        game.setGameDiscount(0.0);
         Game savedGame = gameDao.save(game);
         log.info("Game Saved With Id :: {}", savedGame.getGameId());
         GameResponse gameResponse = mapper.convertToResponse(savedGame, GameResponse.class);
@@ -117,7 +116,9 @@ public class GameService implements IGameService {
             log.error("Game Ids are not found in the system for Ids {}",gameIds);
             throw new GameNotFoundException("GAME_NOT_FOUND_FOR_ID");
         }
-        double totalCost = games.stream().mapToDouble(Game::getDiscountedGamePrice).sum();
+
+        // TO-DO :: Redesign this logic
+        double totalCost = 0.0;
         log.debug("Total Cost Calculated :: {}",totalCost);
         log.info("Leaving GameService getTotalCostOfGames ...");
         return totalCost;
@@ -130,6 +131,7 @@ public class GameService implements IGameService {
           return null;
     }
 
+    // No need for Event to update the Discount and should be fetched by the stateful info from the database.
     @Override
     @KafkaListener(topics = KafkaConstants.TOPIC, groupId = KafkaConstants.GROUP_ID)
     public List<GameResponse> updateDiscountOfGames(DiscountPlacedEvent discountPlacedEvent) {
@@ -141,8 +143,7 @@ public class GameService implements IGameService {
             log.error("No Games Found with the provided Ids...");
             throw new GameNotFoundException("No Games Found");
         }
-        games.forEach(game -> game.setGameDiscount(discountValue));
-        games.forEach(game -> log.info("Updated Discounts of game {} with ID :: {} is {}%", game.getGameName(), game.getGameId(), game.getGameDiscount()));
+        games.forEach(game -> log.info("Updated Discounts of game {} with ID :: {} is", game.getGameName(), game.getGameId()));
         games = gameDao.saveAll(games);
         log.info("Leaving Update Game Discount Request......");
         return games.stream().map(game -> mapper.convertToResponse(game, GameResponse.class)).toList();

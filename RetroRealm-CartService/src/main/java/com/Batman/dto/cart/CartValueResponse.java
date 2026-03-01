@@ -1,7 +1,8 @@
 package com.Batman.dto.cart;
 
-import java.util.Set;
+import java.util.List;
 
+import com.Batman.entity.CartItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,6 +10,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CartValueResponse {
-	Set<String> cartItems;
+	List<CartItem> cartItems;
 	Double totalPrice;
 }

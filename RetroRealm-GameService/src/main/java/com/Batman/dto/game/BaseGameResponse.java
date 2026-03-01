@@ -24,12 +24,7 @@ public class BaseGameResponse {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	private LocalDate gameReleasedDate;
-	private Double gameDiscount;
 	private Set<GameGenre> gameGenre;
-	
-	public double getDiscountedGamePrice() {
-	    return this.gamePrice * (1 - this.gameDiscount / 100.0);
-	}
-	
+
 	
 }
