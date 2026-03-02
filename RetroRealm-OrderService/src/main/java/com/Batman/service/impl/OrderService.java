@@ -64,9 +64,9 @@ public class OrderService implements IOrderService {
         Integer userId = orderRequest.getUserId();
         log.debug("Placing User Id for User Id :: {}", userId);
 
-        CartValueResponse userCartValue = fetchCartDetails(userId);
-
-        validateOrderDetailsWithCartDetails(orderRequest, userCartValue);
+//        CartValueResponse userCartValue = fetchCartDetails(userId);
+//
+//        validateOrderDetailsWithCartDetails(orderRequest, userCartValue);
 
         Order orderEntity = Order.builder().orderItems(orderRequest.getGameIds()).userId(orderRequest.getUserId())
                 .orderPrice(orderRequest.getTotalPrice()).paymentType(orderRequest.getPaymentType())
